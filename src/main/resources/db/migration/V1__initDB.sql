@@ -12,7 +12,7 @@ create table if not exists employees (
 	employee_id int primary key not null,
 	name varchar(255) not null,
 	date_of_birth date,
-	gender ENUM('male','female'),
+	gender ENUM('MALE','FEMALE'),
 	graduation_date date,
 	salary float(2),
 	department_id int not null,
