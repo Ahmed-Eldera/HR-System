@@ -39,7 +39,11 @@ public class EmployeeServiceUnitTest {
         when(employeeMapper.toEntity(employeeRequestDTO)).thenReturn(emp);
         when(employeeRepository.save(emp)).thenReturn(emp);
         when(employeeMapper.toDTO(emp).thenReturn(employeeResponseDTO));
+
+        //act
         Employee result = employeeService.addEmployee(employeeRequestDTO);
+
+        //assert
         assertEquals(result.getEmployeeID(),employeeResponseDTO.getEmployeeID());
         assertEquals(result.getName(),employeeResponseDTO.getName());
     }
