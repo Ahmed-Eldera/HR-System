@@ -5,7 +5,9 @@ import com.orange.hr.dto.EmployeeResponseDTO;
 import com.orange.hr.entity.Department;
 import com.orange.hr.entity.Employee;
 import com.orange.hr.entity.Team;
+import org.springframework.stereotype.Component;
 
+@Component
 public class EmployeeMapper {
     public Employee toEntity(EmployeeRequestDTO dto){
 //        Employee entity = new Employee(dto.getEmployeeId(),dto.getName(),dto.getDateOfBirth(),dto.getGender(),dto.getGraduationDate(),dto.getSalary(),dept,manager,team);
