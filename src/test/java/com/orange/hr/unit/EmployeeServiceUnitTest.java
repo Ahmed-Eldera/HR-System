@@ -11,6 +11,7 @@ import com.orange.hr.entity.Team;
 import com.orange.hr.enums.Gender;
 import com.orange.hr.exceptions.NoSuchDepartmentFound;
 import com.orange.hr.exceptions.NoSuchManagerFound;
+import com.orange.hr.exceptions.NoSuchTeamFound;
 import com.orange.hr.mapper.EmployeeMapper;
 import com.orange.hr.repository.DepartmentRepository;
 import com.orange.hr.repository.EmployeeRepository;
@@ -115,11 +116,12 @@ public class EmployeeServiceUnitTest {
         when(employeeRepository.findById(employeeRequestDTO.getManagerId())).thenReturn(manager);
 
         //act&assert
-        NoSuchManagerFound exception =  assertThrows( NoSuchManagerFound.class,()->employeeService.addEmployee(employeeRequestDTO));
-        assertEquals(exception.getMessage(),"Can't find the Selected Manager");
+        NoSuchManagerFound exception = assertThrows(NoSuchManagerFound.class, () -> employeeService.addEmployee(employeeRequestDTO));
+        assertEquals(exception.getMessage(), "Can't find the Selected Manager");
 
     }
-        @Test
+
+    @Test
     public void addEmployee_givenInValidDataWithDepartmentNotPresent_shouldThrowException() {
 
         //Arrange
@@ -128,8 +130,23 @@ public class EmployeeServiceUnitTest {
         Optional<Department> department = Optional.empty();
         when(departmentRepository.findById(employeeRequestDTO.getDepartmentId())).thenReturn(department);
         //act&assert
-        NoSuchDepartmentFound exception =  assertThrows( NoSuchDepartmentFound.class,()->employeeService.addEmployee(employeeRequestDTO));
-        assertEquals(exception.getMessage(),"Can't find the Selected Department");
+        NoSuchDepartmentFound exception = assertThrows(NoSuchDepartmentFound.class, () -> employeeService.addEmployee(employeeRequestDTO));
+        assertEquals(exception.getMessage(), "Can't find the Selected Department");
+
+    }
+        @Test
+    public void addEmployee_givenInValidDataWithTeamNotPresent_shouldThrowException() {
+
+        //Arrange
+        EmployeeRequestDTO employeeRequestDTO = new EmployeeRequestDTO(1, "ahmed ELdera", LocalDate.of(2003, 2, 18), Gender.MALE, LocalDate.of(2026, 4, 12), 1000, 1, 1, 1, null);
+        EmployeeResponseDTO employeeResponseDTO = new EmployeeResponseDTO(1, "ahmed ELdera", LocalDate.of(2003, 2, 18), Gender.MALE, LocalDate.of(2026, 4, 12), 1000, new DepartmentDTO(1, "dept 1"), null, new TeamDTO(1, "team 1"), null);
+        Optional<Department> department = Optional.of(new Department(1, "abc"));
+        Optional<Team> team = Optional.empty();
+        when(departmentRepository.findById(employeeRequestDTO.getDepartmentId())).thenReturn(department);
+        when(teamRepository.findById(employeeRequestDTO.getTeamId())).thenReturn(team);
+        //act&assert
+        NoSuchTeamFound exception = assertThrows(NoSuchTeamFound.class, () -> employeeService.addEmployee(employeeRequestDTO));
+        assertEquals(exception.getMessage(), "Can't find the Selected Team");
 
     }
 }
