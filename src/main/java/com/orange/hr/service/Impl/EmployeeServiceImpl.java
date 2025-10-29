@@ -5,6 +5,7 @@ import com.orange.hr.dto.EmployeeResponseDTO;
 import com.orange.hr.entity.Department;
 import com.orange.hr.entity.Employee;
 import com.orange.hr.entity.Team;
+import com.orange.hr.exceptions.NoSuchDepartmentFound;
 import com.orange.hr.exceptions.NoSuchManagerFound;
 import com.orange.hr.mapper.EmployeeMapper;
 import com.orange.hr.repository.DepartmentRepository;
@@ -29,7 +30,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     public EmployeeResponseDTO addEmployee(EmployeeRequestDTO employee) {
 
-        Department dept = departmentRepository.findById(employee.getDepartmentId()).get();
+        Department dept = departmentRepository.findById(employee.getDepartmentId()).orElseThrow(()->new NoSuchDepartmentFound("Can't find the Selected Department"));
         Team team = teamRepository.findById(employee.getTeamId()).get();
         Optional<Employee> manager = employeeRepository.findById(employee.getManagerId());
         Employee entity = employeeMapper.toEntity(employee);
