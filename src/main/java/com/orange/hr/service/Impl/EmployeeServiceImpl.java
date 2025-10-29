@@ -5,6 +5,7 @@ import com.orange.hr.dto.EmployeeResponseDTO;
 import com.orange.hr.entity.Department;
 import com.orange.hr.entity.Employee;
 import com.orange.hr.entity.Team;
+import com.orange.hr.exceptions.InValidDateException;
 import com.orange.hr.exceptions.NoSuchDepartmentFound;
 import com.orange.hr.exceptions.NoSuchManagerFound;
 import com.orange.hr.exceptions.NoSuchTeamFound;
@@ -16,6 +17,7 @@ import com.orange.hr.service.EmployeeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.Optional;
 
 @Service
@@ -41,6 +43,9 @@ public class EmployeeServiceImpl implements EmployeeService {
             entity.setManager(manager.get());
         }else if(employee.getManagerId()!=null){
             throw new NoSuchManagerFound("Can't find the Selected Manager");
+        }
+        if(employee.getDateOfBirth().isAfter(LocalDate.now())){
+            throw new InValidDateException("Birth date can't be in the future");
         }
         employeeRepository.save(entity);
         EmployeeResponseDTO responseDTO = employeeMapper.toDTO(entity);
