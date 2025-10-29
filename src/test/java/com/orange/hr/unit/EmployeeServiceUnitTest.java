@@ -9,6 +9,7 @@ import com.orange.hr.entity.Department;
 import com.orange.hr.entity.Employee;
 import com.orange.hr.entity.Team;
 import com.orange.hr.enums.Gender;
+import com.orange.hr.exceptions.NoSuchDepartmentFound;
 import com.orange.hr.exceptions.NoSuchManagerFound;
 import com.orange.hr.mapper.EmployeeMapper;
 import com.orange.hr.repository.DepartmentRepository;
@@ -116,6 +117,28 @@ public class EmployeeServiceUnitTest {
         //act&assert
         NoSuchManagerFound exception =  assertThrows( NoSuchManagerFound.class,()->employeeService.addEmployee(employeeRequestDTO));
         assertEquals(exception.getMessage(),"Can't find the Selected Manager");
+
+    }
+        @Test
+    public void addEmployee_givenInValidDataWithDepartmentNotPresent_shouldThrowException() {
+
+        //Arrange
+        EmployeeRequestDTO employeeRequestDTO = new EmployeeRequestDTO(1, "ahmed ELdera", LocalDate.of(2003, 2, 18), Gender.MALE, LocalDate.of(2026, 4, 12), 1000, 1, 1, 1, null);
+        EmployeeResponseDTO employeeResponseDTO = new EmployeeResponseDTO(1, "ahmed ELdera", LocalDate.of(2003, 2, 18), Gender.MALE, LocalDate.of(2026, 4, 12), 1000, new DepartmentDTO(1, "dept 1"), null, new TeamDTO(1, "team 1"), null);
+        Employee emp = new Employee();
+        Optional<Department> department = Optional.of(new Department(1, "abc"));
+        Optional<Team> team = Optional.of(new Team(1, "abc"));
+        Optional<Employee> manager = Optional.empty();
+        when(employeeMapper.toEntity(employeeRequestDTO)).thenReturn(emp);
+        when(employeeRepository.save(emp)).thenReturn(emp);
+        when(employeeMapper.toDTO(emp)).thenReturn(employeeResponseDTO);
+        when(departmentRepository.findById(employeeRequestDTO.getDepartmentId())).thenReturn(department);
+        when(teamRepository.findById(employeeRequestDTO.getTeamId())).thenReturn(team);
+        when(employeeRepository.findById(employeeRequestDTO.getManagerId())).thenReturn(manager);
+
+        //act&assert
+        NoSuchDepartmentFound exception =  assertThrows( NoSuchDepartmentFound.class,()->employeeService.addEmployee(employeeRequestDTO));
+        assertEquals(exception.getMessage(),"Can't find the Selected Department");
 
     }
 }
