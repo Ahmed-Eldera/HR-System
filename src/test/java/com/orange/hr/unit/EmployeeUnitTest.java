@@ -4,9 +4,10 @@ import com.orange.hr.entity.Department;
 import com.orange.hr.entity.Team;
 import com.orange.hr.entity.Employee;
 import com.orange.hr.enums.Gender;
+import com.orange.hr.repository.DepartmentRepository;
+import com.orange.hr.repository.EmployeeRepository;
+import com.orange.hr.repository.TeamRepository;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
@@ -22,7 +23,11 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 public class EmployeeUnitTest {
 
     @Autowired
-    private EmployeeRepository employeeRepository;
+    EmployeeRepository employeeRepository;
+    @Autowired
+    DepartmentRepository departmentRepository;
+    @Autowired
+    TeamRepository teamRepository;
 
 
     @Test
@@ -31,14 +36,17 @@ public class EmployeeUnitTest {
 
         //Arrange
         Employee emp = new Employee();
+        emp.setEmployeeID(1);
         emp.setName("Ahmed");
         emp.setDateOfBirth(LocalDate.of(1999, 5, 12));
         emp.setGender(Gender.MALE);
         emp.setGraduationDate(LocalDate.of(2021, 7, 1));
         emp.setSalary(500F);
-        Department department = new Department(1,"dept 1");
+        Department department = new Department(null, "dept 1");
+        departmentRepository.save(department);
         emp.setDepartment(department);
-        Team team = new Team(1,"team 1");
+        Team team = new Team(null, "team 1");
+        teamRepository.save(team);
         emp.setTeam(team);
         employeeRepository.save(emp);
         assertNotNull(emp.getEmployeeID());
