@@ -1,7 +1,9 @@
 package com.orange.hr.unit;
 
 import com.orange.hr.entity.Department;
+import com.orange.hr.entity.Team;
 import com.orange.hr.repository.DepartmentRepository;
+import com.orange.hr.repository.TeamRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -20,7 +22,7 @@ public class TeamUnitTest {
     @Test
     public void CreateTeam_WithName_ShouldReturnSavedTeam(){
         Team team = new Team(null,"Team 1");
-        assertNull(team.GetTeamId());
+        assertNull(team.getTeamId());
         teamRepository.save(team);
         assertNotNull(team.getTeamId());
         assertEquals(team.getName(),"Team 1");
