@@ -21,19 +21,21 @@ public class DepartmentUnitTest {
 
     @Test
     public void CreateDepartment_WithName_ShouldReturnSavedEntity() {
-        Department dept = new Department(null, "department 1");
+        String deptName = "Department 1";
+        Department dept = new Department(null, deptName);
         assertNull(dept.getDepartment_Id());
         dept = departmentRepository.save(dept);
         assertNotEquals(dept.getDepartment_Id(), null);
-        assertEquals(dept.getName(), "department 1");
+        assertEquals(dept.getName(), deptName);
     }
 
     @Test
     public void CreateDepartment_WithExistingName_shouldThrowException() {
-        Department dept1 = new Department(null, "department 1");
-        dept1 = departmentRepository.save(dept1);
-        Department dept2 = new Department(null, "department 1");
-        assertThrows(Exception.class,()-> departmentRepository.save(dept2));
+        String deptName = "Department 1";
+        Department dept1 = new Department(null, deptName);
+        departmentRepository.save(dept1);
+        Department dept2 = new Department(null, deptName);
+        assertThrows(Exception.class, () -> departmentRepository.save(dept2));
 
 
     }
