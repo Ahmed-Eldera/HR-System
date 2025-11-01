@@ -1,0 +1,1 @@
+alter table departments add unique (name);
