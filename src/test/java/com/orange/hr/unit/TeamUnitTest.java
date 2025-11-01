@@ -27,4 +27,11 @@ public class TeamUnitTest {
         assertNotNull(team.getTeamId());
         assertEquals(team.getName(),"Team 1");
     }
+        @Test
+    public void CreateTeam_WithExistingName_ShouldThrowException(){
+        Team team1 = new Team(null,"Team 1");
+        Team team11 = new Team(null,"Team 1");
+        teamRepository.save(team1);
+        assertThrows(Exception.class,()-> teamRepository.save(team11));
+    }
 }
