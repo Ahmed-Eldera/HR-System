@@ -1,0 +1,1 @@
+alter table teams add unique (name);
