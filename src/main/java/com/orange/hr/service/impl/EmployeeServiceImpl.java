@@ -6,6 +6,7 @@ import com.orange.hr.entity.Department;
 import com.orange.hr.entity.Employee;
 import com.orange.hr.entity.Expertise;
 import com.orange.hr.entity.Team;
+import com.orange.hr.exceptions.NoSuchEmployee;
 import com.orange.hr.mapper.EmployeeMapper;
 import com.orange.hr.repository.DepartmentRepository;
 import com.orange.hr.repository.EmployeeRepository;
@@ -37,17 +38,12 @@ public class EmployeeServiceImpl implements EmployeeService {
 
         Department dept = departmentRepository.findById(employee.getDepartmentId()).orElseThrow(() -> new RuntimeException());
         Team team = teamRepository.findById(employee.getTeamId()).orElseThrow(() -> new RuntimeException());
-        Optional<Employee> manager = employeeRepository.findById(employee.getManagerId());
+        Employee manager = employeeRepository.findById(employee.getManagerId()).orElseThrow(()-> new NoSuchEmployee("Can't find the Selected Manager"));
         Employee entity = employeeMapper.toEntity(employee);
         entity.setDepartment(dept);
         entity.setTeam(team);
-        if (manager.isPresent()) {
-            entity.setManager(manager.get());
-        } else if (employee.getManagerId() != null) {
-            throw new RuntimeException();
-        }
-        if (employee.getDateOfBirth().isAfter(LocalDate.now())) {
-            throw new RuntimeException();
+        if (employee.getManagerId()!=null) {
+            entity.setManager(manager);
         }
         List<Expertise> expertises = new ArrayList<>();
         if(employee.getExpertise()!=null) {
