@@ -7,6 +7,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
-public class NoSuchTeam extends RuntimeException{
+public class InValidDateException extends RuntimeException{
         private String message;
 }

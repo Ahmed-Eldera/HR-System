@@ -7,6 +7,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
-public class NoSuchEmployee extends RuntimeException{
+public class NoSuchEmployeeException extends RuntimeException{
         private String message;
 }

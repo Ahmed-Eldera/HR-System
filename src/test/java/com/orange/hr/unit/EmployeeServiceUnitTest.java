@@ -6,10 +6,7 @@ import com.orange.hr.entity.Department;
 import com.orange.hr.entity.Employee;
 import com.orange.hr.entity.Team;
 import com.orange.hr.enums.Gender;
-import com.orange.hr.exceptions.NoSuchDepartment;
-import com.orange.hr.exceptions.NoSuchEmployee;
-import com.orange.hr.exceptions.NoSuchExpertise;
-import com.orange.hr.exceptions.NoSuchTeam;
+import com.orange.hr.exceptions.*;
 import com.orange.hr.mapper.EmployeeMapper;
 import com.orange.hr.repository.DepartmentRepository;
 import com.orange.hr.repository.EmployeeRepository;
@@ -151,7 +148,7 @@ public class EmployeeServiceUnitTest {
         when(employeeMapper.toEntity(employeeRequestDTO)).thenReturn(emp);
 
         //act&assert
-        NoSuchEmployee exception = assertThrows(NoSuchEmployee.class, () -> employeeService.addEmployee(employeeRequestDTO));
+        NoSuchEmployeeException exception = assertThrows(NoSuchEmployeeException.class, () -> employeeService.addEmployee(employeeRequestDTO));
         assertEquals(exception.getMessage(), "Can't find the Selected Manager");
 
     }
@@ -174,7 +171,7 @@ public class EmployeeServiceUnitTest {
         when(employeeRepository.findById(1)).thenReturn(manager);
         when(expertiseRepository.existsById(3)).thenReturn(false);
         //assert
-        NoSuchExpertise exception = assertThrows(NoSuchExpertise.class, () -> employeeService.addEmployee(employeeRequestDTO));
+        NoSuchExpertiseException exception = assertThrows(NoSuchExpertiseException.class, () -> employeeService.addEmployee(employeeRequestDTO));
         assertEquals(exception.getMessage(), "Can't find the Selected Expertise");
 
     }
@@ -191,7 +188,7 @@ public class EmployeeServiceUnitTest {
         manager.get().setEmployeeID(1);
         when(departmentRepository.findById(employeeRequestDTO.getDepartmentId())).thenReturn(department);
         //assert
-        NoSuchDepartment exception = assertThrows(NoSuchDepartment.class, () -> employeeService.addEmployee(employeeRequestDTO));
+        NoSuchDepartmentException exception = assertThrows(NoSuchDepartmentException.class, () -> employeeService.addEmployee(employeeRequestDTO));
         assertEquals(exception.getMessage(), "Can't find the Selected Department");
 
     }
@@ -202,15 +199,34 @@ public class EmployeeServiceUnitTest {
         //Arrange
         EmployeeRequestDTO employeeRequestDTO = new EmployeeRequestDTO(1, "ahmed ELdera", LocalDate.of(2003, 2, 18), Gender.MALE, LocalDate.of(2026, 4, 12), 1000F, 1, 1, 1, null);
         Employee emp = new Employee();
-        Optional<Department> department = Optional.of(new Department(1,"abc"));
+        Optional<Department> department = Optional.of(new Department(1, "abc"));
         Optional<Team> team = Optional.empty();
         Optional<Employee> manager = Optional.of(new Employee());
         manager.get().setEmployeeID(1);
         when(departmentRepository.findById(employeeRequestDTO.getDepartmentId())).thenReturn(department);
         //assert
-        NoSuchTeam exception = assertThrows(NoSuchTeam.class, () -> employeeService.addEmployee(employeeRequestDTO));
+        NoSuchTeamException exception = assertThrows(NoSuchTeamException.class, () -> employeeService.addEmployee(employeeRequestDTO));
         assertEquals(exception.getMessage(), "Can't find the Selected Team");
 
+    }
+
+    @Test
+    public void addEmployee_givenInValidDataWithFutureBirthDate_shouldThrowException() {
+
+        //Arrange
+        EmployeeRequestDTO employeeRequestDTO = new EmployeeRequestDTO(1, "ahmed ELdera", LocalDate.of(2099, 2, 18), Gender.MALE, LocalDate.of(2026, 4, 12), 1000F, 1, 1, 1, null);
+        EmployeeResponseDTO employeeResponseDTO = new EmployeeResponseDTO(1, "ahmed ELdera", LocalDate.of(2003, 2, 18), Gender.MALE, LocalDate.of(2026, 4, 12), 1000F, 1, 1, 1, null);
+        Employee emp = new Employee();
+        Optional<Department> department = Optional.of(new Department(1, "dept 1"));
+        Optional<Team> team = Optional.of(new Team(1, "team 1"));
+        Optional<Employee> manager = Optional.of(new Employee());
+        when(employeeMapper.toEntity(employeeRequestDTO)).thenReturn(emp);
+        when(departmentRepository.findById(employeeRequestDTO.getDepartmentId())).thenReturn(department);
+        when(teamRepository.findById(employeeRequestDTO.getTeamId())).thenReturn(team);
+        when(employeeRepository.findById(employeeRequestDTO.getManagerId())).thenReturn(manager);
+        //act&assert
+        InValidDateException exception = assertThrows(InValidDateException.class, () -> employeeService.addEmployee(employeeRequestDTO));
+        assertEquals(exception.getMessage(), "Birth date can't be in the future");
     }
 
 

@@ -7,6 +7,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
-public class NoSuchDepartment extends RuntimeException{
+public class NoSuchTeamException extends RuntimeException{
         private String message;
 }

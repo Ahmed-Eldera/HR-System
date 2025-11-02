@@ -7,6 +7,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
-public class NoSuchExpertise extends RuntimeException{
+public class NoSuchExpertiseException extends RuntimeException{
         private String message;
 }
