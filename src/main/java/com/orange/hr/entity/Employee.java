@@ -43,4 +43,8 @@ public class Employee {
     @JoinColumn(name = "team_id", nullable = false)
     private Team team;
 
+    @ManyToOne
+    @JoinColumn(name="manager_id")
+    private Employee manager;
+
 }

@@ -88,8 +88,8 @@ public class EmployeeUnitTest {
         employee.setGender(Gender.MALE);
         employee.setGraduationDate(LocalDate.of(2021, 7, 1));
         employee.setSalary(500F);
-        manager.setDepartment(department);
-        manager.setTeam(team);
+        employee.setDepartment(department);
+        employee.setTeam(team);
         employee.setManager(manager);
         employeeRepository.save(employee);
         assertEquals(employee.getManager().getEmployeeID(), manager.getEmployeeID());
