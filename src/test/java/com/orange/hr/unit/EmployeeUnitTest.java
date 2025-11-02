@@ -15,8 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 //@Transactional
 @DataJpaTest
@@ -49,15 +48,50 @@ public class EmployeeUnitTest {
         Team team = new Team(null, "team 1");
         teamRepository.save(team);
         emp.setTeam(team);
+        //act
         employeeRepository.save(emp);
+        //assert
         assertNotNull(emp.getEmployeeID());
     }
 
     @Test
     public void CreateEmployee_givenMissingData_shouldThrowException() {
+        //arrange
         Employee emp = new Employee();
         emp.setEmployeeID(1);
         emp.setName("Ahmed");
-        assertThrows(Exception.class,()->employeeRepository.save(emp));
+        //act&assert
+        assertThrows(Exception.class, () -> employeeRepository.save(emp));
+    }
+
+    @Test
+    public void CreateEmployee_givenValidDataWithManger_ShouldReturnSavedEmployee() {
+        //Arrange
+        Employee manager = new Employee();
+        manager.setEmployeeID(1);
+        manager.setName("Ahmed");
+        manager.setDateOfBirth(LocalDate.of(1999, 5, 12));
+        manager.setGender(Gender.MALE);
+        manager.setGraduationDate(LocalDate.of(2021, 7, 1));
+        manager.setSalary(500F);
+        Department department = new Department(null, "dept 1");
+        departmentRepository.save(department);
+        manager.setDepartment(department);
+        Team team = new Team(null, "team 1");
+        teamRepository.save(team);
+        manager.setTeam(team);
+        employeeRepository.save(manager);
+        Employee employee = new Employee();
+        employee.setEmployeeID(2);
+        employee.setName("Ahmed");
+        employee.setDateOfBirth(LocalDate.of(1999, 5, 12));
+        employee.setGender(Gender.MALE);
+        employee.setGraduationDate(LocalDate.of(2021, 7, 1));
+        employee.setSalary(500F);
+        manager.setDepartment(department);
+        manager.setTeam(team);
+        employee.setManager(manager);
+        employeeRepository.save(employee);
+        assertEquals(employee.getManager().getEmployeeID(), manager.getEmployeeID());
     }
 }
