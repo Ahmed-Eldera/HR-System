@@ -7,6 +7,7 @@ import com.orange.hr.entity.Employee;
 import com.orange.hr.entity.Expertise;
 import com.orange.hr.entity.Team;
 import com.orange.hr.exceptions.NoSuchEmployee;
+import com.orange.hr.exceptions.NoSuchExpertise;
 import com.orange.hr.mapper.EmployeeMapper;
 import com.orange.hr.repository.DepartmentRepository;
 import com.orange.hr.repository.EmployeeRepository;
@@ -49,7 +50,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         if(employee.getExpertise()!=null) {
             for (Integer i : employee.getExpertise()) {
                 if (!expertiseRepository.existsById(i)) {
-//                throw new RuntimeException();
+                throw new NoSuchExpertise("Can't find the Selected Expertise");
                 }
             }
         }

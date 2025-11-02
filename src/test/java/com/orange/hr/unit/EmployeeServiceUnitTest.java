@@ -153,17 +153,14 @@ public class EmployeeServiceUnitTest {
         assertEquals(exception.getMessage(), "Can't find the Selected Manager");
 
     }
-        @Test
+
+    @Test
     public void addEmployee_givenInValidExpertise_shouldReturnException() {
 
         //Arrange
-        List<Integer> expertises = new ArrayList<>();
-        expertises.add(1);
-        expertises.add(2);
-        List<Integer> falseExpertises =  new ArrayList<>();
+        List<Integer> falseExpertises = new ArrayList<>();
         falseExpertises.add(3);
-        EmployeeRequestDTO employeeRequestDTO = new EmployeeRequestDTO(1, "ahmed ELdera", LocalDate.of(2003, 2, 18), Gender.MALE, LocalDate.of(2026, 4, 12), 1000F, 1, 1, 1, expertises);
-        EmployeeResponseDTO employeeResponseDTO = new EmployeeResponseDTO(1, "ahmed ELdera", LocalDate.of(2003, 2, 18), Gender.MALE, LocalDate.of(2026, 4, 12), 1000F, 1, 1, 1, falseExpertises);
+        EmployeeRequestDTO employeeRequestDTO = new EmployeeRequestDTO(1, "ahmed ELdera", LocalDate.of(2003, 2, 18), Gender.MALE, LocalDate.of(2026, 4, 12), 1000F, 1, 1, 1, falseExpertises);
         Employee emp = new Employee();
         Optional<Department> department = Optional.of(new Department(1, "dept 1"));
         Optional<Team> team = Optional.of(new Team(1, "team 1"));
@@ -172,14 +169,12 @@ public class EmployeeServiceUnitTest {
         when(departmentRepository.findById(employeeRequestDTO.getDepartmentId())).thenReturn(department);
         when(teamRepository.findById(employeeRequestDTO.getTeamId())).thenReturn(team);
         when(employeeMapper.toEntity(employeeRequestDTO)).thenReturn(emp);
-        when(employeeRepository.save(emp)).thenReturn(emp);
-        when(employeeMapper.toDTO(emp)).thenReturn(employeeResponseDTO);
         when(employeeRepository.findById(1)).thenReturn(manager);
-        for (Integer i : expertises) {
-            when(expertiseRepository.existsById(i)).thenReturn(true);
-        }
+        when(expertiseRepository.existsById(3)).thenReturn(false);
         //assert
-        assertThrows(NoSuchExpertise.class,()->employeeService.addEmployee(employeeRequestDTO));
+        NoSuchExpertise exception = assertThrows(NoSuchExpertise.class, () -> employeeService.addEmployee(employeeRequestDTO));
+        assertEquals(exception.getMessage(), "Can't find the Selected Expertise");
+
     }
 
 
