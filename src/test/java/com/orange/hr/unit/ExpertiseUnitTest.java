@@ -1,7 +1,6 @@
 package com.orange.hr.unit;
 
 
-
 import com.orange.hr.entity.Expertise;
 import com.orange.hr.repository.ExpertiseRepository;
 import org.junit.jupiter.api.Test;
@@ -18,10 +17,18 @@ import static org.junit.jupiter.api.Assertions.*;
 public class ExpertiseUnitTest {
     @Autowired
     ExpertiseRepository expertiseRepository;
+
     @Test
-    public void CreateExpertise(){
-        Expertise expertise = new Expertise(null,"java");
+    public void CreateExpertise_ShouldReturnSavedExpertise() {
+        Expertise expertise = new Expertise(null, "java", null);
         expertiseRepository.save(expertise);
         assertNotNull(expertise.getExpertiseId());
+    }
+
+    @Test
+    public void CreateExpertise_WithNoName_ShouldThrowException() {
+        Expertise expertise = new Expertise(null, null, null);
+
+        assertThrows(Exception.class,()-> expertiseRepository.save(expertise));
     }
 }

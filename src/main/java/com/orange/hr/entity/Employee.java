@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Getter
 @Setter
@@ -44,7 +45,13 @@ public class Employee {
     private Team team;
 
     @ManyToOne
-    @JoinColumn(name="manager_id")
+    @JoinColumn(name = "manager_id")
     private Employee manager;
 
+    @ManyToMany
+    @JoinTable(
+            name = "employees_expertise",
+            joinColumns = @JoinColumn(name = "employee_id"),
+            inverseJoinColumns = @JoinColumn(name = "expertise_id"))
+    List<Expertise> expertises;
 }

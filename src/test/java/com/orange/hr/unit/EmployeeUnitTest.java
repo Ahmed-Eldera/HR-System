@@ -1,6 +1,7 @@
 package com.orange.hr.unit;
 
 import com.orange.hr.entity.Department;
+import com.orange.hr.entity.Expertise;
 import com.orange.hr.entity.Team;
 import com.orange.hr.entity.Employee;
 import com.orange.hr.enums.Gender;
@@ -14,6 +15,8 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -93,5 +96,27 @@ public class EmployeeUnitTest {
         employee.setManager(manager);
         employeeRepository.save(employee);
         assertEquals(employee.getManager().getEmployeeID(), manager.getEmployeeID());
+    }
+    @Test
+    public void CreateEmployee_WithValidDataAndExpertise_ShouldReturnSavedEmployee(){
+        Employee emp = new Employee();
+        emp.setEmployeeID(1);
+        emp.setName("Ahmed");
+        emp.setDateOfBirth(LocalDate.of(1999, 5, 12));
+        emp.setGender(Gender.MALE);
+        emp.setGraduationDate(LocalDate.of(2021, 7, 1));
+        emp.setSalary(500F);
+        Department department = new Department(null, "dept 1");
+        departmentRepository.save(department);
+        emp.setDepartment(department);
+        Team team = new Team(null, "team 1");
+        teamRepository.save(team);
+        emp.setTeam(team);
+        Expertise exp = new Expertise(null,"java",null);
+        List<Expertise> l = new ArrayList<>();
+        l.add(exp);
+        emp.setExpertises(l);
+        employeeRepository.save(emp);
+        assertEquals(emp.getExpertises(),l);
     }
 }

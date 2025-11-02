@@ -6,11 +6,13 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
+
 @Setter
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name="expertises")
+@Table(name = "expertises")
 @Entity
 public class Expertise {
     @Id
@@ -19,4 +21,7 @@ public class Expertise {
     private Integer expertiseId;
 
     private String name;
+
+    @ManyToMany(mappedBy = "expertises")
+    private List<Employee> professionals;
 }
