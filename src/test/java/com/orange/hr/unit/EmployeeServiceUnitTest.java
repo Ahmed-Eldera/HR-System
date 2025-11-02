@@ -9,6 +9,7 @@ import com.orange.hr.enums.Gender;
 import com.orange.hr.exceptions.NoSuchDepartment;
 import com.orange.hr.exceptions.NoSuchEmployee;
 import com.orange.hr.exceptions.NoSuchExpertise;
+import com.orange.hr.exceptions.NoSuchTeam;
 import com.orange.hr.mapper.EmployeeMapper;
 import com.orange.hr.repository.DepartmentRepository;
 import com.orange.hr.repository.EmployeeRepository;
