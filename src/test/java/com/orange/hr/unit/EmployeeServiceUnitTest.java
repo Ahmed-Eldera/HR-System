@@ -60,5 +60,34 @@ public class EmployeeServiceUnitTest {
         assertEquals(result.getTeamId(), employeeResponseDTO.getTeamId());
         assertEquals(result.getManagerId(), employeeResponseDTO.getManagerId());
     }
+        @Test
+    public void addEmployee_givenValidDataWithManagerAndNoExpertise_shouldReturnSavedEmployee() {
+
+        //Arrange
+        EmployeeRequestDTO employeeRequestDTO = new EmployeeRequestDTO(1, "ahmed ELdera", LocalDate.of(2003, 2, 18), Gender.MALE, LocalDate.of(2026, 4, 12), 1000F, 1, 1, 1, null);
+        EmployeeResponseDTO employeeResponseDTO = new EmployeeResponseDTO(1, "ahmed ELdera", LocalDate.of(2003, 2, 18), Gender.MALE, LocalDate.of(2026, 4, 12), 1000F, 1, 1, 1, null);
+        Employee emp = new Employee();
+        Optional<Department> department = Optional.of(new Department(1, "dept 1"));
+        Optional<Team> team = Optional.of(new Team(1, "team 1"));
+        Optional<Employee> manager = Optional.of(new Employee());
+        manager.get().setEmployeeID(1);
+        when(departmentRepository.findById(employeeRequestDTO.getDepartmentId())).thenReturn(department);
+        when(teamRepository.findById(employeeRequestDTO.getTeamId())).thenReturn(team);
+        when(employeeMapper.toEntity(employeeRequestDTO)).thenReturn(emp);
+        when(employeeRepository.save(emp)).thenReturn(emp);
+        when(employeeMapper.toDTO(emp)).thenReturn(employeeResponseDTO);
+        when(employeeRepository.findById(1)).thenReturn(manager);
+
+        //act
+        EmployeeResponseDTO result = employeeService.addEmployee(employeeRequestDTO);
+
+        //assert
+        assertEquals(result.getEmployeeID(), employeeResponseDTO.getEmployeeID());
+        assertEquals(result.getName(), employeeResponseDTO.getName());
+        assertEquals(result.getDepartmentId(), employeeResponseDTO.getDepartmentId());
+        assertEquals(result.getTeamId(), employeeResponseDTO.getTeamId());
+        assertEquals(result.getManagerId(), employeeResponseDTO.getManagerId());
+    }
+
 
 }
