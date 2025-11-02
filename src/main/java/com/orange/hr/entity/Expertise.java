@@ -6,17 +6,17 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Entity
 @Setter
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name="teams")
-public class Team {
-	@Id
+@Table(name="expertises")
+@Entity
+public class Expertise {
+    @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="team_id")
-	private Integer teamId;
+    @Column(name = "expertise_id")
+    private Integer expertiseId;
 
-	private String name;
+    private String name;
 }
