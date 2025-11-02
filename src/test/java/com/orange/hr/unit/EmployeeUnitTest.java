@@ -16,8 +16,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-@Transactional
+//@Transactional
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 public class EmployeeUnitTest {
@@ -50,6 +51,13 @@ public class EmployeeUnitTest {
         emp.setTeam(team);
         employeeRepository.save(emp);
         assertNotNull(emp.getEmployeeID());
+    }
 
+    @Test
+    public void CreateEmployee_givenMissingData_shouldThrowException() {
+        Employee emp = new Employee();
+        emp.setEmployeeID(1);
+        emp.setName("Ahmed");
+        assertThrows(Exception.class,()->employeeRepository.save(emp));
     }
 }
