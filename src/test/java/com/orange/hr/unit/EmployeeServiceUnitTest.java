@@ -12,7 +12,7 @@ import com.orange.hr.repository.DepartmentRepository;
 import com.orange.hr.repository.EmployeeRepository;
 import com.orange.hr.repository.ExpertiseRepository;
 import com.orange.hr.repository.TeamRepository;
-import com.orange.hr.service.Impl.EmployeeServiceImpl;
+import com.orange.hr.service.impl.EmployeeServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;

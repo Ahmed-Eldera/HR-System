@@ -1,4 +1,4 @@
-package com.orange.hr.service.Impl;
+package com.orange.hr.service.impl;
 
 import com.orange.hr.dto.EmployeeRequestDTO;
 import com.orange.hr.dto.EmployeeResponseDTO;
@@ -6,10 +6,7 @@ import com.orange.hr.entity.Department;
 import com.orange.hr.entity.Employee;
 import com.orange.hr.entity.Expertise;
 import com.orange.hr.entity.Team;
-import com.orange.hr.exceptions.NoSuchDepartmentException;
-import com.orange.hr.exceptions.NoSuchEmployeeException;
-import com.orange.hr.exceptions.NoSuchExpertiseException;
-import com.orange.hr.exceptions.NoSuchTeamException;
+import com.orange.hr.exceptions.*;
 import com.orange.hr.mapper.EmployeeMapper;
 import com.orange.hr.repository.DepartmentRepository;
 import com.orange.hr.repository.EmployeeRepository;
@@ -19,6 +16,7 @@ import com.orange.hr.service.EmployeeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -53,6 +51,9 @@ public class EmployeeServiceImpl implements EmployeeService {
                     throw new NoSuchExpertiseException("Can't find the Selected Expertise");
                 }
             }
+        }
+        if (employee.getDateOfBirth().isAfter(LocalDate.now())) {
+            throw new InValidDateException("Birth date can't be in the future");
         }
         entity.setExpertises(expertises);
         employeeRepository.save(entity);
