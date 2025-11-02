@@ -7,6 +7,7 @@ import com.orange.hr.entity.Employee;
 import com.orange.hr.entity.Expertise;
 import com.orange.hr.entity.Team;
 import com.orange.hr.enums.Gender;
+import com.orange.hr.exceptions.NoSuchEmployee;
 import com.orange.hr.mapper.EmployeeMapper;
 import com.orange.hr.repository.DepartmentRepository;
 import com.orange.hr.repository.EmployeeRepository;
@@ -25,6 +26,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -117,7 +119,7 @@ public class EmployeeServiceUnitTest {
         when(employeeRepository.save(emp)).thenReturn(emp);
         when(employeeMapper.toDTO(emp)).thenReturn(employeeResponseDTO);
         when(employeeRepository.findById(1)).thenReturn(manager);
-        for(Integer i : expertises) {
+        for (Integer i : expertises) {
             when(expertiseRepository.existsById(i)).thenReturn(true);
         }
         //act
@@ -131,5 +133,24 @@ public class EmployeeServiceUnitTest {
         assertEquals(result.getManagerId(), employeeResponseDTO.getManagerId());
     }
 
+    @Test
+    public void addEmployee_givenInValidDataWithManagerNotPresent_shouldThrowException() {
+
+        //Arrange
+        EmployeeRequestDTO employeeRequestDTO = new EmployeeRequestDTO(1, "ahmed ELdera", LocalDate.of(2003, 2, 18), Gender.MALE, LocalDate.of(2026, 4, 12), 1000F, 1, 1, 1, null);
+        EmployeeResponseDTO employeeResponseDTO = new EmployeeResponseDTO(1, "ahmed ELdera", LocalDate.of(2003, 2, 18), Gender.MALE, LocalDate.of(2026, 4, 12), 1000F, 1, 1, 1, null);
+        Employee emp = new Employee();
+        Optional<Department> department = Optional.of(new Department(1, "abc"));
+        Optional<Team> team = Optional.of(new Team(1, "abc"));
+        Optional<Employee> manager = Optional.empty();
+        when(departmentRepository.findById(employeeRequestDTO.getDepartmentId())).thenReturn(department);
+        when(teamRepository.findById(employeeRequestDTO.getTeamId())).thenReturn(team);
+        when(employeeRepository.findById(employeeRequestDTO.getManagerId())).thenReturn(manager);
+
+        //act&assert
+        NoSuchEmployee exception = assertThrows(NoSuchEmployee.class, () -> employeeService.addEmployee(employeeRequestDTO));
+        assertEquals(exception.getMessage(), "Can't find the Selected Manager");
+
+    }
 
 }
