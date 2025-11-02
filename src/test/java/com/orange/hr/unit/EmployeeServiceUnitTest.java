@@ -147,7 +147,7 @@ public class EmployeeServiceUnitTest {
         when(departmentRepository.findById(employeeRequestDTO.getDepartmentId())).thenReturn(department);
         when(teamRepository.findById(employeeRequestDTO.getTeamId())).thenReturn(team);
         when(employeeRepository.findById(employeeRequestDTO.getManagerId())).thenReturn(manager);
-         when(employeeMapper.toEntity(employeeRequestDTO)).thenReturn(emp);
+        when(employeeMapper.toEntity(employeeRequestDTO)).thenReturn(emp);
 
         //act&assert
         NoSuchEmployee exception = assertThrows(NoSuchEmployee.class, () -> employeeService.addEmployee(employeeRequestDTO));
@@ -177,6 +177,7 @@ public class EmployeeServiceUnitTest {
         assertEquals(exception.getMessage(), "Can't find the Selected Expertise");
 
     }
+
     @Test
     public void addEmployee_givenInValidDepartment_shouldReturnException() {
 
@@ -191,6 +192,23 @@ public class EmployeeServiceUnitTest {
         //assert
         NoSuchDepartment exception = assertThrows(NoSuchDepartment.class, () -> employeeService.addEmployee(employeeRequestDTO));
         assertEquals(exception.getMessage(), "Can't find the Selected Department");
+
+    }
+
+    @Test
+    public void addEmployee_givenInValidTeam_shouldReturnException() {
+
+        //Arrange
+        EmployeeRequestDTO employeeRequestDTO = new EmployeeRequestDTO(1, "ahmed ELdera", LocalDate.of(2003, 2, 18), Gender.MALE, LocalDate.of(2026, 4, 12), 1000F, 1, 1, 1, null);
+        Employee emp = new Employee();
+        Optional<Department> department = Optional.of(new Department(1,"abc"));
+        Optional<Team> team = Optional.empty();
+        Optional<Employee> manager = Optional.of(new Employee());
+        manager.get().setEmployeeID(1);
+        when(departmentRepository.findById(employeeRequestDTO.getDepartmentId())).thenReturn(department);
+        //assert
+        NoSuchTeam exception = assertThrows(NoSuchTeam.class, () -> employeeService.addEmployee(employeeRequestDTO));
+        assertEquals(exception.getMessage(), "Can't find the Selected Team");
 
     }
 
