@@ -6,6 +6,7 @@ import com.orange.hr.entity.Department;
 import com.orange.hr.entity.Employee;
 import com.orange.hr.entity.Expertise;
 import com.orange.hr.entity.Team;
+import com.orange.hr.exceptions.NoSuchDepartment;
 import com.orange.hr.exceptions.NoSuchEmployee;
 import com.orange.hr.exceptions.NoSuchExpertise;
 import com.orange.hr.mapper.EmployeeMapper;
@@ -37,20 +38,20 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     public EmployeeResponseDTO addEmployee(EmployeeRequestDTO employee) {
 
-        Department dept = departmentRepository.findById(employee.getDepartmentId()).orElseThrow(() -> new RuntimeException());
+        Department dept = departmentRepository.findById(employee.getDepartmentId()).orElseThrow(() -> new NoSuchDepartment("Can't find the Selected Department"));
         Team team = teamRepository.findById(employee.getTeamId()).orElseThrow(() -> new RuntimeException());
-        Employee manager = employeeRepository.findById(employee.getManagerId()).orElseThrow(()-> new NoSuchEmployee("Can't find the Selected Manager"));
         Employee entity = employeeMapper.toEntity(employee);
         entity.setDepartment(dept);
         entity.setTeam(team);
-        if (employee.getManagerId()!=null) {
+        if (employee.getManagerId() != null) {
+            Employee manager = employeeRepository.findById(employee.getManagerId()).orElseThrow(() -> new NoSuchEmployee("Can't find the Selected Manager"));
             entity.setManager(manager);
         }
         List<Expertise> expertises = new ArrayList<>();
-        if(employee.getExpertise()!=null) {
+        if (employee.getExpertise() != null) {
             for (Integer i : employee.getExpertise()) {
                 if (!expertiseRepository.existsById(i)) {
-                throw new NoSuchExpertise("Can't find the Selected Expertise");
+                    throw new NoSuchExpertise("Can't find the Selected Expertise");
                 }
             }
         }
