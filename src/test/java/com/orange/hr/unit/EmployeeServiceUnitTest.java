@@ -130,6 +130,8 @@ public class EmployeeServiceUnitTest {
         assertEquals(result.getDepartmentId(), employeeResponseDTO.getDepartmentId());
         assertEquals(result.getTeamId(), employeeResponseDTO.getTeamId());
         assertEquals(result.getManagerId(), employeeResponseDTO.getManagerId());
+        assertEquals(result.getExpertisesIds(), employeeResponseDTO.getExpertisesIds());
+
     }
 
     @Test

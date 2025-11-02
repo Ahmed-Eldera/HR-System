@@ -49,6 +49,8 @@ public class EmployeeServiceImpl implements EmployeeService {
             for (Integer i : employee.getExpertise()) {
                 if (!expertiseRepository.existsById(i)) {
                     throw new NoSuchExpertiseException("Can't find the Selected Expertise");
+                }else{
+                    expertises.add(new Expertise(i,null,null));
                 }
             }
         }
