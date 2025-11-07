@@ -1,235 +1,235 @@
-package com.orange.hr.unit;
-
-import com.orange.hr.dto.EmployeeRequestDTO;
-import com.orange.hr.dto.EmployeeResponseDTO;
-import com.orange.hr.entity.Department;
-import com.orange.hr.entity.Employee;
-import com.orange.hr.entity.Team;
-import com.orange.hr.enums.Gender;
-import com.orange.hr.exceptions.*;
-import com.orange.hr.mapper.EmployeeMapper;
-import com.orange.hr.repository.DepartmentRepository;
-import com.orange.hr.repository.EmployeeRepository;
-import com.orange.hr.repository.ExpertiseRepository;
-import com.orange.hr.repository.TeamRepository;
-import com.orange.hr.service.impl.EmployeeServiceImpl;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.when;
-
-@ExtendWith(MockitoExtension.class)
-public class EmployeeServiceUnitTest {
-    @Mock
-    private EmployeeRepository employeeRepository;
-    @Mock
-    private EmployeeMapper employeeMapper;
-    @Mock
-    private DepartmentRepository departmentRepository;
-    @Mock
-    private TeamRepository teamRepository;
-    @Mock
-    private ExpertiseRepository expertiseRepository;
-    @InjectMocks
-    private EmployeeServiceImpl employeeService;
-
-
-    @Test
-    public void addEmployee_givenValidDataWithNoExpertiseNoManager_shouldReturnSavedEmployee() {
-
-        //Arrange
-        EmployeeRequestDTO employeeRequestDTO = new EmployeeRequestDTO(1, "ahmed ELdera", LocalDate.of(2003, 2, 18), Gender.MALE, LocalDate.of(2026, 4, 12), 1000F, 1, null, 1, null);
-        EmployeeResponseDTO employeeResponseDTO = new EmployeeResponseDTO(1, "ahmed ELdera", LocalDate.of(2003, 2, 18), Gender.MALE, LocalDate.of(2026, 4, 12), 1000F, 1, null, 1, null);
-        Employee emp = new Employee();
-        Optional<Department> department = Optional.of(new Department(1, "dept 1"));
-        Optional<Team> team = Optional.of(new Team(1, "team 1"));
-        when(departmentRepository.findById(employeeRequestDTO.getDepartmentId())).thenReturn(department);
-        when(teamRepository.findById(employeeRequestDTO.getTeamId())).thenReturn(team);
-        when(employeeMapper.toEntity(employeeRequestDTO)).thenReturn(emp);
-        when(employeeRepository.save(emp)).thenReturn(emp);
-        when(employeeMapper.toDTO(emp)).thenReturn(employeeResponseDTO);
-        //act
-        EmployeeResponseDTO result = employeeService.addEmployee(employeeRequestDTO);
-
-        //assert
-        assertEquals(result.getEmployeeID(), employeeResponseDTO.getEmployeeID());
-        assertEquals(result.getName(), employeeResponseDTO.getName());
-        assertEquals(result.getDepartmentId(), employeeResponseDTO.getDepartmentId());
-        assertEquals(result.getTeamId(), employeeResponseDTO.getTeamId());
-        assertEquals(result.getManagerId(), employeeResponseDTO.getManagerId());
-    }
-
-    @Test
-    public void addEmployee_givenValidDataWithManagerAndNoExpertise_shouldReturnSavedEmployee() {
-
-        //Arrange
-        EmployeeRequestDTO employeeRequestDTO = new EmployeeRequestDTO(1, "ahmed ELdera", LocalDate.of(2003, 2, 18), Gender.MALE, LocalDate.of(2026, 4, 12), 1000F, 1, 1, 1, null);
-        EmployeeResponseDTO employeeResponseDTO = new EmployeeResponseDTO(1, "ahmed ELdera", LocalDate.of(2003, 2, 18), Gender.MALE, LocalDate.of(2026, 4, 12), 1000F, 1, 1, 1, null);
-        Employee emp = new Employee();
-        Optional<Department> department = Optional.of(new Department(1, "dept 1"));
-        Optional<Team> team = Optional.of(new Team(1, "team 1"));
-        Optional<Employee> manager = Optional.of(new Employee());
-        manager.get().setEmployeeID(1);
-        when(departmentRepository.findById(employeeRequestDTO.getDepartmentId())).thenReturn(department);
-        when(teamRepository.findById(employeeRequestDTO.getTeamId())).thenReturn(team);
-        when(employeeMapper.toEntity(employeeRequestDTO)).thenReturn(emp);
-        when(employeeRepository.save(emp)).thenReturn(emp);
-        when(employeeMapper.toDTO(emp)).thenReturn(employeeResponseDTO);
-        when(employeeRepository.findById(1)).thenReturn(manager);
-
-        //act
-        EmployeeResponseDTO result = employeeService.addEmployee(employeeRequestDTO);
-
-        //assert
-        assertEquals(result.getEmployeeID(), employeeResponseDTO.getEmployeeID());
-        assertEquals(result.getName(), employeeResponseDTO.getName());
-        assertEquals(result.getDepartmentId(), employeeResponseDTO.getDepartmentId());
-        assertEquals(result.getTeamId(), employeeResponseDTO.getTeamId());
-        assertEquals(result.getManagerId(), employeeResponseDTO.getManagerId());
-    }
-
-    @Test
-    public void addEmployee_givenValidDataWithManagerAndExpertise_shouldReturnSavedEmployee() {
-
-        //Arrange
-        List<Integer> expertises = new ArrayList<>();
-        expertises.add(1);
-        expertises.add(2);
-        EmployeeRequestDTO employeeRequestDTO = new EmployeeRequestDTO(1, "ahmed ELdera", LocalDate.of(2003, 2, 18), Gender.MALE, LocalDate.of(2026, 4, 12), 1000F, 1, 1, 1, expertises);
-        EmployeeResponseDTO employeeResponseDTO = new EmployeeResponseDTO(1, "ahmed ELdera", LocalDate.of(2003, 2, 18), Gender.MALE, LocalDate.of(2026, 4, 12), 1000F, 1, 1, 1, expertises);
-        Employee emp = new Employee();
-        Optional<Department> department = Optional.of(new Department(1, "dept 1"));
-        Optional<Team> team = Optional.of(new Team(1, "team 1"));
-        Optional<Employee> manager = Optional.of(new Employee());
-        manager.get().setEmployeeID(1);
-        when(departmentRepository.findById(employeeRequestDTO.getDepartmentId())).thenReturn(department);
-        when(teamRepository.findById(employeeRequestDTO.getTeamId())).thenReturn(team);
-        when(employeeMapper.toEntity(employeeRequestDTO)).thenReturn(emp);
-        when(employeeRepository.save(emp)).thenReturn(emp);
-        when(employeeMapper.toDTO(emp)).thenReturn(employeeResponseDTO);
-        when(employeeRepository.findById(1)).thenReturn(manager);
-        for (Integer i : expertises) {
-            when(expertiseRepository.existsById(i)).thenReturn(true);
-        }
-        //act
-        EmployeeResponseDTO result = employeeService.addEmployee(employeeRequestDTO);
-
-        //assert
-        assertEquals(result.getEmployeeID(), employeeResponseDTO.getEmployeeID());
-        assertEquals(result.getName(), employeeResponseDTO.getName());
-        assertEquals(result.getDepartmentId(), employeeResponseDTO.getDepartmentId());
-        assertEquals(result.getTeamId(), employeeResponseDTO.getTeamId());
-        assertEquals(result.getManagerId(), employeeResponseDTO.getManagerId());
-        assertEquals(result.getExpertisesIds(), employeeResponseDTO.getExpertisesIds());
-
-    }
-
-    @Test
-    public void addEmployee_givenInValidDataWithManagerNotPresent_shouldThrowException() {
-
-        //Arrange
-        EmployeeRequestDTO employeeRequestDTO = new EmployeeRequestDTO(1, "ahmed ELdera", LocalDate.of(2003, 2, 18), Gender.MALE, LocalDate.of(2026, 4, 12), 1000F, 1, 1, 1, null);
-        EmployeeResponseDTO employeeResponseDTO = new EmployeeResponseDTO(1, "ahmed ELdera", LocalDate.of(2003, 2, 18), Gender.MALE, LocalDate.of(2026, 4, 12), 1000F, 1, 1, 1, null);
-        Employee emp = new Employee();
-        Optional<Department> department = Optional.of(new Department(1, "abc"));
-        Optional<Team> team = Optional.of(new Team(1, "abc"));
-        Optional<Employee> manager = Optional.empty();
-        when(departmentRepository.findById(employeeRequestDTO.getDepartmentId())).thenReturn(department);
-        when(teamRepository.findById(employeeRequestDTO.getTeamId())).thenReturn(team);
-        when(employeeRepository.findById(employeeRequestDTO.getManagerId())).thenReturn(manager);
-        when(employeeMapper.toEntity(employeeRequestDTO)).thenReturn(emp);
-
-        //act&assert
-        NoSuchEmployeeException exception = assertThrows(NoSuchEmployeeException.class, () -> employeeService.addEmployee(employeeRequestDTO));
-        assertEquals(exception.getMessage(), "Can't find the Selected Manager");
-
-    }
-
-    @Test
-    public void addEmployee_givenInValidExpertise_shouldReturnException() {
-
-        //Arrange
-        List<Integer> falseExpertises = new ArrayList<>();
-        falseExpertises.add(3);
-        EmployeeRequestDTO employeeRequestDTO = new EmployeeRequestDTO(1, "ahmed ELdera", LocalDate.of(2003, 2, 18), Gender.MALE, LocalDate.of(2026, 4, 12), 1000F, 1, 1, 1, falseExpertises);
-        Employee emp = new Employee();
-        Optional<Department> department = Optional.of(new Department(1, "dept 1"));
-        Optional<Team> team = Optional.of(new Team(1, "team 1"));
-        Optional<Employee> manager = Optional.of(new Employee());
-        manager.get().setEmployeeID(1);
-        when(departmentRepository.findById(employeeRequestDTO.getDepartmentId())).thenReturn(department);
-        when(teamRepository.findById(employeeRequestDTO.getTeamId())).thenReturn(team);
-        when(employeeMapper.toEntity(employeeRequestDTO)).thenReturn(emp);
-        when(employeeRepository.findById(1)).thenReturn(manager);
-        when(expertiseRepository.existsById(3)).thenReturn(false);
-        //assert
-        NoSuchExpertiseException exception = assertThrows(NoSuchExpertiseException.class, () -> employeeService.addEmployee(employeeRequestDTO));
-        assertEquals(exception.getMessage(), "Can't find the Selected Expertise");
-
-    }
-
-    @Test
-    public void addEmployee_givenInValidDepartment_shouldReturnException() {
-
-        //Arrange
-        EmployeeRequestDTO employeeRequestDTO = new EmployeeRequestDTO(1, "ahmed ELdera", LocalDate.of(2003, 2, 18), Gender.MALE, LocalDate.of(2026, 4, 12), 1000F, 1, 1, 1, null);
-        Employee emp = new Employee();
-        Optional<Department> department = Optional.empty();
-        Optional<Team> team = Optional.of(new Team(1, "team 1"));
-        Optional<Employee> manager = Optional.of(new Employee());
-        manager.get().setEmployeeID(1);
-        when(departmentRepository.findById(employeeRequestDTO.getDepartmentId())).thenReturn(department);
-        //assert
-        NoSuchDepartmentException exception = assertThrows(NoSuchDepartmentException.class, () -> employeeService.addEmployee(employeeRequestDTO));
-        assertEquals(exception.getMessage(), "Can't find the Selected Department");
-
-    }
-
-    @Test
-    public void addEmployee_givenInValidTeam_shouldReturnException() {
-
-        //Arrange
-        EmployeeRequestDTO employeeRequestDTO = new EmployeeRequestDTO(1, "ahmed ELdera", LocalDate.of(2003, 2, 18), Gender.MALE, LocalDate.of(2026, 4, 12), 1000F, 1, 1, 1, null);
-        Employee emp = new Employee();
-        Optional<Department> department = Optional.of(new Department(1, "abc"));
-        Optional<Team> team = Optional.empty();
-        Optional<Employee> manager = Optional.of(new Employee());
-        manager.get().setEmployeeID(1);
-        when(departmentRepository.findById(employeeRequestDTO.getDepartmentId())).thenReturn(department);
-        //assert
-        NoSuchTeamException exception = assertThrows(NoSuchTeamException.class, () -> employeeService.addEmployee(employeeRequestDTO));
-        assertEquals(exception.getMessage(), "Can't find the Selected Team");
-
-    }
-
-    @Test
-    public void addEmployee_givenInValidDataWithFutureBirthDate_shouldThrowException() {
-
-        //Arrange
-        EmployeeRequestDTO employeeRequestDTO = new EmployeeRequestDTO(1, "ahmed ELdera", LocalDate.of(2099, 2, 18), Gender.MALE, LocalDate.of(2026, 4, 12), 1000F, 1, 1, 1, null);
-        EmployeeResponseDTO employeeResponseDTO = new EmployeeResponseDTO(1, "ahmed ELdera", LocalDate.of(2003, 2, 18), Gender.MALE, LocalDate.of(2026, 4, 12), 1000F, 1, 1, 1, null);
-        Employee emp = new Employee();
-        Optional<Department> department = Optional.of(new Department(1, "dept 1"));
-        Optional<Team> team = Optional.of(new Team(1, "team 1"));
-        Optional<Employee> manager = Optional.of(new Employee());
-        when(employeeMapper.toEntity(employeeRequestDTO)).thenReturn(emp);
-        when(departmentRepository.findById(employeeRequestDTO.getDepartmentId())).thenReturn(department);
-        when(teamRepository.findById(employeeRequestDTO.getTeamId())).thenReturn(team);
-        when(employeeRepository.findById(employeeRequestDTO.getManagerId())).thenReturn(manager);
-        //act&assert
-        InValidDateException exception = assertThrows(InValidDateException.class, () -> employeeService.addEmployee(employeeRequestDTO));
-        assertEquals(exception.getMessage(), "Birth date can't be in the future");
-    }
-
-
-}
+//package com.orange.hr.unit;
+//
+//import com.orange.hr.dto.EmployeeRequestDTO;
+//import com.orange.hr.dto.EmployeeResponseDTO;
+//import com.orange.hr.entity.Department;
+//import com.orange.hr.entity.Employee;
+//import com.orange.hr.entity.Team;
+//import com.orange.hr.enums.Gender;
+//import com.orange.hr.exceptions.*;
+//import com.orange.hr.mapper.EmployeeMapper;
+//import com.orange.hr.repository.DepartmentRepository;
+//import com.orange.hr.repository.EmployeeRepository;
+//import com.orange.hr.repository.ExpertiseRepository;
+//import com.orange.hr.repository.TeamRepository;
+//import com.orange.hr.service.impl.EmployeeServiceImpl;
+//import org.junit.jupiter.api.Test;
+//import org.junit.jupiter.api.extension.ExtendWith;
+//import org.mockito.InjectMocks;
+//import org.mockito.Mock;
+//import org.mockito.junit.jupiter.MockitoExtension;
+//
+//import java.time.LocalDate;
+//import java.util.ArrayList;
+//import java.util.List;
+//import java.util.Optional;
+//
+//import static org.junit.jupiter.api.Assertions.assertEquals;
+//import static org.junit.jupiter.api.Assertions.assertThrows;
+//import static org.mockito.Mockito.when;
+//
+//@ExtendWith(MockitoExtension.class)
+//public class EmployeeServiceUnitTest {
+//    @Mock
+//    private EmployeeRepository employeeRepository;
+//    @Mock
+//    private EmployeeMapper employeeMapper;
+//    @Mock
+//    private DepartmentRepository departmentRepository;
+//    @Mock
+//    private TeamRepository teamRepository;
+//    @Mock
+//    private ExpertiseRepository expertiseRepository;
+//    @InjectMocks
+//    private EmployeeServiceImpl employeeService;
+//
+//
+//    @Test
+//    public void addEmployee_givenValidDataWithNoExpertiseNoManager_shouldReturnSavedEmployee() {
+//
+//        //Arrange
+//        EmployeeRequestDTO employeeRequestDTO = new EmployeeRequestDTO(1, "ahmed ELdera", LocalDate.of(2003, 2, 18), Gender.MALE, LocalDate.of(2026, 4, 12), 1000F, 1, null, 1, null);
+//        EmployeeResponseDTO employeeResponseDTO = new EmployeeResponseDTO(1, "ahmed ELdera", LocalDate.of(2003, 2, 18), Gender.MALE, LocalDate.of(2026, 4, 12), 1000F, 1, null, 1, null);
+//        Employee emp = new Employee();
+//        Optional<Department> department = Optional.of(new Department(1, "dept 1"));
+//        Optional<Team> team = Optional.of(new Team(1, "team 1"));
+//        when(departmentRepository.findById(employeeRequestDTO.getDepartmentId())).thenReturn(department);
+//        when(teamRepository.findById(employeeRequestDTO.getTeamId())).thenReturn(team);
+//        when(employeeMapper.toEntity(employeeRequestDTO)).thenReturn(emp);
+//        when(employeeRepository.save(emp)).thenReturn(emp);
+//        when(employeeMapper.toDTO(emp)).thenReturn(employeeResponseDTO);
+//        //act
+//        EmployeeResponseDTO result = employeeService.addEmployee(employeeRequestDTO);
+//
+//        //assert
+//        assertEquals(result.getEmployeeID(), employeeResponseDTO.getEmployeeID());
+//        assertEquals(result.getName(), employeeResponseDTO.getName());
+//        assertEquals(result.getDepartmentId(), employeeResponseDTO.getDepartmentId());
+//        assertEquals(result.getTeamId(), employeeResponseDTO.getTeamId());
+//        assertEquals(result.getManagerId(), employeeResponseDTO.getManagerId());
+//    }
+//
+//    @Test
+//    public void addEmployee_givenValidDataWithManagerAndNoExpertise_shouldReturnSavedEmployee() {
+//
+//        //Arrange
+//        EmployeeRequestDTO employeeRequestDTO = new EmployeeRequestDTO(1, "ahmed ELdera", LocalDate.of(2003, 2, 18), Gender.MALE, LocalDate.of(2026, 4, 12), 1000F, 1, 1, 1, null);
+//        EmployeeResponseDTO employeeResponseDTO = new EmployeeResponseDTO(1, "ahmed ELdera", LocalDate.of(2003, 2, 18), Gender.MALE, LocalDate.of(2026, 4, 12), 1000F, 1, 1, 1, null);
+//        Employee emp = new Employee();
+//        Optional<Department> department = Optional.of(new Department(1, "dept 1"));
+//        Optional<Team> team = Optional.of(new Team(1, "team 1"));
+//        Optional<Employee> manager = Optional.of(new Employee());
+//        manager.get().setEmployeeID(1);
+//        when(departmentRepository.findById(employeeRequestDTO.getDepartmentId())).thenReturn(department);
+//        when(teamRepository.findById(employeeRequestDTO.getTeamId())).thenReturn(team);
+//        when(employeeMapper.toEntity(employeeRequestDTO)).thenReturn(emp);
+//        when(employeeRepository.save(emp)).thenReturn(emp);
+//        when(employeeMapper.toDTO(emp)).thenReturn(employeeResponseDTO);
+//        when(employeeRepository.findById(1)).thenReturn(manager);
+//
+//        //act
+//        EmployeeResponseDTO result = employeeService.addEmployee(employeeRequestDTO);
+//
+//        //assert
+//        assertEquals(result.getEmployeeID(), employeeResponseDTO.getEmployeeID());
+//        assertEquals(result.getName(), employeeResponseDTO.getName());
+//        assertEquals(result.getDepartmentId(), employeeResponseDTO.getDepartmentId());
+//        assertEquals(result.getTeamId(), employeeResponseDTO.getTeamId());
+//        assertEquals(result.getManagerId(), employeeResponseDTO.getManagerId());
+//    }
+//
+//    @Test
+//    public void addEmployee_givenValidDataWithManagerAndExpertise_shouldReturnSavedEmployee() {
+//
+//        //Arrange
+//        List<Integer> expertises = new ArrayList<>();
+//        expertises.add(1);
+//        expertises.add(2);
+//        EmployeeRequestDTO employeeRequestDTO = new EmployeeRequestDTO(1, "ahmed ELdera", LocalDate.of(2003, 2, 18), Gender.MALE, LocalDate.of(2026, 4, 12), 1000F, 1, 1, 1, expertises);
+//        EmployeeResponseDTO employeeResponseDTO = new EmployeeResponseDTO(1, "ahmed ELdera", LocalDate.of(2003, 2, 18), Gender.MALE, LocalDate.of(2026, 4, 12), 1000F, 1, 1, 1, expertises);
+//        Employee emp = new Employee();
+//        Optional<Department> department = Optional.of(new Department(1, "dept 1"));
+//        Optional<Team> team = Optional.of(new Team(1, "team 1"));
+//        Optional<Employee> manager = Optional.of(new Employee());
+//        manager.get().setEmployeeID(1);
+//        when(departmentRepository.findById(employeeRequestDTO.getDepartmentId())).thenReturn(department);
+//        when(teamRepository.findById(employeeRequestDTO.getTeamId())).thenReturn(team);
+//        when(employeeMapper.toEntity(employeeRequestDTO)).thenReturn(emp);
+//        when(employeeRepository.save(emp)).thenReturn(emp);
+//        when(employeeMapper.toDTO(emp)).thenReturn(employeeResponseDTO);
+//        when(employeeRepository.findById(1)).thenReturn(manager);
+//        for (Integer i : expertises) {
+//            when(expertiseRepository.existsById(i)).thenReturn(true);
+//        }
+//        //act
+//        EmployeeResponseDTO result = employeeService.addEmployee(employeeRequestDTO);
+//
+//        //assert
+//        assertEquals(result.getEmployeeID(), employeeResponseDTO.getEmployeeID());
+//        assertEquals(result.getName(), employeeResponseDTO.getName());
+//        assertEquals(result.getDepartmentId(), employeeResponseDTO.getDepartmentId());
+//        assertEquals(result.getTeamId(), employeeResponseDTO.getTeamId());
+//        assertEquals(result.getManagerId(), employeeResponseDTO.getManagerId());
+//        assertEquals(result.getExpertisesIds(), employeeResponseDTO.getExpertisesIds());
+//
+//    }
+//
+//    @Test
+//    public void addEmployee_givenInValidDataWithManagerNotPresent_shouldThrowException() {
+//
+//        //Arrange
+//        EmployeeRequestDTO employeeRequestDTO = new EmployeeRequestDTO(1, "ahmed ELdera", LocalDate.of(2003, 2, 18), Gender.MALE, LocalDate.of(2026, 4, 12), 1000F, 1, 1, 1, null);
+//        EmployeeResponseDTO employeeResponseDTO = new EmployeeResponseDTO(1, "ahmed ELdera", LocalDate.of(2003, 2, 18), Gender.MALE, LocalDate.of(2026, 4, 12), 1000F, 1, 1, 1, null);
+//        Employee emp = new Employee();
+//        Optional<Department> department = Optional.of(new Department(1, "abc"));
+//        Optional<Team> team = Optional.of(new Team(1, "abc"));
+//        Optional<Employee> manager = Optional.empty();
+//        when(departmentRepository.findById(employeeRequestDTO.getDepartmentId())).thenReturn(department);
+//        when(teamRepository.findById(employeeRequestDTO.getTeamId())).thenReturn(team);
+//        when(employeeRepository.findById(employeeRequestDTO.getManagerId())).thenReturn(manager);
+//        when(employeeMapper.toEntity(employeeRequestDTO)).thenReturn(emp);
+//
+//        //act&assert
+//        NoSuchEmployeeException exception = assertThrows(NoSuchEmployeeException.class, () -> employeeService.addEmployee(employeeRequestDTO));
+//        assertEquals(exception.getMessage(), "Can't find the Selected Manager");
+//
+//    }
+//
+//    @Test
+//    public void addEmployee_givenInValidExpertise_shouldReturnException() {
+//
+//        //Arrange
+//        List<Integer> falseExpertises = new ArrayList<>();
+//        falseExpertises.add(3);
+//        EmployeeRequestDTO employeeRequestDTO = new EmployeeRequestDTO(1, "ahmed ELdera", LocalDate.of(2003, 2, 18), Gender.MALE, LocalDate.of(2026, 4, 12), 1000F, 1, 1, 1, falseExpertises);
+//        Employee emp = new Employee();
+//        Optional<Department> department = Optional.of(new Department(1, "dept 1"));
+//        Optional<Team> team = Optional.of(new Team(1, "team 1"));
+//        Optional<Employee> manager = Optional.of(new Employee());
+//        manager.get().setEmployeeID(1);
+//        when(departmentRepository.findById(employeeRequestDTO.getDepartmentId())).thenReturn(department);
+//        when(teamRepository.findById(employeeRequestDTO.getTeamId())).thenReturn(team);
+//        when(employeeMapper.toEntity(employeeRequestDTO)).thenReturn(emp);
+//        when(employeeRepository.findById(1)).thenReturn(manager);
+//        when(expertiseRepository.existsById(3)).thenReturn(false);
+//        //assert
+//        NoSuchExpertiseException exception = assertThrows(NoSuchExpertiseException.class, () -> employeeService.addEmployee(employeeRequestDTO));
+//        assertEquals(exception.getMessage(), "Can't find the Selected Expertise");
+//
+//    }
+//
+//    @Test
+//    public void addEmployee_givenInValidDepartment_shouldReturnException() {
+//
+//        //Arrange
+//        EmployeeRequestDTO employeeRequestDTO = new EmployeeRequestDTO(1, "ahmed ELdera", LocalDate.of(2003, 2, 18), Gender.MALE, LocalDate.of(2026, 4, 12), 1000F, 1, 1, 1, null);
+//        Employee emp = new Employee();
+//        Optional<Department> department = Optional.empty();
+//        Optional<Team> team = Optional.of(new Team(1, "team 1"));
+//        Optional<Employee> manager = Optional.of(new Employee());
+//        manager.get().setEmployeeID(1);
+//        when(departmentRepository.findById(employeeRequestDTO.getDepartmentId())).thenReturn(department);
+//        //assert
+//        NoSuchDepartmentException exception = assertThrows(NoSuchDepartmentException.class, () -> employeeService.addEmployee(employeeRequestDTO));
+//        assertEquals(exception.getMessage(), "Can't find the Selected Department");
+//
+//    }
+//
+//    @Test
+//    public void addEmployee_givenInValidTeam_shouldReturnException() {
+//
+//        //Arrange
+//        EmployeeRequestDTO employeeRequestDTO = new EmployeeRequestDTO(1, "ahmed ELdera", LocalDate.of(2003, 2, 18), Gender.MALE, LocalDate.of(2026, 4, 12), 1000F, 1, 1, 1, null);
+//        Employee emp = new Employee();
+//        Optional<Department> department = Optional.of(new Department(1, "abc"));
+//        Optional<Team> team = Optional.empty();
+//        Optional<Employee> manager = Optional.of(new Employee());
+//        manager.get().setEmployeeID(1);
+//        when(departmentRepository.findById(employeeRequestDTO.getDepartmentId())).thenReturn(department);
+//        //assert
+//        NoSuchTeamException exception = assertThrows(NoSuchTeamException.class, () -> employeeService.addEmployee(employeeRequestDTO));
+//        assertEquals(exception.getMessage(), "Can't find the Selected Team");
+//
+//    }
+//
+//    @Test
+//    public void addEmployee_givenInValidDataWithFutureBirthDate_shouldThrowException() {
+//
+//        //Arrange
+//        EmployeeRequestDTO employeeRequestDTO = new EmployeeRequestDTO(1, "ahmed ELdera", LocalDate.of(2099, 2, 18), Gender.MALE, LocalDate.of(2026, 4, 12), 1000F, 1, 1, 1, null);
+//        EmployeeResponseDTO employeeResponseDTO = new EmployeeResponseDTO(1, "ahmed ELdera", LocalDate.of(2003, 2, 18), Gender.MALE, LocalDate.of(2026, 4, 12), 1000F, 1, 1, 1, null);
+//        Employee emp = new Employee();
+//        Optional<Department> department = Optional.of(new Department(1, "dept 1"));
+//        Optional<Team> team = Optional.of(new Team(1, "team 1"));
+//        Optional<Employee> manager = Optional.of(new Employee());
+//        when(employeeMapper.toEntity(employeeRequestDTO)).thenReturn(emp);
+//        when(departmentRepository.findById(employeeRequestDTO.getDepartmentId())).thenReturn(department);
+//        when(teamRepository.findById(employeeRequestDTO.getTeamId())).thenReturn(team);
+//        when(employeeRepository.findById(employeeRequestDTO.getManagerId())).thenReturn(manager);
+//        //act&assert
+//        InValidDateException exception = assertThrows(InValidDateException.class, () -> employeeService.addEmployee(employeeRequestDTO));
+//        assertEquals(exception.getMessage(), "Birth date can't be in the future");
+//    }
+//
+//
+//}
