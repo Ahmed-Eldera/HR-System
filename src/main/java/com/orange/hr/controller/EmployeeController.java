@@ -3,6 +3,7 @@ package com.orange.hr.controller;
 import com.orange.hr.dto.EmployeeRequestDTO;
 import com.orange.hr.dto.EmployeeResponseDTO;
 import com.orange.hr.service.EmployeeService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,7 +17,7 @@ public class EmployeeController {
         this.employeeService = employeeService;
     }
     @PostMapping
-    public ResponseEntity<EmployeeResponseDTO> addEmployee(@RequestBody EmployeeRequestDTO requestDTO){
+    public ResponseEntity<EmployeeResponseDTO> addEmployee(@RequestBody @Valid EmployeeRequestDTO requestDTO){
         EmployeeResponseDTO responseDTO = employeeService.addEmployee(requestDTO);
         return new ResponseEntity<EmployeeResponseDTO>(responseDTO,HttpStatus.CREATED);
     }

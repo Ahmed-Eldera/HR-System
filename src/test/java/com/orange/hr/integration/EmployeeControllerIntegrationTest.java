@@ -49,16 +49,8 @@ import java.time.*;
 import java.util.ArrayList;
 import java.util.List;
 
-@SpringBootTest
-@AutoConfigureMockMvc
-@Transactional
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-@TestExecutionListeners({
-        DependencyInjectionTestExecutionListener.class,
-        DirtiesContextTestExecutionListener.class,
-        TransactionDbUnitTestExecutionListener.class
-})
-public class EmployeeControllerIntegrationTest {
+
+public class EmployeeControllerIntegrationTest extends AbstractTest {
     @Autowired
     MockMvc mockMvc;
     @Autowired
@@ -71,58 +63,17 @@ public class EmployeeControllerIntegrationTest {
     ExpertiseRepository expertiseRepository;
     @Autowired
     private ObjectMapper objectMapper;
-    @Autowired
-    private DataSource dataSource;
 
-    private IDatabaseConnection dbUnitConnection;
 
-    @BeforeEach
-    void setUp() throws Exception {
-        dbUnitConnection = new DatabaseConnection(dataSource.getConnection());
-        DatabaseConfig config = dbUnitConnection.getConfig();
-
-        config.setProperty(DatabaseConfig.PROPERTY_DATATYPE_FACTORY, new CustomH2DataTypeFactory());
-        config.setProperty(DatabaseConfig.FEATURE_CASE_SENSITIVE_TABLE_NAMES, false);
-        config.setProperty(DatabaseConfig.FEATURE_ALLOW_EMPTY_FIELDS, true);
-
-        System.out.println("DBUnit manually configured");
-    }
-
-    public class CustomH2DataTypeFactory extends H2DataTypeFactory {
-        @Override
-        public DataType createDataType(int sqlType, String sqlTypeName) throws DataTypeException {
-            if (sqlType == Types.OTHER && sqlTypeName.startsWith("ENUM")) {
-                return DataType.VARCHAR;
-            }
-            return super.createDataType(sqlType, sqlTypeName);
-        }
-    }
     @Test
-    public void AddEmpolyeeSuccessfully() throws Exception {
-        FlatXmlDataSetBuilder builder = new FlatXmlDataSetBuilder();
-        IDataSet dataSet = builder.build(getClass().getResourceAsStream("/datasets/populateDB.xml"));
-        DatabaseOperation.CLEAN_INSERT.execute(dbUnitConnection, dataSet);
+    public void AddEmpolyeeSuccessfully_WithFullData_ExpectCreated() throws Exception {
+        prepareDB("/datasets/populateDB.xml");
         //Arrange
-//        Department department = new Department(null, "Developers");
-//        departmentRepository.save(department);
-//        Team team = new Team(null, "Project-X");
-//        teamRepository.save(team);
-//        Employee manager = new Employee();
-//        manager.setEmployeeID(1);
-//        manager.setName("Ahmed");
-//        manager.setDateOfBirth(LocalDate.of(1999, 5, 12));
-//        manager.setGender(Gender.MALE);
-//        manager.setGraduationDate(LocalDate.of(2021, 7, 1));
-//        manager.setSalary(500F);
-//        manager.setTeam(team);
-//        manager.setDepartment(department);
-//        employeeRepository.save(manager);
-//        Expertise expertise = new Expertise(null, "java", null);
-//        expertise = expertiseRepository.save(expertise);
+
         List<Integer> l = new ArrayList<>();
         l.add(1);
         //act
-        EmployeeRequestDTO employee = new EmployeeRequestDTO(2, "ahmed ELdera", LocalDate.of(2003, 2, 18), Gender.MALE, LocalDate.of(2026, 4, 12), 1000F,1,1,1, l);
+        EmployeeRequestDTO employee = new EmployeeRequestDTO(2, "ahmed ELdera", LocalDate.of(2003, 2, 18), Gender.MALE, LocalDate.of(2026, 4, 12), 1000F, 1, 1, 1, l);
 
         //act
         ResultActions result = mockMvc.perform(post("/employees").contentType(MediaType.APPLICATION_JSON)
@@ -140,4 +91,122 @@ public class EmployeeControllerIntegrationTest {
                 .andExpect(jsonPath("$.teamId").value(employee.getTeamId()))
                 .andExpect(jsonPath("$.expertisesIds").value(employee.getExpertise()));
     }
+
+    @Test
+    public void AddEmpolyeeSuccessfully_WithNoManager_ExpectCreated() throws Exception {
+        prepareDB("/datasets/populateDB.xml");
+        //Arrange
+
+        List<Integer> l = new ArrayList<>();
+        l.add(1);
+        //act
+        EmployeeRequestDTO employee = new EmployeeRequestDTO(2, "ahmed ELdera", LocalDate.of(2003, 2, 18), Gender.MALE, LocalDate.of(2026, 4, 12), 1000F, 1, null, 1, l);
+
+        //act
+        ResultActions result = mockMvc.perform(post("/employees").contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(employee)));
+        //assert
+        result.andExpect(status().isCreated())
+                .andExpect(jsonPath("$.employeeID").value(employee.getEmployeeId()))
+                .andExpect(jsonPath("$.name").value(employee.getName()))
+                .andExpect(jsonPath("$.dateOfBirth").value(employee.getDateOfBirth().toString()))
+                .andExpect(jsonPath("$.gender").value(employee.getGender().toString()))
+                .andExpect(jsonPath("$.graduationDate").value(employee.getGraduationDate().toString()))
+                .andExpect(jsonPath("$.salary").value(employee.getSalary()))
+                .andExpect(jsonPath("$.departmentId").value(employee.getDepartmentId()))
+                .andExpect(jsonPath("$.managerId").value(employee.getManagerId()))
+                .andExpect(jsonPath("$.teamId").value(employee.getTeamId()))
+                .andExpect(jsonPath("$.expertisesIds").value(employee.getExpertise()));
+    }
+
+    @Test
+    public void AddEmpolyee_WithMissingData_ExpectBadRequest() throws Exception {
+        prepareDB("/datasets/populateDB.xml");
+        //Arrange
+
+        List<Integer> l = new ArrayList<>();
+        l.add(1);
+        //act
+        EmployeeRequestDTO employee = new EmployeeRequestDTO(2, "ahmed ELdera", LocalDate.of(2003, 2, 18), Gender.MALE, LocalDate.of(2026, 4, 12), 1000F, null, null, 1, l);
+
+        //act
+        ResultActions result = mockMvc.perform(post("/employees").contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(employee)));
+        //assert
+        result.andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void AddEmpolyee_WithDepartmentNotValid_ExpectNotFound() throws Exception {
+        prepareDB("/datasets/populateDB.xml");
+        //Arrange
+
+        List<Integer> l = new ArrayList<>();
+        l.add(1);
+        //act
+        EmployeeRequestDTO employee = new EmployeeRequestDTO(2, "ahmed ELdera", LocalDate.of(2003, 2, 18), Gender.MALE, LocalDate.of(2026, 4, 12), 1000F, 2, null, 1, l);
+
+        //act
+        ResultActions result = mockMvc.perform(post("/employees").contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(employee)));
+        //assert
+        result.andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.msg").value("Can't find the Selected Department"));
+    }
+
+    @Test
+    public void AddEmpolyee_WithTeamNotValid_ExpectNotFound() throws Exception {
+        prepareDB("/datasets/populateDB.xml");
+        //Arrange
+
+        List<Integer> l = new ArrayList<>();
+        l.add(1);
+        //act
+        EmployeeRequestDTO employee = new EmployeeRequestDTO(2, "ahmed ELdera", LocalDate.of(2003, 2, 18), Gender.MALE, LocalDate.of(2026, 4, 12), 1000F, 1, null, 2, l);
+
+        //act
+        ResultActions result = mockMvc.perform(post("/employees").contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(employee)));
+        //assert
+        result.andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.msg").value("Can't find the Selected Team"));
+    }
+
+    @Test
+    public void AddEmpolyee_WithManagerNotValid_ExpectNotFound() throws Exception {
+        prepareDB("/datasets/populateDB.xml");
+        //Arrange
+
+        List<Integer> l = new ArrayList<>();
+        l.add(1);
+        //act
+        EmployeeRequestDTO employee = new EmployeeRequestDTO(2, "ahmed ELdera", LocalDate.of(2003, 2, 18), Gender.MALE, LocalDate.of(2026, 4, 12), 1000F, 1, 55, 1, l);
+
+        //act
+        ResultActions result = mockMvc.perform(post("/employees").contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(employee)));
+        //assert
+        result.andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.msg").value("Can't find the Selected Manager"));
+    }
+
+    @Test
+    public void AddEmpolyee_WithBirthDateNotValid_ExpectNotFound() throws Exception {
+        prepareDB("/datasets/populateDB.xml");
+        //Arrange
+
+        List<Integer> l = new ArrayList<>();
+        l.add(1);
+        //act
+        EmployeeRequestDTO employee = new EmployeeRequestDTO(2, "ahmed ELdera", LocalDate.of(2993, 2, 18), Gender.MALE, LocalDate.of(2026, 4, 12), 1000F, 1, 1, 1, l);
+
+        //act
+        ResultActions result = mockMvc.perform(post("/employees").contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(employee)));
+        //assert
+        result.andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.msg").value("Birth date can't be in the future"));
+    }
+
+
 }
