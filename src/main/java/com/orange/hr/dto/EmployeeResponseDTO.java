@@ -1,10 +1,8 @@
 package com.orange.hr.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.orange.hr.enums.Gender;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -13,6 +11,8 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@Data
+@JsonInclude(JsonInclude.Include.ALWAYS)
 public class EmployeeResponseDTO {
     private Integer employeeID;
     private String name;

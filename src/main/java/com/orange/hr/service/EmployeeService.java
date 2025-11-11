@@ -6,4 +6,5 @@ import com.orange.hr.dto.EmployeeResponseDTO;
 public interface EmployeeService {
     public EmployeeResponseDTO addEmployee(EmployeeRequestDTO employee);
 
+    public EmployeeResponseDTO modifyEmployee(Integer id,EmployeeRequestDTO employee);
 }

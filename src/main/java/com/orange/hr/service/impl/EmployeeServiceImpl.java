@@ -62,4 +62,11 @@ public class EmployeeServiceImpl implements EmployeeService {
         employeeRepository.save(entity);
         return employeeMapper.toDTO(entity);
     }
+
+    public EmployeeResponseDTO modifyEmployee(Integer id ,EmployeeRequestDTO dto) {
+        Employee entity = employeeRepository.findById(id).orElseThrow(()->new NoSuchEmployeeException(HttpStatus.NOT_FOUND,"Employee Not Found"));
+        entity.setName(dto.getName());
+
+        return employeeMapper.toDTO(entity);
+    }
 }

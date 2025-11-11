@@ -39,11 +39,11 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
 
     private static final int EXISTING_EMPLOYEE_ID = 1;
     private static final int NEW_EMPLOYEE_ID = 2;
-    private static final String EMPLOYEE_NAME = "Ahmed Eldera";
+    private static final String NEW_EMPLOYEE_NAME = "Ahmed Eldera";
     private static final LocalDate DATE_OF_BIRTH = LocalDate.of(2003, 2, 18);
     private static final LocalDate FUTURE_DATE_OF_BIRTH = LocalDate.of(2999, 2, 18);
-    private static final LocalDate GRADUATION_DATE = LocalDate.of(2026, 4, 12);
-    private static final float SALARY = 1000F;
+    private static final LocalDate GRADUATION_DATE = LocalDate.of(2026, 2, 18);
+    private static final float SALARY = 500F;
     private static final int DEPARTMENT_ID = 1;
     private static final int NON_EXISTENT_DEPARTMENT_ID = 9876;
     private static final int TEAM_ID = 1;
@@ -62,7 +62,7 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
         expertises.add(EXPERTISE_ID);
         EmployeeRequestDTO employee = new EmployeeRequestDTO(
                 NEW_EMPLOYEE_ID,
-                EMPLOYEE_NAME,
+                NEW_EMPLOYEE_NAME,
                 DATE_OF_BIRTH,
                 Gender.MALE,
                 GRADUATION_DATE,
@@ -98,7 +98,7 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
         expertises.add(EXPERTISE_ID);
         EmployeeRequestDTO employee = new EmployeeRequestDTO(
                 NEW_EMPLOYEE_ID,
-                EMPLOYEE_NAME,
+                NEW_EMPLOYEE_NAME,
                 DATE_OF_BIRTH,
                 Gender.MALE,
                 GRADUATION_DATE,
@@ -159,7 +159,7 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
         expertises.add(EXPERTISE_ID);
         EmployeeRequestDTO employee = new EmployeeRequestDTO(
                 NEW_EMPLOYEE_ID,
-                EMPLOYEE_NAME,
+                NEW_EMPLOYEE_NAME,
                 DATE_OF_BIRTH,
                 Gender.MALE,
                 GRADUATION_DATE,
@@ -185,7 +185,7 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
         expertises.add(EXPERTISE_ID);
         EmployeeRequestDTO employee = new EmployeeRequestDTO(
                 NEW_EMPLOYEE_ID,
-                EMPLOYEE_NAME,
+                NEW_EMPLOYEE_NAME,
                 DATE_OF_BIRTH,
                 Gender.MALE,
                 GRADUATION_DATE,
@@ -211,7 +211,7 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
         expertises.add(EXPERTISE_ID);
         EmployeeRequestDTO employee = new EmployeeRequestDTO(
                 NEW_EMPLOYEE_ID,
-                EMPLOYEE_NAME,
+                NEW_EMPLOYEE_NAME,
                 DATE_OF_BIRTH,
                 Gender.MALE,
                 GRADUATION_DATE,
@@ -237,7 +237,7 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
         expertises.add(EXPERTISE_ID);
         EmployeeRequestDTO employee = new EmployeeRequestDTO(
                 NEW_EMPLOYEE_ID,
-                EMPLOYEE_NAME,
+                NEW_EMPLOYEE_NAME,
                 FUTURE_DATE_OF_BIRTH,
                 Gender.MALE,
                 GRADUATION_DATE,
@@ -286,15 +286,16 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
         //arrange
         EmployeeRequestDTO employee = new EmployeeRequestDTO();
         employee.setName("new Name"); // changing the original name
+        employee.setExpertise(new ArrayList<>());
         //act
         ResultActions result = mockMvc.perform(patch("/employee/"+EXISTING_EMPLOYEE_ID).contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(employee)));
         //assert
-                result.andExpect(status().isCreated())
+                result.andExpect(status().isOk())
                 .andExpect(jsonPath("$.employeeID").value(EXISTING_EMPLOYEE_ID))
                 .andExpect(jsonPath("$.name").value(employee.getName())) //assert the change happened
                 .andExpect(jsonPath("$.dateOfBirth").value(DATE_OF_BIRTH.toString()))
-                .andExpect(jsonPath("$.gender").value(Gender.MALE))
+                .andExpect(jsonPath("$.gender").value(Gender.MALE.toString()))
                 .andExpect(jsonPath("$.graduationDate").value(GRADUATION_DATE.toString()))
                 .andExpect(jsonPath("$.salary").value(SALARY))
                 .andExpect(jsonPath("$.departmentId").value(DEPARTMENT_ID))
