@@ -2,20 +2,14 @@ package com.orange.hr.integration;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.springtestdbunit.TransactionDbUnitTestExecutionListener;
-import com.github.springtestdbunit.annotation.DatabaseSetup;
-import com.github.springtestdbunit.annotation.DbUnitConfiguration;
 import com.orange.hr.dto.EmployeeRequestDTO;
-import com.orange.hr.entity.Department;
-import com.orange.hr.entity.Employee;
-import com.orange.hr.entity.Expertise;
-import com.orange.hr.entity.Team;
 import com.orange.hr.enums.Gender;
 import com.orange.hr.repository.DepartmentRepository;
 import com.orange.hr.repository.EmployeeRepository;
 import com.orange.hr.repository.ExpertiseRepository;
 import com.orange.hr.repository.TeamRepository;
 import org.junit.jupiter.api.Test;
+import org.mockito.internal.matchers.Null;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
@@ -41,19 +35,42 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
     @Autowired
     private ObjectMapper objectMapper;
 
+    private static final int EMPLOYEE_ID = 2;
+    private static final String EMPLOYEE_NAME = "Ahmed Eldera";
+    private static final LocalDate DATE_OF_BIRTH = LocalDate.of(2003, 2, 18);
+    private static final LocalDate FUTURE_DATE_OF_BIRTH = LocalDate.of(2999, 2, 18);
+    private static final LocalDate GRADUATION_DATE = LocalDate.of(2026, 4, 12);
+    private static final float SALARY = 1000F;
+    private static final int DEPARTMENT_ID = 1;
+    private static final int NON_EXISTENT_DEPARTMENT_ID = 9876;
+    private static final int TEAM_ID = 1;
+    private static final int NON_EXISTENT_TEAM_ID = 9876;
+    private static final int MANAGER_ID = 1;
+    private static final int NON_EXISTENT_MANAGER_ID = 9876;
+    private static final int EXPERTISE_ID = 1;
+
 
     @Test
     public void AddEmpolyeeSuccessfully_WithFullData_ExpectCreated() throws Exception {
         prepareDB("/datasets/populateDB.xml");
         //Arrange
+        List<Integer> expertises = new ArrayList<>();
+        expertises.add(EXPERTISE_ID);
+        EmployeeRequestDTO employee = new EmployeeRequestDTO(
+                EMPLOYEE_ID,
+                EMPLOYEE_NAME,
+                DATE_OF_BIRTH,
+                Gender.MALE,
+                GRADUATION_DATE,
+                SALARY,
+                DEPARTMENT_ID,
+                MANAGER_ID,
+                TEAM_ID,
+                expertises
+        );
 
-        List<Integer> l = new ArrayList<>();
-        l.add(1);
         //act
-        EmployeeRequestDTO employee = new EmployeeRequestDTO(2, "ahmed ELdera", LocalDate.of(2003, 2, 18), Gender.MALE, LocalDate.of(2026, 4, 12), 1000F, 1, 1, 1, l);
-
-        //act
-        ResultActions result = mockMvc.perform(post("/employees").contentType(MediaType.APPLICATION_JSON)
+        ResultActions result = mockMvc.perform(post("/employee").contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(employee)));
         //assert
         result.andExpect(status().isCreated())
@@ -73,14 +90,23 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
     public void AddEmpolyeeSuccessfully_WithNoManager_ExpectCreated() throws Exception {
         prepareDB("/datasets/populateDB.xml");
         //Arrange
+        List<Integer> expertises = new ArrayList<>();
+        expertises.add(EXPERTISE_ID);
+        EmployeeRequestDTO employee = new EmployeeRequestDTO(
+                EMPLOYEE_ID,
+                EMPLOYEE_NAME,
+                DATE_OF_BIRTH,
+                Gender.MALE,
+                GRADUATION_DATE,
+                SALARY,
+                DEPARTMENT_ID,
+                null,
+                TEAM_ID,
+                expertises
+        );
 
-        List<Integer> l = new ArrayList<>();
-        l.add(1);
         //act
-        EmployeeRequestDTO employee = new EmployeeRequestDTO(2, "ahmed ELdera", LocalDate.of(2003, 2, 18), Gender.MALE, LocalDate.of(2026, 4, 12), 1000F, 1, null, 1, l);
-
-        //act
-        ResultActions result = mockMvc.perform(post("/employees").contentType(MediaType.APPLICATION_JSON)
+        ResultActions result = mockMvc.perform(post("/employee").contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(employee)));
         //assert
         result.andExpect(status().isCreated())
@@ -100,14 +126,22 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
     public void AddEmpolyee_WithMissingData_ExpectBadRequest() throws Exception {
         prepareDB("/datasets/populateDB.xml");
         //Arrange
-
-        List<Integer> l = new ArrayList<>();
-        l.add(1);
+        List<Integer> expertises = new ArrayList<>();
+        expertises.add(EXPERTISE_ID);
+        EmployeeRequestDTO employee = new EmployeeRequestDTO(
+                EMPLOYEE_ID,
+                null,  //missing name
+                DATE_OF_BIRTH,
+                Gender.MALE,
+                GRADUATION_DATE,
+                SALARY,
+                DEPARTMENT_ID,
+                null,
+                TEAM_ID,
+                expertises
+        );
         //act
-        EmployeeRequestDTO employee = new EmployeeRequestDTO(2, "ahmed ELdera", LocalDate.of(2003, 2, 18), Gender.MALE, LocalDate.of(2026, 4, 12), 1000F, null, null, 1, l);
-
-        //act
-        ResultActions result = mockMvc.perform(post("/employees").contentType(MediaType.APPLICATION_JSON)
+        ResultActions result = mockMvc.perform(post("/employee").contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(employee)));
         //assert
         result.andExpect(status().isBadRequest());
@@ -117,14 +151,22 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
     public void AddEmpolyee_WithDepartmentNotValid_ExpectNotFound() throws Exception {
         prepareDB("/datasets/populateDB.xml");
         //Arrange
-
-        List<Integer> l = new ArrayList<>();
-        l.add(1);
+        List<Integer> expertises = new ArrayList<>();
+        expertises.add(EXPERTISE_ID);
+        EmployeeRequestDTO employee = new EmployeeRequestDTO(
+                EMPLOYEE_ID,
+                EMPLOYEE_NAME,
+                DATE_OF_BIRTH,
+                Gender.MALE,
+                GRADUATION_DATE,
+                SALARY,
+                NON_EXISTENT_DEPARTMENT_ID,
+                MANAGER_ID,
+                TEAM_ID,
+                expertises
+        );
         //act
-        EmployeeRequestDTO employee = new EmployeeRequestDTO(2, "ahmed ELdera", LocalDate.of(2003, 2, 18), Gender.MALE, LocalDate.of(2026, 4, 12), 1000F, 2, null, 1, l);
-
-        //act
-        ResultActions result = mockMvc.perform(post("/employees").contentType(MediaType.APPLICATION_JSON)
+        ResultActions result = mockMvc.perform(post("/employee").contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(employee)));
         //assert
         result.andExpect(status().isNotFound())
@@ -135,14 +177,22 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
     public void AddEmpolyee_WithTeamNotValid_ExpectNotFound() throws Exception {
         prepareDB("/datasets/populateDB.xml");
         //Arrange
-
-        List<Integer> l = new ArrayList<>();
-        l.add(1);
+        List<Integer> expertises = new ArrayList<>();
+        expertises.add(EXPERTISE_ID);
+        EmployeeRequestDTO employee = new EmployeeRequestDTO(
+                EMPLOYEE_ID,
+                EMPLOYEE_NAME,
+                DATE_OF_BIRTH,
+                Gender.MALE,
+                GRADUATION_DATE,
+                SALARY,
+                DEPARTMENT_ID,
+                MANAGER_ID,
+                NON_EXISTENT_TEAM_ID,
+                expertises
+        );
         //act
-        EmployeeRequestDTO employee = new EmployeeRequestDTO(2, "ahmed ELdera", LocalDate.of(2003, 2, 18), Gender.MALE, LocalDate.of(2026, 4, 12), 1000F, 1, null, 2, l);
-
-        //act
-        ResultActions result = mockMvc.perform(post("/employees").contentType(MediaType.APPLICATION_JSON)
+        ResultActions result = mockMvc.perform(post("/employee").contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(employee)));
         //assert
         result.andExpect(status().isNotFound())
@@ -153,14 +203,22 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
     public void AddEmpolyee_WithManagerNotValid_ExpectNotFound() throws Exception {
         prepareDB("/datasets/populateDB.xml");
         //Arrange
-
-        List<Integer> l = new ArrayList<>();
-        l.add(1);
+        List<Integer> expertises = new ArrayList<>();
+        expertises.add(EXPERTISE_ID);
+        EmployeeRequestDTO employee = new EmployeeRequestDTO(
+                EMPLOYEE_ID,
+                EMPLOYEE_NAME,
+                DATE_OF_BIRTH,
+                Gender.MALE,
+                GRADUATION_DATE,
+                SALARY,
+                DEPARTMENT_ID,
+                NON_EXISTENT_MANAGER_ID,
+                TEAM_ID,
+                expertises
+        );
         //act
-        EmployeeRequestDTO employee = new EmployeeRequestDTO(2, "ahmed ELdera", LocalDate.of(2003, 2, 18), Gender.MALE, LocalDate.of(2026, 4, 12), 1000F, 1, 55, 1, l);
-
-        //act
-        ResultActions result = mockMvc.perform(post("/employees").contentType(MediaType.APPLICATION_JSON)
+        ResultActions result = mockMvc.perform(post("/employee").contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(employee)));
         //assert
         result.andExpect(status().isNotFound())
@@ -171,14 +229,22 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
     public void AddEmpolyee_WithBirthDateNotValid_ExpectNotFound() throws Exception {
         prepareDB("/datasets/populateDB.xml");
         //Arrange
-
-        List<Integer> l = new ArrayList<>();
-        l.add(1);
+        List<Integer> expertises = new ArrayList<>();
+        expertises.add(1);
+                EmployeeRequestDTO employee = new EmployeeRequestDTO(
+                EMPLOYEE_ID,
+                EMPLOYEE_NAME,
+                FUTURE_DATE_OF_BIRTH,
+                Gender.MALE,
+                GRADUATION_DATE,
+                SALARY,
+                DEPARTMENT_ID,
+                MANAGER_ID,
+                TEAM_ID,
+                expertises
+        );
         //act
-        EmployeeRequestDTO employee = new EmployeeRequestDTO(2, "ahmed ELdera", LocalDate.of(2993, 2, 18), Gender.MALE, LocalDate.of(2026, 4, 12), 1000F, 1, 1, 1, l);
-
-        //act
-        ResultActions result = mockMvc.perform(post("/employees").contentType(MediaType.APPLICATION_JSON)
+        ResultActions result = mockMvc.perform(post("/employee").contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(employee)));
         //assert
         result.andExpect(status().isBadRequest())
