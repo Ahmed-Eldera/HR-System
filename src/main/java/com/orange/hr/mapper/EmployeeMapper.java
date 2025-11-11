@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 public class EmployeeMapper {
     public Employee toEntity(EmployeeRequestDTO dto) {
         Employee employee = new Employee();
-        employee.setEmployeeID(dto.getEmployeeId());
+//        employee.setEmployeeID(dto.getEmployeeId());
         employee.setName(dto.getName());
         employee.setDateOfBirth(dto.getDateOfBirth());
         employee.setGraduationDate(dto.getGraduationDate());

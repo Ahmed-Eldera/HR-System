@@ -1,0 +1,1 @@
+alter table employees modify column employee_id INT AUTO_INCREMENT;

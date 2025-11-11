@@ -35,32 +35,27 @@ public class EmployeeServiceImpl implements EmployeeService {
     private EmployeeMapper employeeMapper;
 
     public EmployeeResponseDTO addEmployee(EmployeeRequestDTO employee) {
-
-        Department dept = departmentRepository.findById(employee.getDepartmentId()).orElseThrow(() -> new NoSuchDepartmentException(HttpStatus.NOT_FOUND,"Can't find the Selected Department"));
-        Team team = teamRepository.findById(employee.getTeamId()).orElseThrow(() -> new NoSuchTeamException(HttpStatus.NOT_FOUND,"Can't find the Selected Team"));
-        Employee entity = employeeMapper.toEntity(employee);
-        entity.setDepartment(dept);
-        entity.setTeam(team);
+        if (employee.getDateOfBirth().isAfter(LocalDate.now())) {
+            throw new InValidDateException(HttpStatus.BAD_REQUEST, "Birth date can't be in the future");
+        }
+        Department dept = departmentRepository.findById(employee.getDepartmentId()).orElseThrow(() -> new NoSuchDepartmentException(HttpStatus.NOT_FOUND, "Can't find the Selected Department"));
+        Team team = teamRepository.findById(employee.getTeamId()).orElseThrow(() -> new NoSuchTeamException(HttpStatus.NOT_FOUND, "Can't find the Selected Team"));
+        Employee manager = null;
         if (employee.getManagerId() != null) {
-            Employee manager = employeeRepository.findById(employee.getManagerId()).orElseThrow(() -> new NoSuchEmployeeException(HttpStatus.NOT_FOUND,"Can't find the Selected Manager"));
-            entity.setManager(manager);
+            manager = employeeRepository.findById(employee.getManagerId()).orElseThrow(() -> new NoSuchEmployeeException(HttpStatus.NOT_FOUND, "Can't find the Selected Manager"));
         }
         List<Expertise> expertises = new ArrayList<>();
         if (employee.getExpertise() != null) {
             for (Integer i : employee.getExpertise()) {
-                if (!expertiseRepository.existsById(i)) {
-                    throw new NoSuchExpertiseException(HttpStatus.NOT_FOUND,"Can't find the Selected Expertise");
-                }else{
-                    expertises.add(new Expertise(i,null,null));
-                }
+                expertises.add(expertiseRepository.findById(i).orElseThrow(()->new NoSuchExpertiseException(HttpStatus.NOT_FOUND, "Can't find the Selected Expertise")));
             }
         }
-        if (employee.getDateOfBirth().isAfter(LocalDate.now())) {
-            throw new InValidDateException(HttpStatus.BAD_REQUEST,"Birth date can't be in the future");
-        }
+        Employee entity = employeeMapper.toEntity(employee);
+        entity.setDepartment(dept);
+        entity.setTeam(team);
+        entity.setManager(manager);
         entity.setExpertises(expertises);
         employeeRepository.save(entity);
-        EmployeeResponseDTO responseDTO = employeeMapper.toDTO(entity);
-        return responseDTO;
+        return employeeMapper.toDTO(entity);
     }
 }
