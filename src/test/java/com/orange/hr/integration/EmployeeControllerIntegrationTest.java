@@ -41,12 +41,17 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
     private static final int NEW_EMPLOYEE_ID = 2;
     private static final String NEW_EMPLOYEE_NAME = "Ahmed Eldera";
     private static final LocalDate DATE_OF_BIRTH = LocalDate.of(2003, 2, 18);
+    private static final LocalDate NEW_DATE_OF_BIRTH = LocalDate.of(2004, 2, 18);
     private static final LocalDate FUTURE_DATE_OF_BIRTH = LocalDate.of(2999, 2, 18);
     private static final LocalDate GRADUATION_DATE = LocalDate.of(2026, 2, 18);
+    private static final LocalDate NEW_GRADUATION_DATE = LocalDate.of(2029, 2, 18);
     private static final float SALARY = 500F;
+    private static final float NEW_SALARY = 99F;
     private static final int DEPARTMENT_ID = 1;
+    private static final int DEPARTMENT_ID2 = 2;
     private static final int NON_EXISTENT_DEPARTMENT_ID = 9876;
     private static final int TEAM_ID = 1;
+    private static final int TEAM_ID2 = 2;
     private static final int NON_EXISTENT_TEAM_ID = 9876;
     private static final int MANAGER_ID = 1;
     private static final int NON_EXISTENT_MANAGER_ID = 9876;
@@ -281,17 +286,27 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
     }
 
     @Test
-    public void modifyEmployee_WithValidName_ExpectOK() throws Exception {
+    public void modifyEmployee_WithValidData_ExpectOK() throws Exception {
         prepareDB("/datasets/populateDB.xml");
         //arrange
-        EmployeeRequestDTO employee = new EmployeeRequestDTO();
-        employee.setName("new Name"); // changing the original name
-        employee.setExpertise(new ArrayList<>());
+        List<Integer> expertises = new ArrayList<>();
+        EmployeeRequestDTO employee = new EmployeeRequestDTO(
+                null,
+                NEW_EMPLOYEE_NAME,
+                DATE_OF_BIRTH,
+                Gender.MALE,
+                GRADUATION_DATE,
+                SALARY,
+                DEPARTMENT_ID,
+                NON_EXISTENT_MANAGER_ID,
+                TEAM_ID,
+                expertises
+        );
         //act
-        ResultActions result = mockMvc.perform(patch("/employee/"+EXISTING_EMPLOYEE_ID).contentType(MediaType.APPLICATION_JSON)
+        ResultActions result = mockMvc.perform(patch("/employee/" + EXISTING_EMPLOYEE_ID).contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(employee)));
         //assert
-                result.andExpect(status().isOk())
+        result.andExpect(status().isOk())
                 .andExpect(jsonPath("$.employeeID").value(EXISTING_EMPLOYEE_ID))
                 .andExpect(jsonPath("$.name").value(employee.getName())) //assert the change happened
                 .andExpect(jsonPath("$.dateOfBirth").value(DATE_OF_BIRTH.toString()))

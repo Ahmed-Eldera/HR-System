@@ -1,6 +1,7 @@
 package com.orange.hr.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.orange.hr.enums.Gender;
 import lombok.*;
 
@@ -24,4 +25,5 @@ public class EmployeeResponseDTO {
     private Integer managerId;
     private Integer teamId;
     private List<Integer> expertisesIds;
+    JsonNode
 }
