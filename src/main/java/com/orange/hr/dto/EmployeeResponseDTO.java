@@ -25,5 +25,4 @@ public class EmployeeResponseDTO {
     private Integer managerId;
     private Integer teamId;
     private List<Integer> expertisesIds;
-    JsonNode
 }

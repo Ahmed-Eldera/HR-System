@@ -46,12 +46,15 @@ public class AbstractTest {
 
     @BeforeAll
     void setUp() throws Exception {
-        dbUnitConnection = new DatabaseConnection(dataSource.getConnection());
-        DatabaseConfig config = dbUnitConnection.getConfig();
+        if (dbUnitConnection == null) {
+            dbUnitConnection = new DatabaseConnection(dataSource.getConnection());
 
-        config.setProperty(DatabaseConfig.PROPERTY_DATATYPE_FACTORY, new CustomH2DataTypeFactory());
-        config.setProperty(DatabaseConfig.FEATURE_CASE_SENSITIVE_TABLE_NAMES, false);
-        config.setProperty(DatabaseConfig.FEATURE_ALLOW_EMPTY_FIELDS, true);
+            DatabaseConfig config = dbUnitConnection.getConfig();
+
+            config.setProperty(DatabaseConfig.PROPERTY_DATATYPE_FACTORY, new CustomH2DataTypeFactory());
+            config.setProperty(DatabaseConfig.FEATURE_CASE_SENSITIVE_TABLE_NAMES, false);
+            config.setProperty(DatabaseConfig.FEATURE_ALLOW_EMPTY_FIELDS, true);
+        }
     }
 
     public static class CustomH2DataTypeFactory extends H2DataTypeFactory {
@@ -68,6 +71,8 @@ public class AbstractTest {
 
         FlatXmlDataSetBuilder builder = new FlatXmlDataSetBuilder();
         IDataSet dataSet = builder.build(getClass().getResourceAsStream(path));
+        dbUnitConnection.getConnection().createStatement().execute("SET REFERENTIAL_INTEGRITY FALSE");
         DatabaseOperation.CLEAN_INSERT.execute(dbUnitConnection, dataSet);
+        dbUnitConnection.getConnection().createStatement().execute("SET REFERENTIAL_INTEGRITY TRUE");
     }
 }

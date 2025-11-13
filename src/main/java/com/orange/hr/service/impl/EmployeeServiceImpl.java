@@ -45,7 +45,9 @@ public class EmployeeServiceImpl implements EmployeeService {
 
         Employee manager = null;
         if (employee.getManagerId() != null) {
-            manager = employeeRepository.findById(employee.getManagerId()).orElseThrow(() -> new NoSuchEmployeeException(HttpStatus.NOT_FOUND, "Can't find the Selected Manager"));
+            if (employee.getManagerId().isPresent()) {
+                manager = employeeRepository.findById(employee.getManagerId().get()).orElseThrow(() -> new NoSuchEmployeeException(HttpStatus.NOT_FOUND, "Can't find the Selected Manager"));
+            }
         }
 
         List<Expertise> expertises = expertiseRepository.findAllById(employee.getExpertise());

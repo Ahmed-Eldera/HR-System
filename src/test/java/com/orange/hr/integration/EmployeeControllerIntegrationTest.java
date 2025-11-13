@@ -21,6 +21,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.time.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 
 public class EmployeeControllerIntegrationTest extends AbstractTest {
@@ -39,6 +40,7 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
 
     private static final int EXISTING_EMPLOYEE_ID = 1;
     private static final int NEW_EMPLOYEE_ID = 2;
+    private static final String EXISTING_EMPLOYEE_NAME = "Ahmed";
     private static final String NEW_EMPLOYEE_NAME = "Ahmed Eldera";
     private static final LocalDate DATE_OF_BIRTH = LocalDate.of(2003, 2, 18);
     private static final LocalDate NEW_DATE_OF_BIRTH = LocalDate.of(2004, 2, 18);
@@ -53,15 +55,17 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
     private static final int TEAM_ID = 1;
     private static final int TEAM_ID2 = 2;
     private static final int NON_EXISTENT_TEAM_ID = 9876;
-    private static final int MANAGER_ID = 1;
-    private static final int NON_EXISTENT_MANAGER_ID = 9876;
+    private static final Optional<Integer> MANAGER_ID = Optional.of(1);
+    private static final Optional<Integer> MANAGER_ID2 = Optional.of(2);
+    private static final Optional<Integer> NON_EXISTENT_MANAGER_ID = Optional.of(99);
     private static final int EXPERTISE_ID = 1;
+    private static final int EXPERTISE_ID2 = 1;
     private static final int NON_EXISTENT_EXPERTISE_ID = 123;
 
 
     @Test
     public void AddEmpolyeeSuccessfully_WithFullData_ExpectCreated() throws Exception {
-        prepareDB("/datasets/populateDB.xml");
+        prepareDB("/datasets/AddEmployeeDataset.xml");
         //Arrange
         List<Integer> expertises = new ArrayList<>();
         expertises.add(EXPERTISE_ID);
@@ -90,14 +94,14 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
                 .andExpect(jsonPath("$.graduationDate").value(employee.getGraduationDate().toString()))
                 .andExpect(jsonPath("$.salary").value(employee.getSalary()))
                 .andExpect(jsonPath("$.departmentId").value(employee.getDepartmentId()))
-                .andExpect(jsonPath("$.managerId").value(employee.getManagerId()))
+                .andExpect(jsonPath("$.managerId").value(employee.getManagerId().get()))
                 .andExpect(jsonPath("$.teamId").value(employee.getTeamId()))
                 .andExpect(jsonPath("$.expertisesIds").value(employee.getExpertise()));
     }
 
     @Test
     public void AddEmpolyeeSuccessfully_WithNoManager_ExpectCreated() throws Exception {
-        prepareDB("/datasets/populateDB.xml");
+        prepareDB("/datasets/AddEmployeeDataset.xml");
         //Arrange
         List<Integer> expertises = new ArrayList<>();
         expertises.add(EXPERTISE_ID);
@@ -109,7 +113,7 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
                 GRADUATION_DATE,
                 SALARY,
                 DEPARTMENT_ID,
-                null,
+                Optional.empty(),
                 TEAM_ID,
                 expertises
         );
@@ -126,14 +130,14 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
                 .andExpect(jsonPath("$.graduationDate").value(employee.getGraduationDate().toString()))
                 .andExpect(jsonPath("$.salary").value(employee.getSalary()))
                 .andExpect(jsonPath("$.departmentId").value(employee.getDepartmentId()))
-                .andExpect(jsonPath("$.managerId").value(employee.getManagerId()))
+                .andExpect(jsonPath("$.managerId").isEmpty())
                 .andExpect(jsonPath("$.teamId").value(employee.getTeamId()))
                 .andExpect(jsonPath("$.expertisesIds").value(employee.getExpertise()));
     }
 
     @Test
     public void AddEmpolyee_WithMissingData_ExpectBadRequest() throws Exception {
-        prepareDB("/datasets/populateDB.xml");
+        prepareDB("/datasets/AddEmployeeDataset.xml");
         //Arrange
         List<Integer> expertises = new ArrayList<>();
         expertises.add(EXPERTISE_ID);
@@ -158,7 +162,7 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
 
     @Test
     public void AddEmpolyee_WithDepartmentNotValid_ExpectNotFound() throws Exception {
-        prepareDB("/datasets/populateDB.xml");
+        prepareDB("/datasets/AddEmployeeDataset.xml");
         //Arrange
         List<Integer> expertises = new ArrayList<>();
         expertises.add(EXPERTISE_ID);
@@ -184,7 +188,7 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
 
     @Test
     public void AddEmpolyee_WithTeamNotValid_ExpectNotFound() throws Exception {
-        prepareDB("/datasets/populateDB.xml");
+        prepareDB("/datasets/AddEmployeeDataset.xml");
         //Arrange
         List<Integer> expertises = new ArrayList<>();
         expertises.add(EXPERTISE_ID);
@@ -210,7 +214,7 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
 
     @Test
     public void AddEmpolyee_WithManagerNotValid_ExpectNotFound() throws Exception {
-        prepareDB("/datasets/populateDB.xml");
+        prepareDB("/datasets/AddEmployeeDataset.xml");
         //Arrange
         List<Integer> expertises = new ArrayList<>();
         expertises.add(EXPERTISE_ID);
@@ -236,7 +240,7 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
 
     @Test
     public void AddEmpolyee_WithBirthDateNotValid_ExpectNotFound() throws Exception {
-        prepareDB("/datasets/populateDB.xml");
+        prepareDB("/datasets/AddEmployeeDataset.xml");
         //Arrange
         List<Integer> expertises = new ArrayList<>();
         expertises.add(EXPERTISE_ID);
@@ -287,19 +291,20 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
 
     @Test
     public void modifyEmployee_WithValidData_ExpectOK() throws Exception {
-        prepareDB("/datasets/populateDB.xml");
+        prepareDB("/datasets/ModifyEmployeeDataset.xml");
         //arrange
         List<Integer> expertises = new ArrayList<>();
+        expertises.add(EXPERTISE_ID2);
         EmployeeRequestDTO employee = new EmployeeRequestDTO(
                 null,
                 NEW_EMPLOYEE_NAME,
-                DATE_OF_BIRTH,
-                Gender.MALE,
-                GRADUATION_DATE,
-                SALARY,
-                DEPARTMENT_ID,
-                NON_EXISTENT_MANAGER_ID,
-                TEAM_ID,
+                NEW_DATE_OF_BIRTH,
+                Gender.FEMALE,
+                NEW_GRADUATION_DATE,
+                NEW_SALARY,
+                DEPARTMENT_ID2,
+                MANAGER_ID2,
+                TEAM_ID2,
                 expertises
         );
         //act
@@ -307,17 +312,89 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
                 .content(objectMapper.writeValueAsString(employee)));
         //assert
         result.andExpect(status().isOk())
-                .andExpect(jsonPath("$.employeeID").value(EXISTING_EMPLOYEE_ID))
+//                .andExpect(jsonPath("$.employeeID").value(EXISTING_EMPLOYEE_ID))
+                .andExpect(jsonPath("$.name").value(employee.getName()))
+                .andExpect(jsonPath("$.dateOfBirth").value(employee.getDateOfBirth().toString()))
+                .andExpect(jsonPath("$.gender").value(employee.getGender().toString()))
+                .andExpect(jsonPath("$.graduationDate").value(employee.getGraduationDate().toString()))
+                .andExpect(jsonPath("$.salary").value(employee.getSalary()))
+                .andExpect(jsonPath("$.departmentId").value(employee.getDepartmentId()))
+                .andExpect(jsonPath("$.managerId").value(employee.getManagerId().get()))
+                .andExpect(jsonPath("$.teamId").value(employee.getTeamId()))
+                .andExpect(jsonPath("$.expertisesIds").value(employee.getExpertise()));
+
+    }
+
+    @Test
+    public void modifyEmployee_RemoveManager_ExpectOK() throws Exception {
+        prepareDB("/datasets/ModifyEmployeeDataset.xml");
+        //arrange
+        List<Integer> expertises = new ArrayList<>();
+        expertises.add(EXPERTISE_ID);
+        EmployeeRequestDTO employee = new EmployeeRequestDTO();
+        employee.setManagerId(Optional.empty());
+        //act
+        ResultActions result = mockMvc.perform(patch("/employee/" + EXISTING_EMPLOYEE_ID).contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(employee)));
+        //assert
+        result.andExpect(status().isOk())
+//                .andExpect(jsonPath("$.employeeID").value(EXISTING_EMPLOYEE_ID))
+                .andExpect(jsonPath("$.name").value(EXISTING_EMPLOYEE_NAME)) //assert the change happened
+                .andExpect(jsonPath("$.dateOfBirth").value(DATE_OF_BIRTH.toString()))
+                .andExpect(jsonPath("$.gender").value(Gender.MALE.toString()))
+                .andExpect(jsonPath("$.graduationDate").value(GRADUATION_DATE.toString()))
+                .andExpect(jsonPath("$.salary").value(SALARY))
+                .andExpect(jsonPath("$.departmentId").value(DEPARTMENT_ID))
+                .andExpect(jsonPath("$.managerId").isEmpty())
+                .andExpect(jsonPath("$.teamId").value(TEAM_ID))
+                .andExpect(jsonPath("$.expertisesIds").value(expertises));
+
+    }
+
+    @Test
+    public void modifyEmployee_PartialUpdateLeaveManagerAsItIs_ExpectOK() throws Exception {
+        prepareDB("/datasets/ModifyEmployeeDataset.xml");
+        //arrange
+        List<Integer> expertises = new ArrayList<>();
+        EmployeeRequestDTO employee = new EmployeeRequestDTO();
+        employee.setName(NEW_EMPLOYEE_NAME);
+        employee.setExpertise(expertises);
+        //act
+        ResultActions result = mockMvc.perform(patch("/employee/" + EXISTING_EMPLOYEE_ID).contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(employee)));
+        //assert
+        result.andExpect(status().isOk())
                 .andExpect(jsonPath("$.name").value(employee.getName())) //assert the change happened
                 .andExpect(jsonPath("$.dateOfBirth").value(DATE_OF_BIRTH.toString()))
                 .andExpect(jsonPath("$.gender").value(Gender.MALE.toString()))
                 .andExpect(jsonPath("$.graduationDate").value(GRADUATION_DATE.toString()))
                 .andExpect(jsonPath("$.salary").value(SALARY))
                 .andExpect(jsonPath("$.departmentId").value(DEPARTMENT_ID))
-                .andExpect(jsonPath("$.managerId").value(employee.getManagerId()))
+                .andExpect(jsonPath("$.managerId").isEmpty())
                 .andExpect(jsonPath("$.teamId").value(TEAM_ID))
-                .andExpect(jsonPath("$.expertisesIds").value(employee.getExpertise()));
-
+                .andExpect(jsonPath("$.expertisesIds").value(expertises));
     }
-
+        @Test
+    public void modifyEmployee_RemoveExpertises_ExpectOK() throws Exception {
+        prepareDB("/datasets/ModifyEmployeeDataset.xml");
+        //arrange
+        List<Integer> expertises = new ArrayList<>();
+        EmployeeRequestDTO employee = new EmployeeRequestDTO();
+        employee.setName(NEW_EMPLOYEE_NAME);
+        employee.setExpertise(expertises);
+        //act
+        ResultActions result = mockMvc.perform(patch("/employee/" + EXISTING_EMPLOYEE_ID).contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(employee)));
+        //assert
+        result.andExpect(status().isOk())
+                .andExpect(jsonPath("$.name").value(employee.getName())) //assert the change happened
+                .andExpect(jsonPath("$.dateOfBirth").value(DATE_OF_BIRTH.toString()))
+                .andExpect(jsonPath("$.gender").value(Gender.MALE.toString()))
+                .andExpect(jsonPath("$.graduationDate").value(GRADUATION_DATE.toString()))
+                .andExpect(jsonPath("$.salary").value(SALARY))
+                .andExpect(jsonPath("$.departmentId").value(DEPARTMENT_ID))
+                .andExpect(jsonPath("$.managerId").isEmpty())
+                .andExpect(jsonPath("$.teamId").value(TEAM_ID))
+                .andExpect(jsonPath("$.expertisesIds").value(expertises));
+    }
 }
