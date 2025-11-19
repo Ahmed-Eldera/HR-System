@@ -51,8 +51,8 @@ public class EmployeeServiceImpl implements EmployeeService {
         }
 
         List<Expertise> expertises = expertiseRepository.findAllById(employee.getExpertise());
-        if(expertises.size()!=employee.getExpertise().size()){
-            throw new NoSuchExpertiseException(HttpStatus.NOT_FOUND,"Can't find the Selected Expertise");
+        if (expertises.size() != employee.getExpertise().size()) {
+            throw new NoSuchExpertiseException(HttpStatus.NOT_FOUND, "Can't find the Selected Expertise");
         }
 
         //saving the employee
@@ -65,10 +65,56 @@ public class EmployeeServiceImpl implements EmployeeService {
         return employeeMapper.toDTO(entity);
     }
 
-    public EmployeeResponseDTO modifyEmployee(Integer id ,EmployeeRequestDTO dto) {
-        Employee entity = employeeRepository.findById(id).orElseThrow(()->new NoSuchEmployeeException(HttpStatus.NOT_FOUND,"Employee Not Found"));
-        entity.setName(dto.getName());
+    public EmployeeResponseDTO modifyEmployee(Integer id, EmployeeRequestDTO dto) {
 
+        Employee entity = employeeRepository.findById(id).orElseThrow(() -> new NoSuchEmployeeException(HttpStatus.NOT_FOUND, "Employee Not Found"));
+        if (dto.getName() != null) {
+            entity.setName(dto.getName());
+        }
+
+        if (dto.getGender() != null) {
+            entity.setGender(dto.getGender());
+        }
+
+        if (dto.getSalary() != null) {
+            entity.setSalary(dto.getSalary());
+        }
+
+        if (dto.getExpertise() != null) {
+            List<Expertise> expertises = expertiseRepository.findAllById(dto.getExpertise());
+            if (expertises.size() != dto.getExpertise().size()) {
+                throw new NoSuchExpertiseException(HttpStatus.NOT_FOUND, "Can't find the Selected Expertise");
+            }
+            entity.setExpertises(expertises);
+        }
+
+        if (dto.getGraduationDate() != null) {
+            entity.setGraduationDate(dto.getGraduationDate());
+        }
+
+        if (dto.getDateOfBirth() != null) {
+            entity.setDateOfBirth(dto.getDateOfBirth());
+        }
+
+        if (dto.getDepartmentId() != null) {
+            Department dept = departmentRepository.findById(dto.getDepartmentId()).orElseThrow(() -> new NoSuchDepartmentException(HttpStatus.NOT_FOUND, "Can't find the Selected Department"));
+            entity.setDepartment(dept);
+        }
+
+        if (dto.getTeamId() != null) {
+            Team team = teamRepository.findById(dto.getTeamId()).orElseThrow(() -> new NoSuchTeamException(HttpStatus.NOT_FOUND, "Can't find the Selected Team"));
+            entity.setTeam(team);
+        }
+
+        if (dto.getManagerId() != null) {
+            if (dto.getManagerId().isPresent()) {
+                entity.setManager(employeeRepository.findById(dto.getManagerId().get()).orElseThrow(() -> new NoSuchEmployeeException(HttpStatus.NOT_FOUND, "Can't find the Selected Manager")));
+            } else {
+                entity.setManager(null);
+            }
+        }
+
+        employeeRepository.save(entity);
         return employeeMapper.toDTO(entity);
     }
 }

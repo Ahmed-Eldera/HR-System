@@ -28,14 +28,6 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
     @Autowired
     MockMvc mockMvc;
     @Autowired
-    DepartmentRepository departmentRepository;
-    @Autowired
-    TeamRepository teamRepository;
-    @Autowired
-    EmployeeRepository employeeRepository;
-    @Autowired
-    ExpertiseRepository expertiseRepository;
-    @Autowired
     private ObjectMapper objectMapper;
 
     private static final int EXISTING_EMPLOYEE_ID = 1;
@@ -265,13 +257,13 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
     }
         @Test
     public void AddEmpolyee_WithExpertiseNotValid_ExpectNotFound() throws Exception {
-        prepareDB("/datasets/populateDB.xml");
+        prepareDB("/datasets/AddEmployeeDataset.xml");
         //Arrange
         List<Integer> expertises = new ArrayList<>();
         expertises.add(NON_EXISTENT_EXPERTISE_ID);
                 EmployeeRequestDTO employee = new EmployeeRequestDTO(
                 NEW_EMPLOYEE_ID,
-                EMPLOYEE_NAME,
+                NEW_EMPLOYEE_NAME,
                 DATE_OF_BIRTH,
                 Gender.MALE,
                 GRADUATION_DATE,
