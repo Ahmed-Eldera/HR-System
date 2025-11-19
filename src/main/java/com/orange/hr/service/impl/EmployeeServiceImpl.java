@@ -48,14 +48,10 @@ public class EmployeeServiceImpl implements EmployeeService {
             manager = employeeRepository.findById(employee.getManagerId()).orElseThrow(() -> new NoSuchEmployeeException(HttpStatus.NOT_FOUND, "Can't find the Selected Manager"));
         }
 
-        List<Expertise> expertises = new ArrayList<>();
-        if (employee.getExpertise() != null) {
-            for (Integer i : employee.getExpertise()) {
-                expertises.add(expertiseRepository.findById(i).orElseThrow(()->new NoSuchExpertiseException(HttpStatus.NOT_FOUND, "Can't find the Selected Expertise")));
-            }
+        List<Expertise> expertises = expertiseRepository.findAllById(employee.getExpertise());
+        if(expertises.size()!=employee.getExpertise().size()){
+            throw new NoSuchExpertiseException(HttpStatus.NOT_FOUND,"Can't find the Selected Expertise");
         }
-        //List<Expertise> expertises = expertiseRepository.findAllById(employee.getExpertise());
-        //ignore any nonExisting ids + throws illegal exception not a customized one + if I want to check if it found all the ids I would have to compare all the sizes
 
         //saving the employee
         Employee entity = employeeMapper.toEntity(employee);
