@@ -117,4 +117,9 @@ public class EmployeeServiceImpl implements EmployeeService {
         employeeRepository.save(entity);
         return employeeMapper.toDTO(entity);
     }
+
+    @Override
+    public void deleteEmployee(Integer id) {
+        employeeRepository.deleteById(id);
+    }
 }
