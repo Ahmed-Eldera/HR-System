@@ -9,13 +9,15 @@ import com.orange.hr.repository.EmployeeRepository;
 import com.orange.hr.repository.ExpertiseRepository;
 import com.orange.hr.repository.TeamRepository;
 import org.junit.jupiter.api.Test;
-import org.mockito.internal.matchers.Null;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
+
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
 import java.time.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -35,7 +37,8 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    private static final int EMPLOYEE_ID = 2;
+    private static final int EXISTING_EMPLOYEE_ID = 1;
+    private static final int NEW_EMPLOYEE_ID = 2;
     private static final String EMPLOYEE_NAME = "Ahmed Eldera";
     private static final LocalDate DATE_OF_BIRTH = LocalDate.of(2003, 2, 18);
     private static final LocalDate FUTURE_DATE_OF_BIRTH = LocalDate.of(2999, 2, 18);
@@ -58,7 +61,7 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
         List<Integer> expertises = new ArrayList<>();
         expertises.add(EXPERTISE_ID);
         EmployeeRequestDTO employee = new EmployeeRequestDTO(
-                EMPLOYEE_ID,
+                NEW_EMPLOYEE_ID,
                 EMPLOYEE_NAME,
                 DATE_OF_BIRTH,
                 Gender.MALE,
@@ -94,7 +97,7 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
         List<Integer> expertises = new ArrayList<>();
         expertises.add(EXPERTISE_ID);
         EmployeeRequestDTO employee = new EmployeeRequestDTO(
-                EMPLOYEE_ID,
+                NEW_EMPLOYEE_ID,
                 EMPLOYEE_NAME,
                 DATE_OF_BIRTH,
                 Gender.MALE,
@@ -130,7 +133,7 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
         List<Integer> expertises = new ArrayList<>();
         expertises.add(EXPERTISE_ID);
         EmployeeRequestDTO employee = new EmployeeRequestDTO(
-                EMPLOYEE_ID,
+                NEW_EMPLOYEE_ID,
                 null,  //missing name
                 DATE_OF_BIRTH,
                 Gender.MALE,
@@ -155,7 +158,7 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
         List<Integer> expertises = new ArrayList<>();
         expertises.add(EXPERTISE_ID);
         EmployeeRequestDTO employee = new EmployeeRequestDTO(
-                EMPLOYEE_ID,
+                NEW_EMPLOYEE_ID,
                 EMPLOYEE_NAME,
                 DATE_OF_BIRTH,
                 Gender.MALE,
@@ -181,7 +184,7 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
         List<Integer> expertises = new ArrayList<>();
         expertises.add(EXPERTISE_ID);
         EmployeeRequestDTO employee = new EmployeeRequestDTO(
-                EMPLOYEE_ID,
+                NEW_EMPLOYEE_ID,
                 EMPLOYEE_NAME,
                 DATE_OF_BIRTH,
                 Gender.MALE,
@@ -207,7 +210,7 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
         List<Integer> expertises = new ArrayList<>();
         expertises.add(EXPERTISE_ID);
         EmployeeRequestDTO employee = new EmployeeRequestDTO(
-                EMPLOYEE_ID,
+                NEW_EMPLOYEE_ID,
                 EMPLOYEE_NAME,
                 DATE_OF_BIRTH,
                 Gender.MALE,
@@ -232,8 +235,8 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
         //Arrange
         List<Integer> expertises = new ArrayList<>();
         expertises.add(EXPERTISE_ID);
-                EmployeeRequestDTO employee = new EmployeeRequestDTO(
-                EMPLOYEE_ID,
+        EmployeeRequestDTO employee = new EmployeeRequestDTO(
+                NEW_EMPLOYEE_ID,
                 EMPLOYEE_NAME,
                 FUTURE_DATE_OF_BIRTH,
                 Gender.MALE,
@@ -258,7 +261,7 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
         List<Integer> expertises = new ArrayList<>();
         expertises.add(NON_EXISTENT_EXPERTISE_ID);
                 EmployeeRequestDTO employee = new EmployeeRequestDTO(
-                EMPLOYEE_ID,
+                NEW_EMPLOYEE_ID,
                 EMPLOYEE_NAME,
                 DATE_OF_BIRTH,
                 Gender.MALE,
@@ -277,5 +280,28 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
                 .andExpect(jsonPath("$.msg").value("Can't find the Selected Expertise"));
     }
 
+    @Test
+    public void modifyEmployee_WithValidName_ExpectOK() throws Exception {
+        prepareDB("/datasets/populateDB.xml");
+        //arrange
+        EmployeeRequestDTO employee = new EmployeeRequestDTO();
+        employee.setName("new Name"); // changing the original name
+        //act
+        ResultActions result = mockMvc.perform(patch("/employee/"+EXISTING_EMPLOYEE_ID).contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(employee)));
+        //assert
+                result.andExpect(status().isCreated())
+                .andExpect(jsonPath("$.employeeID").value(EXISTING_EMPLOYEE_ID))
+                .andExpect(jsonPath("$.name").value(employee.getName())) //assert the change happened
+                .andExpect(jsonPath("$.dateOfBirth").value(DATE_OF_BIRTH.toString()))
+                .andExpect(jsonPath("$.gender").value(Gender.MALE))
+                .andExpect(jsonPath("$.graduationDate").value(GRADUATION_DATE.toString()))
+                .andExpect(jsonPath("$.salary").value(SALARY))
+                .andExpect(jsonPath("$.departmentId").value(DEPARTMENT_ID))
+                .andExpect(jsonPath("$.managerId").value(employee.getManagerId()))
+                .andExpect(jsonPath("$.teamId").value(TEAM_ID))
+                .andExpect(jsonPath("$.expertisesIds").value(employee.getExpertise()));
+
+    }
 
 }
