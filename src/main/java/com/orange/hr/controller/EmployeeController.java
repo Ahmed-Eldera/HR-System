@@ -27,9 +27,10 @@ public class EmployeeController {
 
     @PatchMapping("/{id}")
     public ResponseEntity<EmployeeResponseDTO> modifyEmployee(@PathVariable("id") Integer id, @RequestBody EmployeeRequestDTO requestDTO) {
-        EmployeeResponseDTO responseDTO = employeeService.modifyEmployee(id,requestDTO);
+        EmployeeResponseDTO responseDTO = employeeService.modifyEmployee(id, requestDTO);
         return ResponseEntity.status(HttpStatus.OK).body(responseDTO);
     }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteEmployee(@PathVariable("id") Integer id){
         employeeService.deleteEmployeeAndReassignSubordinates(id);
