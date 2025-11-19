@@ -48,6 +48,7 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
     private static final int MANAGER_ID = 1;
     private static final int NON_EXISTENT_MANAGER_ID = 9876;
     private static final int EXPERTISE_ID = 1;
+    private static final int NON_EXISTENT_EXPERTISE_ID = 123;
 
 
     @Test
@@ -230,7 +231,7 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
         prepareDB("/datasets/populateDB.xml");
         //Arrange
         List<Integer> expertises = new ArrayList<>();
-        expertises.add(1);
+        expertises.add(EXPERTISE_ID);
                 EmployeeRequestDTO employee = new EmployeeRequestDTO(
                 EMPLOYEE_ID,
                 EMPLOYEE_NAME,
@@ -249,6 +250,31 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
         //assert
         result.andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.msg").value("Birth date can't be in the future"));
+    }
+        @Test
+    public void AddEmpolyee_WithExpertiseNotValid_ExpectNotFound() throws Exception {
+        prepareDB("/datasets/populateDB.xml");
+        //Arrange
+        List<Integer> expertises = new ArrayList<>();
+        expertises.add(NON_EXISTENT_EXPERTISE_ID);
+                EmployeeRequestDTO employee = new EmployeeRequestDTO(
+                EMPLOYEE_ID,
+                EMPLOYEE_NAME,
+                DATE_OF_BIRTH,
+                Gender.MALE,
+                GRADUATION_DATE,
+                SALARY,
+                DEPARTMENT_ID,
+                MANAGER_ID,
+                TEAM_ID,
+                expertises
+        );
+        //act
+        ResultActions result = mockMvc.perform(post("/employee").contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(employee)));
+        //assert
+        result.andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.msg").value("Can't find the Selected Expertise"));
     }
 
 

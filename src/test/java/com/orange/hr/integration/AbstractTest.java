@@ -12,7 +12,9 @@ import org.dbunit.dataset.datatype.DataTypeException;
 import org.dbunit.dataset.xml.FlatXmlDataSetBuilder;
 import org.dbunit.ext.h2.H2DataTypeFactory;
 import org.dbunit.operation.DatabaseOperation;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -35,13 +37,14 @@ import java.sql.Types;
         DirtiesContextTestExecutionListener.class,
         TransactionDbUnitTestExecutionListener.class
 })
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class AbstractTest {
     @Autowired
     private DataSource dataSource;
 
-    private IDatabaseConnection dbUnitConnection;
+    private static IDatabaseConnection dbUnitConnection;
 
-    @BeforeEach
+    @BeforeAll
     void setUp() throws Exception {
         dbUnitConnection = new DatabaseConnection(dataSource.getConnection());
         DatabaseConfig config = dbUnitConnection.getConfig();
@@ -51,7 +54,7 @@ public class AbstractTest {
         config.setProperty(DatabaseConfig.FEATURE_ALLOW_EMPTY_FIELDS, true);
     }
 
-    public class CustomH2DataTypeFactory extends H2DataTypeFactory {
+    public static class CustomH2DataTypeFactory extends H2DataTypeFactory {
         @Override
         public DataType createDataType(int sqlType, String sqlTypeName) throws DataTypeException {
             if (sqlType == Types.OTHER && sqlTypeName.startsWith("ENUM")) {

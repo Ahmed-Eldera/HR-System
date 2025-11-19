@@ -35,21 +35,29 @@ public class EmployeeServiceImpl implements EmployeeService {
     private EmployeeMapper employeeMapper;
 
     public EmployeeResponseDTO addEmployee(EmployeeRequestDTO employee) {
+        // validating the input data
         if (employee.getDateOfBirth().isAfter(LocalDate.now())) {
             throw new InValidDateException(HttpStatus.BAD_REQUEST, "Birth date can't be in the future");
         }
+
         Department dept = departmentRepository.findById(employee.getDepartmentId()).orElseThrow(() -> new NoSuchDepartmentException(HttpStatus.NOT_FOUND, "Can't find the Selected Department"));
         Team team = teamRepository.findById(employee.getTeamId()).orElseThrow(() -> new NoSuchTeamException(HttpStatus.NOT_FOUND, "Can't find the Selected Team"));
+
         Employee manager = null;
         if (employee.getManagerId() != null) {
             manager = employeeRepository.findById(employee.getManagerId()).orElseThrow(() -> new NoSuchEmployeeException(HttpStatus.NOT_FOUND, "Can't find the Selected Manager"));
         }
+
         List<Expertise> expertises = new ArrayList<>();
         if (employee.getExpertise() != null) {
             for (Integer i : employee.getExpertise()) {
                 expertises.add(expertiseRepository.findById(i).orElseThrow(()->new NoSuchExpertiseException(HttpStatus.NOT_FOUND, "Can't find the Selected Expertise")));
             }
         }
+        //List<Expertise> expertises = expertiseRepository.findAllById(employee.getExpertise());
+        //ignore any nonExisting ids + throws illegal exception not a customized one + if I want to check if it found all the ids I would have to compare all the sizes
+
+        //saving the employee
         Employee entity = employeeMapper.toEntity(employee);
         entity.setDepartment(dept);
         entity.setTeam(team);

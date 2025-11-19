@@ -10,3 +10,6 @@ create table if not exists employees (
 	team_id int not null ,
 	foreign key (team_id) references teams(team_id)
 );
+alter table employees add manager_id int;
+alter table employees add constraint fk_const foreign key (manager_id) references employees(employee_id);
+alter table employees modify column employee_id INT AUTO_INCREMENT;
