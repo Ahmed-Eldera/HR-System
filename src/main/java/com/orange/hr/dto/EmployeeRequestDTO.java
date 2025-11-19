@@ -5,14 +5,17 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Setter
 @Getter
 @AllArgsConstructor
+@NoArgsConstructor
 public class EmployeeRequestDTO {
 
     @NotNull(message = "employeeId can't be null")
@@ -36,7 +39,7 @@ public class EmployeeRequestDTO {
     @NotNull(message = "Department can't be null")
     private Integer departmentId;
 
-    private Integer managerId;
+    private Optional<Integer> managerId;
 
     @NotNull(message = "Team can't be null")
     private Integer teamId;
