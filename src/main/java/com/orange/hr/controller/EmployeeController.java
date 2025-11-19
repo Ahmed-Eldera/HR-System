@@ -4,9 +4,11 @@ import com.orange.hr.dto.EmployeeRequestDTO;
 import com.orange.hr.dto.EmployeeResponseDTO;
 import com.orange.hr.service.EmployeeService;
 import jakarta.validation.Valid;
+import org.apache.coyote.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.service.annotation.PatchExchange;
 
 @RestController
 @RequestMapping("/employee")
@@ -32,5 +34,12 @@ public class EmployeeController {
     public ResponseEntity<String> deleteEmployee(@PathVariable("id") Integer id){
         employeeService.deleteEmployeeAndReassignSubordinates(id);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<EmployeeResponseDTO> getEmployee(@PathVariable("id") Integer id) {
+        EmployeeResponseDTO responseDTO = employeeService.getEmployee(id);
+        return new ResponseEntity<>(responseDTO, HttpStatus.OK);
+
     }
 }
