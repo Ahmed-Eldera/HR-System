@@ -13,14 +13,20 @@ import com.orange.hr.repository.EmployeeRepository;
 import com.orange.hr.repository.ExpertiseRepository;
 import com.orange.hr.repository.TeamRepository;
 import com.orange.hr.service.EmployeeService;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaUpdate;
+import jakarta.persistence.criteria.Root;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+@Transactional
 @Service
 public class EmployeeServiceImpl implements EmployeeService {
     @Autowired
@@ -33,6 +39,9 @@ public class EmployeeServiceImpl implements EmployeeService {
     private ExpertiseRepository expertiseRepository;
     @Autowired
     private EmployeeMapper employeeMapper;
+    @Autowired
+    private EntityManager entityManager;
+
 
     public EmployeeResponseDTO addEmployee(EmployeeRequestDTO employee) {
         // validating the input data
@@ -120,6 +129,17 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     public void deleteEmployee(Integer id) {
+        Employee employee = employeeRepository.findById(id).orElseThrow(() -> new NoSuchEmployeeException(HttpStatus.NOT_FOUND, "Can't find Such Employee"));
+        if (employee.getManager() == null) {
+            throw new MyException(HttpStatus.CONFLICT, "Can't delete a super manager");
+        }
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaUpdate<Employee> update = cb.createCriteriaUpdate(Employee.class);
+        Root<Employee> root = update.from(Employee.class);
+        update.set(root.get("manager").get("id"), employee.getManager().getEmployeeID());
+        update.where(cb.equal(root.get("manager").get("id"), id));
+
+        entityManager.createQuery(update).executeUpdate();
         employeeRepository.deleteById(id);
     }
 }

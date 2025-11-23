@@ -11,12 +11,14 @@ import com.orange.hr.repository.DepartmentRepository;
 import com.orange.hr.repository.EmployeeRepository;
 import com.orange.hr.repository.ExpertiseRepository;
 import com.orange.hr.repository.TeamRepository;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -30,9 +32,14 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
     MockMvc mockMvc;
     @Autowired
     private ObjectMapper objectMapper;
+    @Autowired
+    EmployeeRepository employeeRepository;
 
+    private static final int NON_EXISTENT_EMPLOYEE_ID = 999;
     private static final int EXISTING_EMPLOYEE_ID = 1;
     private static final int EXISTING_EMPLOYEE_ID2 = 2;
+    private static final int LEAF_EMPLOYEE_ID3 = 3;
+    private static final int SUPER_MANAGER_ID2 = 2;
     private static final int NEW_EMPLOYEE_ID = 2;
     private static final String EXISTING_EMPLOYEE_NAME = "Ahmed";
     private static final String NEW_EMPLOYEE_NAME = "Ahmed Eldera";
@@ -415,6 +422,26 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
         ResultActions result = mockMvc.perform(delete("/employee/" + EXISTING_EMPLOYEE_ID2));
 
         result.andExpect(status().isConflict());
+
+    }
+
+    @Test
+    public void deleteEmployee_WithNonExistentEmployee_ShouldReturnNotFound() throws Exception {
+        prepareDB("/datasets/DeleteEmployee.xml");
+        //act
+        ResultActions result = mockMvc.perform(delete("/employee/" + NON_EXISTENT_EMPLOYEE_ID));
+
+        result.andExpect(status().isNotFound());
+
+    }
+
+    @Test
+    public void deleteEmployee_WithAManagerThatHasEmployees_ShouldMoveEmployeesToHisManager() throws Exception {
+        prepareDB("/datasets/DeleteEmployee.xml");
+        //act
+        ResultActions result = mockMvc.perform(delete("/employee/" + EXISTING_EMPLOYEE_ID));
+        result.andExpect(status().isNoContent());
+        assertEquals(employeeRepository.findById(LEAF_EMPLOYEE_ID3).get().getManager().getEmployeeID(),SUPER_MANAGER_ID2);
 
     }
 }
