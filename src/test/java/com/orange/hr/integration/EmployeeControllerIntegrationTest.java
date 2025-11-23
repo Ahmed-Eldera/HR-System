@@ -538,4 +538,17 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
         result.andExpect(status().isNotFound());
 
     }
+
+    @Test
+    public void GetSalary_WithValidEmployee_ShouldReturnOK() throws Exception {
+        prepareDB("/datasets/GetSalary.xml");
+        //prepare
+        double netSalary = SALARY - 500 - SALARY * 0.15; //net = gross - fixed 500 and - 15% tax
+        //act
+        ResultActions result = mockMvc.perform(get("/employee/" + EXISTING_EMPLOYEE_ID + "/salary"));
+
+        result.andExpect(status().isOk())
+                .andExpect(jsonPath("$.gross").value(SALARY))
+                .andExpect(jsonPath("$.net").value(netSalary));
+    }
 }
