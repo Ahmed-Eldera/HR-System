@@ -351,7 +351,7 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
     public void modifyEmployee_PartialUpdateLeaveManagerAsItIs_ExpectOK() throws Exception {
         prepareDB("/datasets/ModifyEmployeeDataset.xml");
         //arrange
-//        objectMapper = new ObjectMapper();
+        objectMapper = new ObjectMapper();
         List<Integer> expertises = new ArrayList<>();
         EmployeeRequestDTO employee = new EmployeeRequestDTO();
         employee.setName(NEW_EMPLOYEE_NAME);
@@ -385,7 +385,6 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
         //act
         ResultActions result = mockMvc.perform(patch("/employee/" + EXISTING_EMPLOYEE_ID).contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL).writeValueAsString(employee)));
-        System.out.println(objectMapper.writeValueAsString(employee));
         //assert
         result.andExpect(status().isOk())
                 .andExpect(jsonPath("$.name").value(employee.getName())) //assert the change happened
