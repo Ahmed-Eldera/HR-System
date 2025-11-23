@@ -2,6 +2,7 @@ package com.orange.hr.service.impl;
 
 import com.orange.hr.dto.EmployeeRequestDTO;
 import com.orange.hr.dto.EmployeeResponseDTO;
+import com.orange.hr.dto.SalaryDTO;
 import com.orange.hr.entity.Department;
 import com.orange.hr.entity.Employee;
 import com.orange.hr.entity.Expertise;
@@ -144,5 +145,15 @@ public class EmployeeServiceImpl implements EmployeeService {
         Employee entity = employeeRepository.findById(id).orElseThrow(() -> new NoSuchEmployeeException(HttpStatus.NOT_FOUND, "Employee Not Found"));
         EmployeeResponseDTO dto = employeeMapper.toDTO(entity);
         return dto;
+    }
+
+    @Override
+    public SalaryDTO getSalary(Integer id) {
+        Employee employee = employeeRepository.findById(id).orElseThrow(()->new NoSuchEmployeeException(HttpStatus.NOT_FOUND,"Can't find the selected employee"));
+        double gross = employee.getSalary();
+        double net = gross - gross*15/100 - 500;
+        SalaryDTO salaryDTO= new SalaryDTO(gross,net);
+        return salaryDTO;
+
     }
 }

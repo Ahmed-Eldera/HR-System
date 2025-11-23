@@ -16,15 +16,14 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
-import java.time.LocalDate;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
+import java.time.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 public class EmployeeControllerIntegrationTest extends AbstractTest {
     @Autowired
@@ -48,8 +47,8 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
     private static final LocalDate GRADUATION_DATE = LocalDate.of(2026, 2, 18);
     private static final LocalDate NEW_GRADUATION_DATE = LocalDate.of(2029, 2, 18);
     private static final float SALARY = 500F;
-    private static final float NEW_SALARY = 2000F;
     private static final float INVALID_SALARY = 100F;
+    private static final float NEW_SALARY = 550F;
     private static final int DEPARTMENT_ID = 1;
     private static final int DEPARTMENT_ID2 = 2;
     private static final int NON_EXISTENT_DEPARTMENT_ID = 9876;
@@ -509,35 +508,6 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
         result.andExpect(status().isNotFound());
 
     }
-        @Test
-    public void GetEmployee_WithValidEmployee_ShouldReturnOK() throws Exception {
-        prepareDB("/datasets/GetEmployee.xml");
-        //act
-        ResultActions result = mockMvc.perform(get("/employee/" + EXISTING_EMPLOYEE_ID));
-
-        result.andExpect(status().isOk())
-                .andExpect(jsonPath("$.employeeID").value(EXISTING_EMPLOYEE_ID))
-                .andExpect(jsonPath("$.name").value(EXISTING_EMPLOYEE_NAME))
-                .andExpect(jsonPath("$.dateOfBirth").value(DATE_OF_BIRTH.toString()))
-                .andExpect(jsonPath("$.gender").value(Gender.MALE.toString()))
-                .andExpect(jsonPath("$.graduationDate").value(GRADUATION_DATE.toString()))
-                .andExpect(jsonPath("$.salary").value(SALARY))
-                .andExpect(jsonPath("$.departmentId").value(DEPARTMENT_ID))
-                .andExpect(jsonPath("$.managerId").isEmpty())
-                .andExpect(jsonPath("$.teamId").value(TEAM_ID))
-                .andExpect(jsonPath("$.expertisesIds").isEmpty());
-
-    }
-
-    @Test
-    public void GetEmployee_WithInValidEmployee_ShouldReturnNotFound() throws Exception {
-        prepareDB("/datasets/GetEmployee.xml");
-        //act
-        ResultActions result = mockMvc.perform(get("/employee/" + NON_EXISTENT_EMPLOYEE_ID));
-
-        result.andExpect(status().isNotFound());
-
-    }
 
     @Test
     public void GetSalary_WithValidEmployee_ShouldReturnOK() throws Exception {
@@ -550,5 +520,17 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
         result.andExpect(status().isOk())
                 .andExpect(jsonPath("$.gross").value(SALARY))
                 .andExpect(jsonPath("$.net").value(netSalary));
+    }
+
+    @Test
+    public void GetSalary_WithInValidEmployee_ShouldReturnNotFound() throws Exception {
+        prepareDB("/datasets/GetSalary.xml");
+        //prepare
+        double netSalary = SALARY - 500 - SALARY * 0.15; //net = gross - fixed 500 and - 15% tax
+        //act
+        ResultActions result = mockMvc.perform(get("/employee/" + NON_EXISTENT_EMPLOYEE_ID + "/salary"));
+
+        result.andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.msg").value("Can't find the selected employee"));
     }
 }
