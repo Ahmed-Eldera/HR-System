@@ -32,6 +32,7 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
     private ObjectMapper objectMapper;
 
     private static final int EXISTING_EMPLOYEE_ID = 1;
+    private static final int EXISTING_EMPLOYEE_ID2 = 2;
     private static final int NEW_EMPLOYEE_ID = 2;
     private static final String EXISTING_EMPLOYEE_NAME = "Ahmed";
     private static final String NEW_EMPLOYEE_NAME = "Ahmed Eldera";
@@ -398,12 +399,22 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
     }
 
     @Test
-    public void deleteEmployee() throws Exception {
+    public void deleteEmployee_WithManager_ShouldReturnNoContent() throws Exception {
         prepareDB("/datasets/DeleteEmployee.xml");
         //act
         ResultActions result = mockMvc.perform(delete("/employee/" + EXISTING_EMPLOYEE_ID));
 
         result.andExpect(status().isNoContent());
+
+    }
+
+    @Test
+    public void deleteEmployee_WithNoManager_ShouldReturnConflict() throws Exception {
+        prepareDB("/datasets/DeleteEmployee.xml");
+        //act
+        ResultActions result = mockMvc.perform(delete("/employee/" + EXISTING_EMPLOYEE_ID2));
+
+        result.andExpect(status().isConflict());
 
     }
 }
