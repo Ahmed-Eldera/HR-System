@@ -454,4 +454,33 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
             assertEquals(SUPER_MANAGER_ID2,emp.getManager().getEmployeeID());
         }
     }
+        @Test
+    public void GetEmployee_WithValidEmployee_ShouldReturnOK() throws Exception {
+        prepareDB("/datasets/GetEmployee.xml");
+        //act
+        ResultActions result = mockMvc.perform(get("/employee/" + EXISTING_EMPLOYEE_ID));
+
+        result.andExpect(status().isOk())
+                .andExpect(jsonPath("$.employeeID").value(EXISTING_EMPLOYEE_ID))
+                .andExpect(jsonPath("$.name").value(EXISTING_EMPLOYEE_NAME))
+                .andExpect(jsonPath("$.dateOfBirth").value(DATE_OF_BIRTH.toString()))
+                .andExpect(jsonPath("$.gender").value(Gender.MALE.toString()))
+                .andExpect(jsonPath("$.graduationDate").value(GRADUATION_DATE.toString()))
+                .andExpect(jsonPath("$.salary").value(SALARY))
+                .andExpect(jsonPath("$.departmentId").value(DEPARTMENT_ID))
+                .andExpect(jsonPath("$.managerId").isEmpty())
+                .andExpect(jsonPath("$.teamId").value(TEAM_ID))
+                .andExpect(jsonPath("$.expertisesIds").isEmpty());
+
+    }
+
+    @Test
+    public void GetEmployee_WithInValidEmployee_ShouldReturnNotFound() throws Exception {
+        prepareDB("/datasets/GetEmployee.xml");
+        //act
+        ResultActions result = mockMvc.perform(get("/employee/" + NON_EXISTENT_EMPLOYEE_ID));
+
+        result.andExpect(status().isNotFound());
+
+    }
 }
