@@ -2,6 +2,7 @@ package com.orange.hr.controller;
 
 import com.orange.hr.dto.EmployeeRequestDTO;
 import com.orange.hr.dto.EmployeeResponseDTO;
+import com.orange.hr.dto.SalaryDTO;
 import com.orange.hr.service.EmployeeService;
 import jakarta.validation.Valid;
 import org.apache.coyote.Response;
@@ -40,6 +41,13 @@ public class EmployeeController {
     @GetMapping("/{id}")
     public ResponseEntity<EmployeeResponseDTO> getEmployee(@PathVariable("id") Integer id) {
         EmployeeResponseDTO responseDTO = employeeService.getEmployee(id);
+        return new ResponseEntity<>(responseDTO, HttpStatus.OK);
+
+    }
+
+    @GetMapping("/{id}/salary")
+    public ResponseEntity<SalaryDTO> getSalary(@PathVariable("id") Integer id) {
+        SalaryDTO responseDTO = employeeService.getSalary(id);
         return new ResponseEntity<>(responseDTO, HttpStatus.OK);
 
     }
