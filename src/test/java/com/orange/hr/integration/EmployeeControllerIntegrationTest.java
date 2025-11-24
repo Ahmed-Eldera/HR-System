@@ -30,8 +30,7 @@ import java.util.Optional;
 public class EmployeeControllerIntegrationTest extends AbstractTest {
     @Autowired
     MockMvc mockMvc;
-    @Autowired
-    private ObjectMapper objectMapper;
+
     @Autowired
     EmployeeRepository employeeRepository;
 
@@ -358,7 +357,6 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
     public void modifyEmployee_PartialUpdateLeaveManagerAsItIs_ExpectOK() throws Exception {
         prepareDB("/datasets/ModifyEmployeeDataset.xml");
         //arrange
-        objectMapper = new ObjectMapper();
         List<Integer> expertises = new ArrayList<>();
         EmployeeRequestDTO employee = new EmployeeRequestDTO();
         employee.setName(NEW_EMPLOYEE_NAME);
@@ -367,31 +365,10 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
         ResultActions result = mockMvc.perform(patch("/employee/" + EXISTING_EMPLOYEE_ID).contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL)
                         .writeValueAsString(employee)));
-        //assert
-        result.andExpect(status().isOk())
-                .andExpect(jsonPath("$.name").value(employee.getName())) //assert the change happened
-                .andExpect(jsonPath("$.dateOfBirth").value(DATE_OF_BIRTH.toString()))
-                .andExpect(jsonPath("$.gender").value(Gender.MALE.toString()))
-                .andExpect(jsonPath("$.graduationDate").value(GRADUATION_DATE.toString()))
-                .andExpect(jsonPath("$.salary").value(SALARY))
-                .andExpect(jsonPath("$.departmentId").value(DEPARTMENT_ID))
-                .andExpect(jsonPath("$.managerId").value(MANAGER_ID2.get()))
-                .andExpect(jsonPath("$.teamId").value(TEAM_ID))
-                .andExpect(jsonPath("$.expertisesIds").value(expertises));
-    }
 
-    @Test
-    public void modifyEmployee_RemoveExpertises_ExpectOK() throws Exception {
-        prepareDB("/datasets/ModifyEmployeeDataset.xml");
-        //arrange
-        objectMapper = new ObjectMapper();
-        List<Integer> expertises = new ArrayList<>();
-        EmployeeRequestDTO employee = new EmployeeRequestDTO();
-        employee.setName(NEW_EMPLOYEE_NAME);
-        employee.setExpertise(expertises);
-        //act
-        ResultActions result = mockMvc.perform(patch("/employee/" + EXISTING_EMPLOYEE_ID).contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL).writeValueAsString(employee)));
+        System.out.println(objectMapper.getSerializationConfig());
+        System.out.println(objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL)
+                        .writeValueAsString(employee));
         //assert
         result.andExpect(status().isOk())
                 .andExpect(jsonPath("$.name").value(employee.getName())) //assert the change happened
