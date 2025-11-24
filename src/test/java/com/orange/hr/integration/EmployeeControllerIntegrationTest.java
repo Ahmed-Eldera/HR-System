@@ -1,8 +1,11 @@
 package com.orange.hr.integration;
 
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.orange.hr.dto.EmployeeRequestDTO;
+import com.orange.hr.entity.Employee;
 import com.orange.hr.enums.Gender;
 import com.orange.hr.repository.DepartmentRepository;
 import com.orange.hr.repository.EmployeeRepository;
@@ -22,7 +25,6 @@ import java.time.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
 
 public class EmployeeControllerIntegrationTest extends AbstractTest {
     @Autowired
@@ -255,13 +257,14 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
         result.andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.msg").value("Birth date can't be in the future"));
     }
-        @Test
+
+    @Test
     public void AddEmpolyee_WithExpertiseNotValid_ExpectNotFound() throws Exception {
         prepareDB("/datasets/AddEmployeeDataset.xml");
         //Arrange
         List<Integer> expertises = new ArrayList<>();
         expertises.add(NON_EXISTENT_EXPERTISE_ID);
-                EmployeeRequestDTO employee = new EmployeeRequestDTO(
+        EmployeeRequestDTO employee = new EmployeeRequestDTO(
                 NEW_EMPLOYEE_ID,
                 NEW_EMPLOYEE_NAME,
                 DATE_OF_BIRTH,
@@ -299,6 +302,7 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
                 TEAM_ID2,
                 expertises
         );
+        objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
         //act
         ResultActions result = mockMvc.perform(patch("/employee/" + EXISTING_EMPLOYEE_ID).contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(employee)));
@@ -347,13 +351,15 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
     public void modifyEmployee_PartialUpdateLeaveManagerAsItIs_ExpectOK() throws Exception {
         prepareDB("/datasets/ModifyEmployeeDataset.xml");
         //arrange
+        objectMapper = new ObjectMapper();
         List<Integer> expertises = new ArrayList<>();
         EmployeeRequestDTO employee = new EmployeeRequestDTO();
         employee.setName(NEW_EMPLOYEE_NAME);
-        employee.setExpertise(expertises);
+        expertises.add(EXPERTISE_ID);
         //act
         ResultActions result = mockMvc.perform(patch("/employee/" + EXISTING_EMPLOYEE_ID).contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(employee)));
+                .content(objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL)
+                        .writeValueAsString(employee)));
         //assert
         result.andExpect(status().isOk())
                 .andExpect(jsonPath("$.name").value(employee.getName())) //assert the change happened
@@ -362,21 +368,23 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
                 .andExpect(jsonPath("$.graduationDate").value(GRADUATION_DATE.toString()))
                 .andExpect(jsonPath("$.salary").value(SALARY))
                 .andExpect(jsonPath("$.departmentId").value(DEPARTMENT_ID))
-                .andExpect(jsonPath("$.managerId").isEmpty())
+                .andExpect(jsonPath("$.managerId").value(MANAGER_ID2.get()))
                 .andExpect(jsonPath("$.teamId").value(TEAM_ID))
                 .andExpect(jsonPath("$.expertisesIds").value(expertises));
     }
-        @Test
+
+    @Test
     public void modifyEmployee_RemoveExpertises_ExpectOK() throws Exception {
         prepareDB("/datasets/ModifyEmployeeDataset.xml");
         //arrange
+        objectMapper = new ObjectMapper();
         List<Integer> expertises = new ArrayList<>();
         EmployeeRequestDTO employee = new EmployeeRequestDTO();
         employee.setName(NEW_EMPLOYEE_NAME);
         employee.setExpertise(expertises);
         //act
         ResultActions result = mockMvc.perform(patch("/employee/" + EXISTING_EMPLOYEE_ID).contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(employee)));
+                .content(objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL).writeValueAsString(employee)));
         //assert
         result.andExpect(status().isOk())
                 .andExpect(jsonPath("$.name").value(employee.getName())) //assert the change happened
@@ -385,7 +393,7 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
                 .andExpect(jsonPath("$.graduationDate").value(GRADUATION_DATE.toString()))
                 .andExpect(jsonPath("$.salary").value(SALARY))
                 .andExpect(jsonPath("$.departmentId").value(DEPARTMENT_ID))
-                .andExpect(jsonPath("$.managerId").isEmpty())
+                .andExpect(jsonPath("$.managerId").value(MANAGER_ID2.get()))
                 .andExpect(jsonPath("$.teamId").value(TEAM_ID))
                 .andExpect(jsonPath("$.expertisesIds").value(expertises));
     }

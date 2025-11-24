@@ -1,5 +1,5 @@
 create table if not exists employees (
-	employee_id int primary key ,
+	employee_id int primary key auto_increment,
 	name varchar(255) not null ,
 	date_of_birth date not null,
     gender ENUM('MALE','FEMALE') not null,
@@ -12,4 +12,3 @@ create table if not exists employees (
 );
 alter table employees add manager_id int;
 alter table employees add constraint fk_const foreign key (manager_id) references employees(employee_id);
-alter table employees modify column employee_id INT AUTO_INCREMENT;
