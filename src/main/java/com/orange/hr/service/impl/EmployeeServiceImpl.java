@@ -86,11 +86,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         }
 
         if (dto.getSalary() != null) {
-            if(dto.getSalary()>=500) {
-                entity.setSalary(dto.getSalary());
-            }else{
-                throw new MyException(HttpStatus.BAD_REQUEST,"Minimum salary is 500");
-            }
+            entity.setSalary(dto.getSalary());
         }
 
         if (dto.getExpertise() != null) {
@@ -139,7 +135,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         }
         Integer newManagerId = employee.getManager().getEmployeeID();
         //reassign his subordinates to his manager before deleting him
-        employeeRepository.reassignSubordinates(id,newManagerId);
+        employeeRepository.reassignSubordinates(id, newManagerId);
         employeeRepository.deleteById(id);
     }
 

@@ -2,6 +2,7 @@ package com.orange.hr.integration;
 
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.orange.hr.dto.EmployeeRequestDTO;
 import com.orange.hr.entity.Employee;
 import com.orange.hr.entity.Expertise;
@@ -26,6 +27,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 public class EmployeeControllerIntegrationTest extends AbstractTest {
+    @Autowired
+    MockMvc mockMvc;
+    @Autowired
+    private ObjectMapper objectMapper;
+    @Autowired
+    EmployeeRepository employeeRepository;
+
     private static final int NON_EXISTENT_EMPLOYEE_ID = 999;
     private static final int EXISTING_EMPLOYEE_ID = 1;
     private static final int EXISTING_EMPLOYEE_ID2 = 2;
@@ -41,6 +49,7 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
     private static final LocalDate NEW_GRADUATION_DATE = LocalDate.of(2029, 2, 18);
     private static final float SALARY = 500F;
     private static final float NEW_SALARY = 2000F;
+    private static final float INVALID_SALARY = 100F;
     private static final int DEPARTMENT_ID = 1;
     private static final int DEPARTMENT_ID2 = 2;
     private static final int NON_EXISTENT_DEPARTMENT_ID = 9876;
@@ -53,14 +62,7 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
     private static final int EXPERTISE_ID = 1;
     private static final int EXPERTISE_ID2 = 1;
     private static final int NON_EXISTENT_EXPERTISE_ID = 123;
-    @Autowired
-    MockMvc mockMvc;
-    @Autowired
-    EntityManager entityManager;
-    @Autowired
-    EmployeeRepository employeeRepository;
-    @Autowired
-    EmployeeMapper employeeMapper;
+
 
     @Test
     public void AddEmpolyeeSuccessfully_WithFullData_ExpectCreated() throws Exception {
@@ -312,7 +314,6 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
         ResultActions result = mockMvc.perform(patch("/employee/" + EXISTING_EMPLOYEE_ID).contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(employee)));
         //assert
-
         result.andExpect(status().isOk())
 //                .andExpect(jsonPath("$.employeeID").value(EXISTING_EMPLOYEE_ID))
                 .andExpect(jsonPath("$.name").value(employee.getName()))
@@ -406,6 +407,34 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
     }
 
     @Test
+    public void modifyEmployee_InValidSalary_ExpectBadRequest() throws Exception {
+        prepareDB("/datasets/ModifyEmployeeDataset.xml");
+        //arrange
+        objectMapper = new ObjectMapper();
+        List<Integer> expertises = new ArrayList<>();
+        EmployeeRequestDTO employee = new EmployeeRequestDTO();
+        employee.setSalary(INVALID_SALARY);
+        employee.setExpertise(expertises);
+        //act
+        ResultActions result = mockMvc.perform(patch("/employee/" + EXISTING_EMPLOYEE_ID).contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL).writeValueAsString(employee)));
+        //assert
+        result.andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.msg").value("Salary must be at least 500")); //assert the change happened
+
+    }
+
+    @Test
+    public void deleteEmployee_WithManager_ShouldReturnNoContent() throws Exception {
+        prepareDB("/datasets/DeleteEmployee.xml");
+        //act
+        ResultActions result = mockMvc.perform(delete("/employee/" + EXISTING_EMPLOYEE_ID));
+
+        result.andExpect(status().isNoContent());
+
+    }
+
+    @Test
     public void deleteEmployee_WithNoManager_ShouldReturnConflict() throws Exception {
         prepareDB("/datasets/DeleteEmployee.xml");
         //arrange
@@ -450,36 +479,8 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
         }
         assertFalse(employeeRepository.findById(EXISTING_EMPLOYEE_ID).isPresent());
     }
-        @Test
-    public void GetEmployee_WithValidEmployee_ShouldReturnOK() throws Exception {
-        prepareDB("/datasets/GetEmployee.xml");
-        //act
-        ResultActions result = mockMvc.perform(get("/employee/" + EXISTING_EMPLOYEE_ID));
-
-        result.andExpect(status().isOk())
-                .andExpect(jsonPath("$.employeeID").value(EXISTING_EMPLOYEE_ID))
-                .andExpect(jsonPath("$.name").value(EXISTING_EMPLOYEE_NAME))
-                .andExpect(jsonPath("$.dateOfBirth").value(DATE_OF_BIRTH.toString()))
-                .andExpect(jsonPath("$.gender").value(Gender.MALE.toString()))
-                .andExpect(jsonPath("$.graduationDate").value(GRADUATION_DATE.toString()))
-                .andExpect(jsonPath("$.salary").value(SALARY))
-                .andExpect(jsonPath("$.departmentId").value(DEPARTMENT_ID))
-                .andExpect(jsonPath("$.managerId").isEmpty())
-                .andExpect(jsonPath("$.teamId").value(TEAM_ID))
-                .andExpect(jsonPath("$.expertisesIds").isEmpty());
-
-    }
 
     @Test
-    public void GetEmployee_WithInValidEmployee_ShouldReturnNotFound() throws Exception {
-        prepareDB("/datasets/GetEmployee.xml");
-        //act
-        ResultActions result = mockMvc.perform(get("/employee/" + NON_EXISTENT_EMPLOYEE_ID));
-
-        result.andExpect(status().isNotFound());
-
-    }
-        @Test
     public void GetEmployee_WithValidEmployee_ShouldReturnOK() throws Exception {
         prepareDB("/datasets/GetEmployee.xml");
         //act

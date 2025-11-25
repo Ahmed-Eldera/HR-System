@@ -42,6 +42,8 @@ import java.sql.Types;
 public class AbstractTest {
     @Autowired
     private DataSource dataSource;
+    @Autowired
+    private ObjectMapper objectMapper;
 
     @Autowired
     public ObjectMapper objectMapper;
@@ -64,6 +66,11 @@ public class AbstractTest {
 
     @BeforeEach
     void setupBeforeEach() {
+        objectMapper.clearCaches();
+    }
+
+    @BeforeEach
+    void setUpBeforeEach() {
         objectMapper.clearCaches();
     }
 
