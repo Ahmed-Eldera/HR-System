@@ -128,18 +128,14 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
-    public void deleteEmployee(Integer id) {
+    public void deleteEmployeeAndReassignSubordinates(Integer id) {
         Employee employee = employeeRepository.findById(id).orElseThrow(() -> new NoSuchEmployeeException(HttpStatus.NOT_FOUND, "Can't find Such Employee"));
         if (employee.getManager() == null) {
             throw new MyException(HttpStatus.CONFLICT, "Can't delete a super manager");
         }
-        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
-        CriteriaUpdate<Employee> update = cb.createCriteriaUpdate(Employee.class);
-        Root<Employee> root = update.from(Employee.class);
-        update.set(root.get("manager").get("id"), employee.getManager().getEmployeeID());
-        update.where(cb.equal(root.get("manager").get("id"), id));
-
-        entityManager.createQuery(update).executeUpdate();
+        Integer newManagerId = employee.getManager().getEmployeeID();
+        //reassign his subordinates to his manager before deleting him
+        employeeRepository.reassignSubordinates(id,newManagerId);
         employeeRepository.deleteById(id);
     }
 }

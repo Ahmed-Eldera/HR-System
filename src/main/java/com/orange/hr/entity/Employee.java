@@ -46,11 +46,14 @@ public class Employee {
     @JoinColumn(name = "team_id", nullable = false)
     private Team team;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "manager_id")
     private Employee manager;
 
-    @ManyToMany
+    @OneToMany(mappedBy = "manager",fetch = FetchType.LAZY)
+    private List<Employee> subordinates;
+
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "employees_expertise",
             joinColumns = @JoinColumn(name = "employee_id"),
