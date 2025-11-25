@@ -3,16 +3,10 @@ package com.orange.hr.integration;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.orange.hr.dto.EmployeeRequestDTO;
 import com.orange.hr.entity.Employee;
 import com.orange.hr.enums.Gender;
-import com.orange.hr.exceptions.NoSuchEmployeeException;
-import com.orange.hr.repository.DepartmentRepository;
 import com.orange.hr.repository.EmployeeRepository;
-import com.orange.hr.repository.ExpertiseRepository;
-import com.orange.hr.repository.TeamRepository;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -50,7 +44,8 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
     private static final LocalDate GRADUATION_DATE = LocalDate.of(2026, 2, 18);
     private static final LocalDate NEW_GRADUATION_DATE = LocalDate.of(2029, 2, 18);
     private static final float SALARY = 500F;
-    private static final float NEW_SALARY = 99F;
+    private static final float INVALID_SALARY = 100F;
+    private static final float NEW_SALARY = 550F;
     private static final int DEPARTMENT_ID = 1;
     private static final int DEPARTMENT_ID2 = 2;
     private static final int NON_EXISTENT_DEPARTMENT_ID = 9876;
@@ -359,7 +354,6 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
     public void modifyEmployee_PartialUpdateLeaveManagerAsItIs_ExpectOK() throws Exception {
         prepareDB("/datasets/ModifyEmployeeDataset.xml");
         //arrange
-        objectMapper = new ObjectMapper();
         List<Integer> expertises = new ArrayList<>();
         EmployeeRequestDTO employee = new EmployeeRequestDTO();
         employee.setName(NEW_EMPLOYEE_NAME);
@@ -385,7 +379,6 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
     public void modifyEmployee_RemoveExpertises_ExpectOK() throws Exception {
         prepareDB("/datasets/ModifyEmployeeDataset.xml");
         //arrange
-        objectMapper = new ObjectMapper();
         List<Integer> expertises = new ArrayList<>();
         EmployeeRequestDTO employee = new EmployeeRequestDTO();
         employee.setName(NEW_EMPLOYEE_NAME);
@@ -404,6 +397,23 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
                 .andExpect(jsonPath("$.managerId").value(MANAGER_ID2.get()))
                 .andExpect(jsonPath("$.teamId").value(TEAM_ID))
                 .andExpect(jsonPath("$.expertisesIds").value(expertises));
+    }
+    @Test
+    public void modifyEmployee_InValidSalary_ExpectBadRequest() throws Exception {
+        prepareDB("/datasets/ModifyEmployeeDataset.xml");
+        //arrange
+        objectMapper = new ObjectMapper();
+        List<Integer> expertises = new ArrayList<>();
+        EmployeeRequestDTO employee = new EmployeeRequestDTO();
+        employee.setSalary(INVALID_SALARY);
+        employee.setExpertise(expertises);
+        //act
+        ResultActions result = mockMvc.perform(patch("/employee/" + EXISTING_EMPLOYEE_ID).contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL).writeValueAsString(employee)));
+        //assert
+        result.andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.msg").value("Salary must be at least 500")); //assert the change happened
+
     }
 
     @Test

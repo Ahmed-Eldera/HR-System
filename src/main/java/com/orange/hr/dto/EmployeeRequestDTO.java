@@ -1,6 +1,7 @@
 package com.orange.hr.dto;
 
 import com.orange.hr.enums.Gender;
+import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -33,6 +34,7 @@ public class EmployeeRequestDTO {
     @NotNull(message = "Graduation Date can't be null")
     private LocalDate graduationDate;
 
+    @DecimalMin(value = "500.0", message = "Salary must be at least 500")
     @NotNull(message = "Salary can't be null")
     private Float salary;
 

@@ -1,5 +1,6 @@
 package com.orange.hr.integration;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.springtestdbunit.TransactionDbUnitTestExecutionListener;
 import org.dbunit.DatabaseUnitException;
 import org.dbunit.database.DatabaseConfig;
@@ -41,6 +42,8 @@ import java.sql.Types;
 public class AbstractTest {
     @Autowired
     private DataSource dataSource;
+    @Autowired
+    private ObjectMapper objectMapper;
 
     private static IDatabaseConnection dbUnitConnection;
 
@@ -55,6 +58,11 @@ public class AbstractTest {
             config.setProperty(DatabaseConfig.FEATURE_CASE_SENSITIVE_TABLE_NAMES, false);
             config.setProperty(DatabaseConfig.FEATURE_ALLOW_EMPTY_FIELDS, true);
         }
+    }
+
+    @BeforeEach
+    void setUpBeforeEach() {
+        objectMapper.clearCaches();
     }
 
     public static class CustomH2DataTypeFactory extends H2DataTypeFactory {
