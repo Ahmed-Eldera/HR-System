@@ -9,4 +9,6 @@ public interface EmployeeService {
     public EmployeeResponseDTO modifyEmployee(Integer id,EmployeeRequestDTO employee);
 
     public void deleteEmployeeAndReassignSubordinates(Integer id);
+
+    public EmployeeResponseDTO getEmployee(Integer id);
 }
