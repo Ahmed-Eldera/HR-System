@@ -61,6 +61,8 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
     private static final int EXPERTISE_ID = 1;
     private static final int EXPERTISE_ID2 = 1;
     private static final int NON_EXISTENT_EXPERTISE_ID = 123;
+    private static final int INSURANCE = 500;
+    private static final float TAX =0.15f;
 
 
     @Test
@@ -513,7 +515,7 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
     public void GetSalary_WithValidEmployee_ShouldReturnOK() throws Exception {
         prepareDB("/datasets/GetSalary.xml");
         //prepare
-        double netSalary = SALARY - 500 - SALARY * 0.15; //net = gross - fixed 500 and - 15% tax
+        double netSalary = SALARY - INSURANCE - SALARY * TAX; //net = gross - fixed 500 and - 15% tax
         //act
         ResultActions result = mockMvc.perform(get("/employee/" + EXISTING_EMPLOYEE_ID + "/salary"));
 
@@ -526,7 +528,7 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
     public void GetSalary_WithInValidEmployee_ShouldReturnNotFound() throws Exception {
         prepareDB("/datasets/GetSalary.xml");
         //prepare
-        double netSalary = SALARY - 500 - SALARY * 0.15; //net = gross - fixed 500 and - 15% tax
+        double netSalary = SALARY - INSURANCE - SALARY * TAX; //net = gross - fixed 500 and - 15% tax
         //act
         ResultActions result = mockMvc.perform(get("/employee/" + NON_EXISTENT_EMPLOYEE_ID + "/salary"));
 
