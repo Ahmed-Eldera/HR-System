@@ -530,14 +530,15 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
     @Test
     public void GetSubordinates_WithValidEmployee_ShouldReturnOk() throws Exception {
         prepareDB("/datasets/GetSubordinates.xml");
-        //root -> directChild |-> leaf1
-        //                    |-> leaf2
+        //                     |-> leaf1
+        // root -> directChild |
+        //                     |-> leaf2
+        //arrange
         EmployeeNodeDTO leaf2 = new EmployeeNodeDTO(4, "Ahmed", null);
         EmployeeNodeDTO leaf1 = new EmployeeNodeDTO(3, "Ahmed", null);
         EmployeeNodeDTO directChild = new EmployeeNodeDTO(2, "Ahmed", List.of(leaf1, leaf2));
         EmployeeNodeDTO root = new EmployeeNodeDTO(1, "Ahmed", List.of(directChild));
         String ExpectedOutput = objectMapper.writeValueAsString(root);
-        //arrange
 
         //act
         ResultActions result = mockMvc.perform(get("/employee/" + EXISTING_EMPLOYEE_ID + "/subordinates"));
@@ -557,10 +558,10 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
         //act
         ResultActions result = mockMvc.perform(get("/employee/" + NON_EXISTENT_EMPLOYEE_ID + "/subordinates"));
 
-        String actualOutput = result.andReturn().getResponse().getContentAsString();
         //assert
         result.andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.msg").value("Can't find selected employee."));
 
     }
+
 }
