@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.orange.hr.dto.EmployeeRequestDTO;
 import com.orange.hr.entity.Employee;
 import com.orange.hr.enums.Gender;
+import com.orange.hr.exceptions.NoSuchEmployeeException;
 import com.orange.hr.repository.DepartmentRepository;
 import com.orange.hr.repository.EmployeeRepository;
 import com.orange.hr.repository.ExpertiseRepository;
@@ -415,10 +416,19 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
     @Test
     public void deleteEmployee_WithAManagerThatHasEmployees_ShouldMoveEmployeesToHisManager() throws Exception {
         prepareDB("/datasets/DeleteEmployee.xml");
+        //arrange
+        List<Employee> subordinatesBeforeReassign = employeeRepository.findById(EXISTING_EMPLOYEE_ID).get().getSubordinates();
+        List<Integer> subordinatesIds = new ArrayList<>();
+        for(Employee emp: subordinatesBeforeReassign){
+            subordinatesIds.add(emp.getEmployeeID());
+        }
         //act
         ResultActions result = mockMvc.perform(delete("/employee/" + EXISTING_EMPLOYEE_ID));
         result.andExpect(status().isNoContent());
-        assertEquals(employeeRepository.findById(LEAF_EMPLOYEE_ID3).get().getManager().getEmployeeID(),SUPER_MANAGER_ID2);
-
+        //assert
+        List<Employee> subordinatesAfterReassign = employeeRepository.findAllById(subordinatesIds);
+        for(Employee emp:subordinatesAfterReassign){
+            assertEquals(SUPER_MANAGER_ID2,emp.getManager().getEmployeeID());
+        }
     }
 }
