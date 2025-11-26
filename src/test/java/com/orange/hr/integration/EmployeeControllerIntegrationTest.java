@@ -564,4 +564,29 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
 
     }
 
+    @Test
+    public void getEmployeesInTeam_WithValidTeam_ShouldReturnOk() throws Exception {
+        prepareDB("/datasets/GetEmployeesInTeam.xml");
+        //                     |-> leaf1
+        // root -> directChild |
+        //                     |-> leaf2
+        //arrange
+        EmployeeNodeDTO leaf2 = new EmployeeNodeDTO(4, "Ahmed", null);
+        EmployeeNodeDTO leaf1 = new EmployeeNodeDTO(3, "Ahmed", null);
+        EmployeeNodeDTO directChild = new EmployeeNodeDTO(2, "Ahmed", null);
+        EmployeeNodeDTO root = new EmployeeNodeDTO(1, "Ahmed", null);
+        List<EmployeeNodeDTO> team = List.of(root,directChild,leaf1,leaf2);
+        String ExpectedOutput = objectMapper.writeValueAsString(team);
+
+        //act
+        ResultActions result = mockMvc.perform(get("/employee?team=" + TEAM_ID));
+
+        String actualOutput = result.andReturn().getResponse().getContentAsString();
+        //assert
+        result.andExpect(status().isOk());
+        JSONAssert.assertEquals(ExpectedOutput, actualOutput, JSONCompareMode.NON_EXTENSIBLE);
+
+    }
+
+
 }
