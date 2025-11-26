@@ -573,11 +573,13 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
     @Test
     public void GetSubordinates_WithValidEmployee_ShouldReturnOk() throws Exception {
         prepareDB("/datasets/GetSubordinates.xml");
-        EmployeeNodeDTO ahmed4 = new EmployeeNodeDTO(4,"Ahmed",null);
-        EmployeeNodeDTO ahmed3 = new EmployeeNodeDTO(3,"Ahmed",null);
-        EmployeeNodeDTO ahmed2 = new EmployeeNodeDTO(2,"Ahmed",List.of(ahmed3,ahmed4));
-        EmployeeNodeDTO ahmed1 = new EmployeeNodeDTO(1,"Ahmed",List.of(ahmed2));
-        String ExpectedOutput =  objectMapper.writeValueAsString(ahmed1);
+        //root -> directChild |-> leaf1
+        //                    |-> leaf2
+        EmployeeNodeDTO leaf2 = new EmployeeNodeDTO(4, "Ahmed", null);
+        EmployeeNodeDTO leaf1 = new EmployeeNodeDTO(3, "Ahmed", null);
+        EmployeeNodeDTO directChild = new EmployeeNodeDTO(2, "Ahmed", List.of(leaf1, leaf2));
+        EmployeeNodeDTO root = new EmployeeNodeDTO(1, "Ahmed", List.of(directChild));
+        String ExpectedOutput = objectMapper.writeValueAsString(root);
         //arrange
 
         //act
@@ -585,13 +587,12 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
 
         String actualOutput = result.andReturn().getResponse().getContentAsString();
         //assert
-        result.andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(EXISTING_EMPLOYEE_ID))
-                .andExpect(jsonPath("$.name").value(EXISTING_EMPLOYEE_NAME));
-            JSONAssert.assertEquals(ExpectedOutput,actualOutput, JSONCompareMode.LENIENT);
+        result.andExpect(status().isOk());
+        JSONAssert.assertEquals(ExpectedOutput, actualOutput, JSONCompareMode.NON_EXTENSIBLE);
 
     }
-        @Test
+
+    @Test
     public void GetSubordinates_WithInValidEmployee_ShouldReturnNotFound() throws Exception {
         prepareDB("/datasets/GetSubordinates.xml");
         //arrange
