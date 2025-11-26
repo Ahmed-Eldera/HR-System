@@ -170,4 +170,16 @@ public class EmployeeServiceImpl implements EmployeeService {
         EmployeeNodeDTO response = employeeMapper.toEmployeeNodeDTO(employee);
         return response;
     }
+
+    @Override
+    public List<EmployeeNodeDTO> getEmployeesInTeam(Integer id) {
+        Team team = teamRepository.findById(id).orElseThrow(()->new NoSuchTeamException(HttpStatus.BAD_REQUEST,"Can't find selected team."));
+        List<Employee> employees = employeeRepository.findByTeam(team);
+        List<EmployeeNodeDTO> response = new ArrayList<>();
+        for(Employee entity : employees){
+            EmployeeNodeDTO dto = new EmployeeNodeDTO(entity.getEmployeeID(), entity.getName(), null);
+            response.add(dto);
+        }
+        return response;
+    }
 }

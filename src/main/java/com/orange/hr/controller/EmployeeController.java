@@ -12,6 +12,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.service.annotation.PatchExchange;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/employee")
 public class EmployeeController {
@@ -34,7 +36,7 @@ public class EmployeeController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteEmployee(@PathVariable("id") Integer id){
+    public ResponseEntity<String> deleteEmployee(@PathVariable("id") Integer id) {
         employeeService.deleteEmployeeAndReassignSubordinates(id);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
@@ -52,9 +54,16 @@ public class EmployeeController {
         return new ResponseEntity<>(responseDTO, HttpStatus.OK);
 
     }
+
     @GetMapping("/{id}/subordinates")
-    public ResponseEntity<EmployeeNodeDTO> getSubordinates(@PathVariable("id") Integer id){
+    public ResponseEntity<EmployeeNodeDTO> getSubordinates(@PathVariable("id") Integer id) {
         EmployeeNodeDTO employeeNodeDTO = employeeService.getSubordinates(id);
-        return new ResponseEntity<>(employeeNodeDTO,HttpStatus.OK);
+        return new ResponseEntity<>(employeeNodeDTO, HttpStatus.OK);
+    }
+
+    @GetMapping
+    public ResponseEntity<List<EmployeeNodeDTO>> getEmployeesInTeam(@RequestParam Integer teamId) {
+        List<EmployeeNodeDTO> team = employeeService.getEmployeesInTeam(teamId);
+        return new ResponseEntity<>(team, HttpStatus.OK);
     }
 }

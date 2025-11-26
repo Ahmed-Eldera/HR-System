@@ -5,6 +5,8 @@ import com.orange.hr.dto.EmployeeRequestDTO;
 import com.orange.hr.dto.EmployeeResponseDTO;
 import com.orange.hr.dto.SalaryDTO;
 
+import java.util.List;
+
 public interface EmployeeService {
     public EmployeeResponseDTO addEmployee(EmployeeRequestDTO employee);
 
@@ -17,4 +19,6 @@ public interface EmployeeService {
     public SalaryDTO getSalary(Integer id);
 
     public EmployeeNodeDTO getSubordinates(Integer id);
+
+    public List<EmployeeNodeDTO> getEmployeesInTeam(Integer id);
 }

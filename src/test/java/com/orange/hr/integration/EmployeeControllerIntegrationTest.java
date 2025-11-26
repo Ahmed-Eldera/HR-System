@@ -579,7 +579,7 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
         String ExpectedOutput = objectMapper.writeValueAsString(team);
 
         //act
-        ResultActions result = mockMvc.perform(get("/employee?team=" + TEAM_ID));
+        ResultActions result = mockMvc.perform(get("/employee?teamId=" + TEAM_ID));
 
         String actualOutput = result.andReturn().getResponse().getContentAsString();
         //assert
