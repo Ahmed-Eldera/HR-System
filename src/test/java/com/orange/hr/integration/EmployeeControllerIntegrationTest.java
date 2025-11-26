@@ -3,6 +3,7 @@ package com.orange.hr.integration;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.orange.hr.dto.EmployeeNodeDTO;
 import com.orange.hr.dto.EmployeeRequestDTO;
 import com.orange.hr.entity.Employee;
 import com.orange.hr.enums.Gender;
@@ -14,6 +15,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -59,7 +61,7 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
     private static final int EXPERTISE_ID2 = 1;
     private static final int NON_EXISTENT_EXPERTISE_ID = 123;
     private static final int INSURANCE = 500;
-    private static final float TAX =0.15f;
+    private static final float TAX = 0.15f;
 
 
     @Test
@@ -400,6 +402,7 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
                 .andExpect(jsonPath("$.teamId").value(TEAM_ID))
                 .andExpect(jsonPath("$.expertisesIds").value(expertises));
     }
+
     @Test
     public void modifyEmployee_InValidSalary_ExpectBadRequest() throws Exception {
         prepareDB("/datasets/ModifyEmployeeDataset.xml");
@@ -454,7 +457,7 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
         //arrange
         List<Employee> subordinatesBeforeReassign = employeeRepository.findById(EXISTING_EMPLOYEE_ID).get().getSubordinates();
         List<Integer> subordinatesIds = new ArrayList<>();
-        for(Employee emp: subordinatesBeforeReassign){
+        for (Employee emp : subordinatesBeforeReassign) {
             subordinatesIds.add(emp.getEmployeeID());
         }
         //act
@@ -462,8 +465,8 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
         result.andExpect(status().isNoContent());
         //assert
         List<Employee> subordinatesAfterReassign = employeeRepository.findAllById(subordinatesIds);
-        for(Employee emp:subordinatesAfterReassign){
-            assertEquals(SUPER_MANAGER_ID2,emp.getManager().getEmployeeID());
+        for (Employee emp : subordinatesAfterReassign) {
+            assertEquals(SUPER_MANAGER_ID2, emp.getManager().getEmployeeID());
         }
     }
 
@@ -520,5 +523,26 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
 
         result.andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.msg").value("Can't find the selected employee"));
+    }
+
+    @Test
+    public void GetSubordinates_WithValidEmployee_ShouldReturnOk() throws Exception {
+        prepareDB("datasets/GetSubordinates.xml");
+        EmployeeNodeDTO ahmed2 = new EmployeeNodeDTO(1,"Ahmed2",null);
+        EmployeeNodeDTO ahmed3 = new EmployeeNodeDTO(1,"Ahmed3",null);
+        EmployeeNodeDTO ahmed1 = new EmployeeNodeDTO(1,"Ahmed1",List.of(ahmed2,ahmed2));
+        List<EmployeeNodeDTO> ExpectedSubordinates =  new ArrayList<>();
+        ExpectedSubordinates.add(ahmed1);
+        //arrange
+
+        //act
+        ResultActions result = mockMvc.perform(get("/employee/" + EXISTING_EMPLOYEE_ID + "/subordinates"));
+
+        EmployeeNodeDTO managerDTO = objectMapper.readValue(result.andReturn().getResponse().getContentAsString(),EmployeeNodeDTO.class);
+        //assert
+        result.andExpect(status().isOk())
+                .andExpect(jsonPath(".id").value(EXISTING_EMPLOYEE_ID))
+                .andExpect(jsonPath("$.name").value(EXISTING_EMPLOYEE_NAME));
+        assertTrue(ExpectedSubordinates.containsAll(managerDTO.getSubordinates())&&managerDTO.getSubordinates().containsAll(ExpectedSubordinates));
     }
 }
