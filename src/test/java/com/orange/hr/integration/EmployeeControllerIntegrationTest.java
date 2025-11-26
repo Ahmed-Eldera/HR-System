@@ -9,6 +9,8 @@ import com.orange.hr.entity.Employee;
 import com.orange.hr.enums.Gender;
 import com.orange.hr.repository.EmployeeRepository;
 import org.junit.jupiter.api.Test;
+import org.skyscreamer.jsonassert.JSONAssert;
+import org.skyscreamer.jsonassert.JSONCompareMode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
@@ -527,22 +529,37 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
 
     @Test
     public void GetSubordinates_WithValidEmployee_ShouldReturnOk() throws Exception {
-        prepareDB("datasets/GetSubordinates.xml");
-        EmployeeNodeDTO ahmed2 = new EmployeeNodeDTO(1,"Ahmed2",null);
-        EmployeeNodeDTO ahmed3 = new EmployeeNodeDTO(1,"Ahmed3",null);
-        EmployeeNodeDTO ahmed1 = new EmployeeNodeDTO(1,"Ahmed1",List.of(ahmed2,ahmed2));
-        List<EmployeeNodeDTO> ExpectedSubordinates =  new ArrayList<>();
-        ExpectedSubordinates.add(ahmed1);
+        prepareDB("/datasets/GetSubordinates.xml");
+        EmployeeNodeDTO ahmed4 = new EmployeeNodeDTO(4,"Ahmed",null);
+        EmployeeNodeDTO ahmed3 = new EmployeeNodeDTO(3,"Ahmed",null);
+        EmployeeNodeDTO ahmed2 = new EmployeeNodeDTO(2,"Ahmed",List.of(ahmed3,ahmed4));
+        EmployeeNodeDTO ahmed1 = new EmployeeNodeDTO(1,"Ahmed",List.of(ahmed2));
+        String ExpectedOutput =  objectMapper.writeValueAsString(ahmed1);
         //arrange
 
         //act
         ResultActions result = mockMvc.perform(get("/employee/" + EXISTING_EMPLOYEE_ID + "/subordinates"));
 
-        EmployeeNodeDTO managerDTO = objectMapper.readValue(result.andReturn().getResponse().getContentAsString(),EmployeeNodeDTO.class);
+        String actualOutput = result.andReturn().getResponse().getContentAsString();
         //assert
         result.andExpect(status().isOk())
-                .andExpect(jsonPath(".id").value(EXISTING_EMPLOYEE_ID))
+                .andExpect(jsonPath("$.id").value(EXISTING_EMPLOYEE_ID))
                 .andExpect(jsonPath("$.name").value(EXISTING_EMPLOYEE_NAME));
-        assertTrue(ExpectedSubordinates.containsAll(managerDTO.getSubordinates())&&managerDTO.getSubordinates().containsAll(ExpectedSubordinates));
+            JSONAssert.assertEquals(ExpectedOutput,actualOutput, JSONCompareMode.LENIENT);
+
+    }
+        @Test
+    public void GetSubordinates_WithInValidEmployee_ShouldReturnNotFound() throws Exception {
+        prepareDB("/datasets/GetSubordinates.xml");
+        //arrange
+
+        //act
+        ResultActions result = mockMvc.perform(get("/employee/" + NON_EXISTENT_EMPLOYEE_ID + "/subordinates"));
+
+        String actualOutput = result.andReturn().getResponse().getContentAsString();
+        //assert
+        result.andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.msg").value("Can't find selected employee."));
+
     }
 }

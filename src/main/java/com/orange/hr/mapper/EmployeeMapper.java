@@ -1,11 +1,14 @@
 package com.orange.hr.mapper;
 
+import com.orange.hr.dto.EmployeeNodeDTO;
 import com.orange.hr.dto.EmployeeRequestDTO;
 import com.orange.hr.dto.EmployeeResponseDTO;
 import com.orange.hr.entity.Employee;
 import com.orange.hr.entity.Expertise;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
@@ -40,5 +43,23 @@ public class EmployeeMapper {
                 .collect(Collectors.toList()));
         response.setTeamId(entity.getTeam().getTeamId());
         return response;
+    }
+    public EmployeeNodeDTO toEmployeeNodeDTO(Employee entity){
+        EmployeeNodeDTO employeeNodeDTO = new EmployeeNodeDTO();
+        employeeNodeDTO.setId(entity.getEmployeeID());
+        employeeNodeDTO.setName(entity.getName());
+        if(!entity.getSubordinates().isEmpty()) {
+            employeeNodeDTO.setSubordinates(
+                    toEmployeeNodeDTOList(entity.getSubordinates())
+            );
+        }
+        return employeeNodeDTO;
+    }
+    public List<EmployeeNodeDTO> toEmployeeNodeDTOList(List<Employee> entityList){
+        List<EmployeeNodeDTO> employeeNodeDTOList = new ArrayList<>();
+        for(Employee entity:entityList){
+            employeeNodeDTOList.add(toEmployeeNodeDTO(entity));
+        }
+        return employeeNodeDTOList;
     }
 }

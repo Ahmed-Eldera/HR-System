@@ -1,5 +1,6 @@
 package com.orange.hr.service.impl;
 
+import com.orange.hr.dto.EmployeeNodeDTO;
 import com.orange.hr.dto.EmployeeRequestDTO;
 import com.orange.hr.dto.EmployeeResponseDTO;
 import com.orange.hr.dto.SalaryDTO;
@@ -25,7 +26,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 
 @Transactional
 @Service
@@ -153,11 +156,18 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     public SalaryDTO getSalary(Integer id) {
-        Employee employee = employeeRepository.findById(id).orElseThrow(()->new NoSuchEmployeeException(HttpStatus.NOT_FOUND,"Can't find the selected employee"));
+        Employee employee = employeeRepository.findById(id).orElseThrow(() -> new NoSuchEmployeeException(HttpStatus.NOT_FOUND, "Can't find the selected employee"));
         double gross = employee.getSalary();
-        double net = gross - gross*15/100 - 500;
-        SalaryDTO salaryDTO= new SalaryDTO(gross,net);
+        double net = gross - gross * 15 / 100 - 500;
+        SalaryDTO salaryDTO = new SalaryDTO(gross, net);
         return salaryDTO;
 
+    }
+
+    @Override
+    public EmployeeNodeDTO getSubordinates(Integer id) {
+        Employee employee = employeeRepository.findById(id).orElseThrow(() -> new NoSuchEmployeeException(HttpStatus.BAD_REQUEST, "Can't find selected employee."));
+        EmployeeNodeDTO response = employeeMapper.toEmployeeNodeDTO(employee);
+        return response;
     }
 }

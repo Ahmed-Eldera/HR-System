@@ -10,7 +10,7 @@
             salary="500"
             department_id="1"
             team_id="1"
-            manager_id="1"
+            manager_id="2"
     />
     <employees
             employee_id="3"
@@ -21,10 +21,10 @@
             salary="500"
             department_id="1"
             team_id="1"
-            manager_id="1"
+            manager_id="2"
     />
     <employees
-            employee_id="1"
+            employee_id="2"
             name="Ahmed"
             date_of_birth="2003-02-18"
             gender="MALE"
@@ -32,10 +32,10 @@
             salary="2000"
             department_id="1"
             team_id="1"
-            manager_id="2"
+            manager_id="1"
     />
     <employees
-            employee_id="2"
+            employee_id="1"
             name="Ahmed"
             date_of_birth="2003-02-18"
             gender="MALE"
