@@ -3,6 +3,7 @@ package com.orange.hr.integration;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.orange.hr.dto.EmployeeNodeDTO;
 import com.orange.hr.dto.EmployeeRequestDTO;
 import com.orange.hr.entity.Employee;
 import com.orange.hr.entity.Expertise;
@@ -16,6 +17,12 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
 import java.time.LocalDate;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
+import java.time.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -559,5 +566,26 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
 
         result.andExpect(status().isNotFound());
 
+    }
+
+    @Test
+    public void GetSubordinates_WithValidEmployee_ShouldReturnOk() throws Exception {
+        prepareDB("datasets/GetSubordinates.xml");
+        EmployeeNodeDTO ahmed2 = new EmployeeNodeDTO(1,"Ahmed2",null);
+        EmployeeNodeDTO ahmed3 = new EmployeeNodeDTO(1,"Ahmed3",null);
+        EmployeeNodeDTO ahmed1 = new EmployeeNodeDTO(1,"Ahmed1",List.of(ahmed2,ahmed2));
+        List<EmployeeNodeDTO> ExpectedSubordinates =  new ArrayList<>();
+        ExpectedSubordinates.add(ahmed1);
+        //arrange
+
+        //act
+        ResultActions result = mockMvc.perform(get("/employee/" + EXISTING_EMPLOYEE_ID + "/subordinates"));
+
+        EmployeeNodeDTO managerDTO = objectMapper.readValue(result.andReturn().getResponse().getContentAsString(),EmployeeNodeDTO.class);
+        //assert
+        result.andExpect(status().isOk())
+                .andExpect(jsonPath(".id").value(EXISTING_EMPLOYEE_ID))
+                .andExpect(jsonPath("$.name").value(EXISTING_EMPLOYEE_NAME));
+        assertTrue(ExpectedSubordinates.containsAll(managerDTO.getSubordinates())&&managerDTO.getSubordinates().containsAll(ExpectedSubordinates));
     }
 }
