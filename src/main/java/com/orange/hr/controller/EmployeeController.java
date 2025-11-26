@@ -1,5 +1,6 @@
 package com.orange.hr.controller;
 
+import com.orange.hr.dto.EmployeeNodeDTO;
 import com.orange.hr.dto.EmployeeRequestDTO;
 import com.orange.hr.dto.EmployeeResponseDTO;
 import com.orange.hr.dto.SalaryDTO;
@@ -50,5 +51,10 @@ public class EmployeeController {
         SalaryDTO responseDTO = employeeService.getSalary(id);
         return new ResponseEntity<>(responseDTO, HttpStatus.OK);
 
+    }
+    @GetMapping("/{id}/subordinates")
+    public ResponseEntity<EmployeeNodeDTO> getSubordinates(@PathVariable("id") Integer id){
+        EmployeeNodeDTO employeeNodeDTO = employeeService.getSubordinates(id);
+        return new ResponseEntity<>(employeeNodeDTO,HttpStatus.OK);
     }
 }
