@@ -4,10 +4,14 @@ package com.orange.hr.integration;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.orange.hr.dto.EmployeeRequestDTO;
+import com.orange.hr.dto.EmployeeResponseDTO;
 import com.orange.hr.entity.Employee;
 import com.orange.hr.enums.Gender;
+import com.orange.hr.mapper.EmployeeMapper;
 import com.orange.hr.repository.EmployeeRepository;
 import org.junit.jupiter.api.Test;
+import org.skyscreamer.jsonassert.JSONAssert;
+import org.skyscreamer.jsonassert.JSONCompareMode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
@@ -24,12 +28,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 public class EmployeeControllerIntegrationTest extends AbstractTest {
-    private static final int NON_EXISTENT_EMPLOYEE_ID = 999;
-    private static final int EXISTING_EMPLOYEE_ID = 1;
-    private static final int EXISTING_EMPLOYEE_ID2 = 2;
-    private static final int LEAF_EMPLOYEE_ID3 = 3;
-    private static final int SUPER_MANAGER_ID2 = 2;
-    private static final int NEW_EMPLOYEE_ID = 2;
+    private static final Integer NON_EXISTENT_EMPLOYEE_ID = 999;
+    private static final Integer EXISTING_EMPLOYEE_ID = 1;
+    private static final Integer EXISTING_EMPLOYEE_ID2 = 2;
+    private static final Integer LEAF_EMPLOYEE_ID3 = 3;
+    private static final Integer SUPER_MANAGER_ID2 = 2;
+    private static final Integer NEW_EMPLOYEE_ID = 2;
     private static final String EXISTING_EMPLOYEE_NAME = "Ahmed";
     private static final String NEW_EMPLOYEE_NAME = "Ahmed Eldera";
     private static final LocalDate DATE_OF_BIRTH = LocalDate.of(2003, 2, 18);
@@ -37,27 +41,29 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
     private static final LocalDate FUTURE_DATE_OF_BIRTH = LocalDate.of(2999, 2, 18);
     private static final LocalDate GRADUATION_DATE = LocalDate.of(2026, 2, 18);
     private static final LocalDate NEW_GRADUATION_DATE = LocalDate.of(2029, 2, 18);
-    private static final float SALARY = 500F;
-    private static final float INVALID_SALARY = 100F;
-    private static final float NEW_SALARY = 550F;
-    private static final int DEPARTMENT_ID = 1;
-    private static final int DEPARTMENT_ID2 = 2;
-    private static final int NON_EXISTENT_DEPARTMENT_ID = 9876;
-    private static final int TEAM_ID = 1;
-    private static final int TEAM_ID2 = 2;
-    private static final int NON_EXISTENT_TEAM_ID = 9876;
+    private static final Float SALARY = 500F;
+    private static final Float INVALID_SALARY = 100F;
+    private static final Float NEW_SALARY = 550F;
+    private static final Integer DEPARTMENT_ID = 1;
+    private static final Integer DEPARTMENT_ID2 = 2;
+    private static final Integer NON_EXISTENT_DEPARTMENT_ID = 9876;
+    private static final Integer TEAM_ID = 1;
+    private static final Integer TEAM_ID2 = 2;
+    private static final Integer NON_EXISTENT_TEAM_ID = 9876;
     private static final Optional<Integer> MANAGER_ID = Optional.of(1);
     private static final Optional<Integer> MANAGER_ID2 = Optional.of(2);
     private static final Optional<Integer> NON_EXISTENT_MANAGER_ID = Optional.of(99);
-    private static final int EXPERTISE_ID = 1;
-    private static final int EXPERTISE_ID2 = 1;
-    private static final int NON_EXISTENT_EXPERTISE_ID = 123;
+    private static final Integer EXPERTISE_ID = 1;
+    private static final Integer EXPERTISE_ID2 = 1;
+    private static final Integer NON_EXISTENT_EXPERTISE_ID = 123;
     @Autowired
     MockMvc mockMvc;
     @Autowired
     EmployeeRepository employeeRepository;
     @Autowired
     private ObjectMapper objectMapper;
+    @Autowired
+    private EmployeeMapper employeeMapper;
 
     @Test
     public void AddEmpolyeeSuccessfully_WithFullData_ExpectCreated() throws Exception {
@@ -397,7 +403,7 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
         ResultActions result = mockMvc.perform(patch("/employee/" + EXISTING_EMPLOYEE_ID).contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL).writeValueAsString(employee)));
         //assert
-        System.out.println(result.andReturn().getResponse().getContentAsString());
+        assertEquals(employeeRepository.findById(EXISTING_EMPLOYEE_ID).get().getSalary(), SALARY);
         result.andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.msg").value("Salary must be at least 500")); //assert the change happened
 
@@ -457,22 +463,15 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
         prepareDB("/datasets/GetEmployee.xml");
         //arrange
         Employee employeeBefore = employeeRepository.findById(EXISTING_EMPLOYEE_ID).get();
-//        EmployeeResponseDTO beforeVal = employeeMapper.
+        EmployeeResponseDTO dtoBefore = employeeMapper.toDTO(employeeBefore);
+        String beforeVal = objectMapper.writeValueAsString(dtoBefore);
+
         //act
         ResultActions result = mockMvc.perform(get("/employee/" + EXISTING_EMPLOYEE_ID));
+        String response = result.andReturn().getResponse().getContentAsString();
         //assert
-        result.andExpect(status().isOk())
-                .andExpect(jsonPath("$.employeeID").value(EXISTING_EMPLOYEE_ID))
-                .andExpect(jsonPath("$.name").value(EXISTING_EMPLOYEE_NAME))
-                .andExpect(jsonPath("$.dateOfBirth").value(DATE_OF_BIRTH.toString()))
-                .andExpect(jsonPath("$.gender").value(Gender.MALE.toString()))
-                .andExpect(jsonPath("$.graduationDate").value(GRADUATION_DATE.toString()))
-                .andExpect(jsonPath("$.salary").value(SALARY))
-                .andExpect(jsonPath("$.departmentId").value(DEPARTMENT_ID))
-                .andExpect(jsonPath("$.managerId").isEmpty())
-                .andExpect(jsonPath("$.teamId").value(TEAM_ID))
-                .andExpect(jsonPath("$.expertisesIds").isEmpty());
-
+        result.andExpect(status().isOk());
+        JSONAssert.assertEquals(beforeVal, response, JSONCompareMode.STRICT);
 
     }
 
