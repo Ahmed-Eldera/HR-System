@@ -1,5 +1,6 @@
 package com.orange.hr.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.orange.hr.enums.Gender;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -51,6 +52,7 @@ public class Employee {
     private Employee manager;
 
     @OneToMany(mappedBy = "manager",fetch = FetchType.LAZY)
+    @JsonBackReference
     private List<Employee> subordinates;
 
     @ManyToMany(fetch = FetchType.LAZY)

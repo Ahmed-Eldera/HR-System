@@ -64,7 +64,7 @@ public class AbstractTest {
 
     @BeforeEach
     void setupBeforeEach() {
-                objectMapper.clearCaches();
+        objectMapper.clearCaches();
     }
 
     public static class CustomH2DataTypeFactory extends H2DataTypeFactory {
