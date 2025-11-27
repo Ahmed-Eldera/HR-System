@@ -1,9 +1,11 @@
 package com.orange.hr.dto;
 
 import com.orange.hr.enums.Gender;
+import com.orange.hr.validationGroup.Always;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.groups.Default;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -19,8 +21,6 @@ import java.util.Optional;
 @NoArgsConstructor
 public class EmployeeRequestDTO {
 
-    @NotNull(message = "employeeId can't be null")
-    private Integer employeeId;
 
     @NotBlank(message = "Name can't be null")
     private String name;
@@ -34,7 +34,7 @@ public class EmployeeRequestDTO {
     @NotNull(message = "Graduation Date can't be null")
     private LocalDate graduationDate;
 
-    @DecimalMin(value = "500.0", message = "Salary must be at least 500")
+    @DecimalMin(value = "500.0", message = "Salary must be at least 500", groups = {Always.class, Default.class})
     @NotNull(message = "Salary can't be null")
     private Float salary;
 

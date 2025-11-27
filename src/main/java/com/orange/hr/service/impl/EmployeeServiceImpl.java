@@ -14,16 +14,12 @@ import com.orange.hr.repository.ExpertiseRepository;
 import com.orange.hr.repository.TeamRepository;
 import com.orange.hr.service.EmployeeService;
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.criteria.CriteriaBuilder;
-import jakarta.persistence.criteria.CriteriaUpdate;
-import jakarta.persistence.criteria.Root;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 
 @Transactional
@@ -88,8 +84,6 @@ public class EmployeeServiceImpl implements EmployeeService {
         if (dto.getSalary() != null) {
             if (dto.getSalary() >= 500) {
                 entity.setSalary(dto.getSalary());
-            } else {
-                throw new MyException(HttpStatus.BAD_REQUEST, "Salary must be at least 500");
             }
         }
 

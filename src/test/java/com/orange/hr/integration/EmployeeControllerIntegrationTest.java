@@ -13,23 +13,17 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-
-import java.time.*;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class EmployeeControllerIntegrationTest extends AbstractTest {
-    @Autowired
-    MockMvc mockMvc;
-    @Autowired
-    private ObjectMapper objectMapper;
-    @Autowired
-    EmployeeRepository employeeRepository;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+public class EmployeeControllerIntegrationTest extends AbstractTest {
     private static final int NON_EXISTENT_EMPLOYEE_ID = 999;
     private static final int EXISTING_EMPLOYEE_ID = 1;
     private static final int EXISTING_EMPLOYEE_ID2 = 2;
@@ -58,7 +52,12 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
     private static final int EXPERTISE_ID = 1;
     private static final int EXPERTISE_ID2 = 1;
     private static final int NON_EXISTENT_EXPERTISE_ID = 123;
-
+    @Autowired
+    MockMvc mockMvc;
+    @Autowired
+    EmployeeRepository employeeRepository;
+    @Autowired
+    private ObjectMapper objectMapper;
 
     @Test
     public void AddEmpolyeeSuccessfully_WithFullData_ExpectCreated() throws Exception {
@@ -67,7 +66,6 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
         List<Integer> expertises = new ArrayList<>();
         expertises.add(EXPERTISE_ID);
         EmployeeRequestDTO employee = new EmployeeRequestDTO(
-                NEW_EMPLOYEE_ID,
                 NEW_EMPLOYEE_NAME,
                 DATE_OF_BIRTH,
                 Gender.MALE,
@@ -84,7 +82,7 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
                 .content(objectMapper.writeValueAsString(employee)));
         //assert
         result.andExpect(status().isCreated())
-                .andExpect(jsonPath("$.employeeID").value(employee.getEmployeeId()))
+                .andExpect(jsonPath("$.employeeID").isNumber())
                 .andExpect(jsonPath("$.name").value(employee.getName()))
                 .andExpect(jsonPath("$.dateOfBirth").value(employee.getDateOfBirth().toString()))
                 .andExpect(jsonPath("$.gender").value(employee.getGender().toString()))
@@ -103,7 +101,6 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
         List<Integer> expertises = new ArrayList<>();
         expertises.add(EXPERTISE_ID);
         EmployeeRequestDTO employee = new EmployeeRequestDTO(
-                NEW_EMPLOYEE_ID,
                 NEW_EMPLOYEE_NAME,
                 DATE_OF_BIRTH,
                 Gender.MALE,
@@ -139,7 +136,6 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
         List<Integer> expertises = new ArrayList<>();
         expertises.add(EXPERTISE_ID);
         EmployeeRequestDTO employee = new EmployeeRequestDTO(
-                NEW_EMPLOYEE_ID,
                 null,  //missing name
                 DATE_OF_BIRTH,
                 Gender.MALE,
@@ -164,7 +160,6 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
         List<Integer> expertises = new ArrayList<>();
         expertises.add(EXPERTISE_ID);
         EmployeeRequestDTO employee = new EmployeeRequestDTO(
-                NEW_EMPLOYEE_ID,
                 NEW_EMPLOYEE_NAME,
                 DATE_OF_BIRTH,
                 Gender.MALE,
@@ -190,7 +185,6 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
         List<Integer> expertises = new ArrayList<>();
         expertises.add(EXPERTISE_ID);
         EmployeeRequestDTO employee = new EmployeeRequestDTO(
-                NEW_EMPLOYEE_ID,
                 NEW_EMPLOYEE_NAME,
                 DATE_OF_BIRTH,
                 Gender.MALE,
@@ -216,7 +210,6 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
         List<Integer> expertises = new ArrayList<>();
         expertises.add(EXPERTISE_ID);
         EmployeeRequestDTO employee = new EmployeeRequestDTO(
-                NEW_EMPLOYEE_ID,
                 NEW_EMPLOYEE_NAME,
                 DATE_OF_BIRTH,
                 Gender.MALE,
@@ -242,7 +235,6 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
         List<Integer> expertises = new ArrayList<>();
         expertises.add(EXPERTISE_ID);
         EmployeeRequestDTO employee = new EmployeeRequestDTO(
-                NEW_EMPLOYEE_ID,
                 NEW_EMPLOYEE_NAME,
                 FUTURE_DATE_OF_BIRTH,
                 Gender.MALE,
@@ -268,7 +260,6 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
         List<Integer> expertises = new ArrayList<>();
         expertises.add(NON_EXISTENT_EXPERTISE_ID);
         EmployeeRequestDTO employee = new EmployeeRequestDTO(
-                NEW_EMPLOYEE_ID,
                 NEW_EMPLOYEE_NAME,
                 DATE_OF_BIRTH,
                 Gender.MALE,
@@ -294,7 +285,6 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
         List<Integer> expertises = new ArrayList<>();
         expertises.add(EXPERTISE_ID2);
         EmployeeRequestDTO employee = new EmployeeRequestDTO(
-                null,
                 NEW_EMPLOYEE_NAME,
                 NEW_DATE_OF_BIRTH,
                 Gender.FEMALE,
@@ -311,7 +301,6 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
                 .content(objectMapper.writeValueAsString(employee)));
         //assert
         result.andExpect(status().isOk())
-//                .andExpect(jsonPath("$.employeeID").value(EXISTING_EMPLOYEE_ID))
                 .andExpect(jsonPath("$.name").value(employee.getName()))
                 .andExpect(jsonPath("$.dateOfBirth").value(employee.getDateOfBirth().toString()))
                 .andExpect(jsonPath("$.gender").value(employee.getGender().toString()))
@@ -337,7 +326,6 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
                 .content(objectMapper.writeValueAsString(employee)));
         //assert
         result.andExpect(status().isOk())
-//                .andExpect(jsonPath("$.employeeID").value(EXISTING_EMPLOYEE_ID))
                 .andExpect(jsonPath("$.name").value(EXISTING_EMPLOYEE_NAME)) //assert the change happened
                 .andExpect(jsonPath("$.dateOfBirth").value(DATE_OF_BIRTH.toString()))
                 .andExpect(jsonPath("$.gender").value(Gender.MALE.toString()))
@@ -355,9 +343,9 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
         prepareDB("/datasets/ModifyEmployeeDataset.xml");
         //arrange
         List<Integer> expertises = new ArrayList<>();
+        expertises.add(EXPERTISE_ID);
         EmployeeRequestDTO employee = new EmployeeRequestDTO();
         employee.setName(NEW_EMPLOYEE_NAME);
-        expertises.add(EXPERTISE_ID);
         //act
         ResultActions result = mockMvc.perform(patch("/employee/" + EXISTING_EMPLOYEE_ID).contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL)
@@ -398,19 +386,18 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
                 .andExpect(jsonPath("$.teamId").value(TEAM_ID))
                 .andExpect(jsonPath("$.expertisesIds").value(expertises));
     }
+
     @Test
     public void modifyEmployee_InValidSalary_ExpectBadRequest() throws Exception {
         prepareDB("/datasets/ModifyEmployeeDataset.xml");
         //arrange
-        objectMapper = new ObjectMapper();
-        List<Integer> expertises = new ArrayList<>();
         EmployeeRequestDTO employee = new EmployeeRequestDTO();
         employee.setSalary(INVALID_SALARY);
-        employee.setExpertise(expertises);
         //act
         ResultActions result = mockMvc.perform(patch("/employee/" + EXISTING_EMPLOYEE_ID).contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL).writeValueAsString(employee)));
         //assert
+        System.out.println(result.andReturn().getResponse().getContentAsString());
         result.andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.msg").value("Salary must be at least 500")); //assert the change happened
 
@@ -452,7 +439,7 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
         //arrange
         List<Employee> subordinatesBeforeReassign = employeeRepository.findById(EXISTING_EMPLOYEE_ID).get().getSubordinates();
         List<Integer> subordinatesIds = new ArrayList<>();
-        for(Employee emp: subordinatesBeforeReassign){
+        for (Employee emp : subordinatesBeforeReassign) {
             subordinatesIds.add(emp.getEmployeeID());
         }
         //act
@@ -460,16 +447,20 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
         result.andExpect(status().isNoContent());
         //assert
         List<Employee> subordinatesAfterReassign = employeeRepository.findAllById(subordinatesIds);
-        for(Employee emp:subordinatesAfterReassign){
-            assertEquals(SUPER_MANAGER_ID2,emp.getManager().getEmployeeID());
+        for (Employee emp : subordinatesAfterReassign) {
+            assertEquals(SUPER_MANAGER_ID2, emp.getManager().getEmployeeID());
         }
     }
-        @Test
+
+    @Test
     public void GetEmployee_WithValidEmployee_ShouldReturnOK() throws Exception {
         prepareDB("/datasets/GetEmployee.xml");
+        //arrange
+        Employee employeeBefore = employeeRepository.findById(EXISTING_EMPLOYEE_ID).get();
+//        EmployeeResponseDTO beforeVal = employeeMapper.
         //act
         ResultActions result = mockMvc.perform(get("/employee/" + EXISTING_EMPLOYEE_ID));
-
+        //assert
         result.andExpect(status().isOk())
                 .andExpect(jsonPath("$.employeeID").value(EXISTING_EMPLOYEE_ID))
                 .andExpect(jsonPath("$.name").value(EXISTING_EMPLOYEE_NAME))
@@ -481,6 +472,7 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
                 .andExpect(jsonPath("$.managerId").isEmpty())
                 .andExpect(jsonPath("$.teamId").value(TEAM_ID))
                 .andExpect(jsonPath("$.expertisesIds").isEmpty());
+
 
     }
 
