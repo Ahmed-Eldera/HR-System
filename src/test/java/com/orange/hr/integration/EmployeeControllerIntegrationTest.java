@@ -316,7 +316,6 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
                 .content(objectMapper.writeValueAsString(employee)));
         //assert
         result.andExpect(status().isOk())
-//                .andExpect(jsonPath("$.employeeID").value(EXISTING_EMPLOYEE_ID))
                 .andExpect(jsonPath("$.name").value(employee.getName()))
                 .andExpect(jsonPath("$.dateOfBirth").value(employee.getDateOfBirth().toString()))
                 .andExpect(jsonPath("$.gender").value(employee.getGender().toString()))
@@ -342,7 +341,6 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
                 .content(objectMapper.writeValueAsString(employee)));
         //assert
         result.andExpect(status().isOk())
-//                .andExpect(jsonPath("$.employeeID").value(EXISTING_EMPLOYEE_ID))
                 .andExpect(jsonPath("$.name").value(EXISTING_EMPLOYEE_NAME)) //assert the change happened
                 .andExpect(jsonPath("$.dateOfBirth").value(DATE_OF_BIRTH.toString()))
                 .andExpect(jsonPath("$.gender").value(Gender.MALE.toString()))
@@ -421,7 +419,7 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
                 .content(objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL).writeValueAsString(employee)));
         //assert
         result.andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.msg").value("Salary must be at least 500")); //assert the change happened
+                .andExpect(jsonPath("$.msg").value("must be greater than or equal to 500")); //assert the change happened
 
     }
 
