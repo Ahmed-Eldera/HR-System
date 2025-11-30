@@ -6,7 +6,6 @@ import org.dbunit.DatabaseUnitException;
 import org.dbunit.database.DatabaseConfig;
 import org.dbunit.database.DatabaseConnection;
 import org.dbunit.database.IDatabaseConnection;
-import org.dbunit.dataset.DataSetException;
 import org.dbunit.dataset.IDataSet;
 import org.dbunit.dataset.datatype.DataType;
 import org.dbunit.dataset.datatype.DataTypeException;
@@ -40,15 +39,11 @@ import java.sql.Types;
 })
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class AbstractTest {
+    private static IDatabaseConnection dbUnitConnection;
     @Autowired
     private DataSource dataSource;
     @Autowired
     private ObjectMapper objectMapper;
-
-    @Autowired
-    public ObjectMapper objectMapper;
-
-    private static IDatabaseConnection dbUnitConnection;
 
     @BeforeAll
     void setUp() throws Exception {
@@ -74,6 +69,15 @@ public class AbstractTest {
         objectMapper.clearCaches();
     }
 
+    public void prepareDB(String path) throws DatabaseUnitException, SQLException {
+
+        FlatXmlDataSetBuilder builder = new FlatXmlDataSetBuilder();
+        IDataSet dataSet = builder.build(getClass().getResourceAsStream(path));
+        dbUnitConnection.getConnection().createStatement().execute("SET REFERENTIAL_INTEGRITY FALSE");
+        DatabaseOperation.CLEAN_INSERT.execute(dbUnitConnection, dataSet);
+        dbUnitConnection.getConnection().createStatement().execute("SET REFERENTIAL_INTEGRITY TRUE");
+    }
+
     public static class CustomH2DataTypeFactory extends H2DataTypeFactory {
         @Override
         public DataType createDataType(int sqlType, String sqlTypeName) throws DataTypeException {
@@ -82,14 +86,5 @@ public class AbstractTest {
             }
             return super.createDataType(sqlType, sqlTypeName);
         }
-    }
-
-    public void prepareDB(String path) throws DatabaseUnitException, SQLException {
-
-        FlatXmlDataSetBuilder builder = new FlatXmlDataSetBuilder();
-        IDataSet dataSet = builder.build(getClass().getResourceAsStream(path));
-        dbUnitConnection.getConnection().createStatement().execute("SET REFERENTIAL_INTEGRITY FALSE");
-        DatabaseOperation.CLEAN_INSERT.execute(dbUnitConnection, dataSet);
-        dbUnitConnection.getConnection().createStatement().execute("SET REFERENTIAL_INTEGRITY TRUE");
     }
 }

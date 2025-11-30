@@ -9,30 +9,23 @@ import com.orange.hr.entity.Expertise;
 import com.orange.hr.enums.Gender;
 import com.orange.hr.mapper.EmployeeMapper;
 import com.orange.hr.repository.EmployeeRepository;
-import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-
-import java.time.*;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class EmployeeControllerIntegrationTest extends AbstractTest {
-    @Autowired
-    MockMvc mockMvc;
-    @Autowired
-    private ObjectMapper objectMapper;
-    @Autowired
-    EmployeeRepository employeeRepository;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+public class EmployeeControllerIntegrationTest extends AbstractTest {
     private static final int NON_EXISTENT_EMPLOYEE_ID = 999;
     private static final int EXISTING_EMPLOYEE_ID = 1;
     private static final int EXISTING_EMPLOYEE_ID2 = 2;
@@ -62,8 +55,15 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
     private static final int EXPERTISE_ID2 = 1;
     private static final int NON_EXISTENT_EXPERTISE_ID = 123;
     private static final int INSURANCE = 500;
-    private static final float TAX =0.15f;
-
+    private static final float TAX = 0.15f;
+    @Autowired
+    MockMvc mockMvc;
+    @Autowired
+    EmployeeRepository employeeRepository;
+    @Autowired
+    EmployeeMapper employeeMapper;
+    @Autowired
+    private ObjectMapper objectMapper;
 
     @Test
     public void AddEmpolyeeSuccessfully_WithFullData_ExpectCreated() throws Exception {
