@@ -2,47 +2,30 @@ package com.orange.hr.integration;
 
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.orange.hr.dto.EmployeeRequestDTO;
 import com.orange.hr.entity.Employee;
+import com.orange.hr.entity.Expertise;
 import com.orange.hr.enums.Gender;
-import com.orange.hr.exceptions.NoSuchEmployeeException;
 import com.orange.hr.mapper.EmployeeMapper;
-import com.orange.hr.repository.DepartmentRepository;
 import com.orange.hr.repository.EmployeeRepository;
-import com.orange.hr.repository.ExpertiseRepository;
-import com.orange.hr.repository.TeamRepository;
 import jakarta.persistence.EntityManager;
-import jakarta.validation.constraints.AssertFalse;
-import org.dbunit.DatabaseUnitException;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-
-import java.sql.SQLException;
-import java.time.*;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class EmployeeControllerIntegrationTest extends AbstractTest {
-    @Autowired
-    MockMvc mockMvc;
-    @Autowired
-    EntityManager entityManager;
-    @Autowired
-    EmployeeRepository employeeRepository;
-    @Autowired
-    EmployeeMapper employeeMapper;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+public class EmployeeControllerIntegrationTest extends AbstractTest {
     private static final int NON_EXISTENT_EMPLOYEE_ID = 999;
     private static final int EXISTING_EMPLOYEE_ID = 1;
     private static final int EXISTING_EMPLOYEE_ID2 = 2;
@@ -70,7 +53,14 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
     private static final int EXPERTISE_ID = 1;
     private static final int EXPERTISE_ID2 = 1;
     private static final int NON_EXISTENT_EXPERTISE_ID = 123;
-
+    @Autowired
+    MockMvc mockMvc;
+    @Autowired
+    EntityManager entityManager;
+    @Autowired
+    EmployeeRepository employeeRepository;
+    @Autowired
+    EmployeeMapper employeeMapper;
 
     @Test
     public void AddEmpolyeeSuccessfully_WithFullData_ExpectCreated() throws Exception {
@@ -322,8 +312,7 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
         ResultActions result = mockMvc.perform(patch("/employee/" + EXISTING_EMPLOYEE_ID).contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(employee)));
         //assert
-        String response = result.andReturn().getResponse().getContentAsString();
-        System.out.println(response);
+
         result.andExpect(status().isOk())
 //                .andExpect(jsonPath("$.employeeID").value(EXISTING_EMPLOYEE_ID))
                 .andExpect(jsonPath("$.name").value(employee.getName()))
@@ -376,10 +365,6 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
         ResultActions result = mockMvc.perform(patch("/employee/" + EXISTING_EMPLOYEE_ID).contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL)
                         .writeValueAsString(employee)));
-
-        System.out.println(objectMapper.getSerializationConfig());
-        System.out.println(objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL)
-                        .writeValueAsString(employee));
         //assert
         result.andExpect(status().isOk())
                 .andExpect(jsonPath("$.name").value(employee.getName())) //assert the change happened
@@ -394,20 +379,47 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
     }
 
     @Test
+    public void modifyEmployee_RemoveExpertises_ExpectOK() throws Exception {
+        prepareDB("/datasets/ModifyEmployeeDataset.xml");
+        //arrange
+        List<Integer> expertises = new ArrayList<>();
+        EmployeeRequestDTO employee = new EmployeeRequestDTO();
+        employee.setName(NEW_EMPLOYEE_NAME);
+        employee.setExpertise(expertises);
+        //act
+        ResultActions result = mockMvc.perform(patch("/employee/" + EXISTING_EMPLOYEE_ID).contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL).writeValueAsString(employee)));
+        //arrange
+        List<Expertise> expertisesAfter = employeeRepository.findById(EXISTING_EMPLOYEE_ID).get().getExpertises();
+        //assert
+        result.andExpect(status().isOk())
+                .andExpect(jsonPath("$.name").value(employee.getName())) //assert the change happened
+                .andExpect(jsonPath("$.dateOfBirth").value(DATE_OF_BIRTH.toString()))
+                .andExpect(jsonPath("$.gender").value(Gender.MALE.toString()))
+                .andExpect(jsonPath("$.graduationDate").value(GRADUATION_DATE.toString()))
+                .andExpect(jsonPath("$.salary").value(SALARY))
+                .andExpect(jsonPath("$.departmentId").value(DEPARTMENT_ID))
+                .andExpect(jsonPath("$.managerId").value(MANAGER_ID2.get()))
+                .andExpect(jsonPath("$.teamId").value(TEAM_ID))
+                .andExpect(jsonPath("$.expertisesIds").value(expertises));
+        assertTrue(expertisesAfter.isEmpty());
+    }
+
+    @Test
     public void deleteEmployee_WithNoManager_ShouldReturnConflict() throws Exception {
         prepareDB("/datasets/DeleteEmployee.xml");
         //arrange
         Employee entityBefore = employeeRepository.findById(EXISTING_EMPLOYEE_ID).get();
-        String beforeVal =objectMapper.writeValueAsString(employeeMapper.toDTO(entityBefore));
+        String beforeVal = objectMapper.writeValueAsString(employeeMapper.toDTO(entityBefore));
         //act
         ResultActions result = mockMvc.perform(delete("/employee/" + EXISTING_EMPLOYEE_ID2));
         //arrange
-        Employee entityAfter =employeeRepository.findById(EXISTING_EMPLOYEE_ID).get();
-        String afterVal =objectMapper.writeValueAsString(employeeMapper.toDTO(entityAfter));
+        Employee entityAfter = employeeRepository.findById(EXISTING_EMPLOYEE_ID).get();
+        String afterVal = objectMapper.writeValueAsString(employeeMapper.toDTO(entityAfter));
         //assert
         result.andExpect(status().isConflict());
         assertTrue(employeeRepository.findById(EXISTING_EMPLOYEE_ID2).isPresent());
-        assertEquals(beforeVal,afterVal);
+        assertEquals(beforeVal, afterVal);
     }
 
     @Test
@@ -426,7 +438,7 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
         //arrange
         List<Employee> subordinatesBeforeReassign = employeeRepository.findById(EXISTING_EMPLOYEE_ID).get().getSubordinates();
         List<Integer> subordinatesIds = new ArrayList<>();
-        for(Employee emp: subordinatesBeforeReassign){
+        for (Employee emp : subordinatesBeforeReassign) {
             subordinatesIds.add(emp.getEmployeeID());
         }
         //act
@@ -434,8 +446,8 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
         result.andExpect(status().isNoContent());
         //assert
         List<Employee> subordinatesAfterReassign = employeeRepository.findAllById(subordinatesIds);
-        for(Employee emp:subordinatesAfterReassign){
-            assertEquals(SUPER_MANAGER_ID2,emp.getManager().getEmployeeID());
+        for (Employee emp : subordinatesAfterReassign) {
+            assertEquals(SUPER_MANAGER_ID2, emp.getManager().getEmployeeID());
         }
         assertFalse(employeeRepository.findById(EXISTING_EMPLOYEE_ID).isPresent());
     }
