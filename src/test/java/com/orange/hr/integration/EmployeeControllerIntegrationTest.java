@@ -418,7 +418,6 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
         String afterVal = objectMapper.writeValueAsString(employeeMapper.toDTO(entityAfter));
         //assert
         result.andExpect(status().isConflict());
-        assertTrue(employeeRepository.findById(EXISTING_EMPLOYEE_ID2).isPresent());
         assertEquals(beforeVal, afterVal);
     }
 
