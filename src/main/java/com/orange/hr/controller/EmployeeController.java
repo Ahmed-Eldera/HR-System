@@ -1,6 +1,5 @@
 package com.orange.hr.controller;
 
-import com.orange.hr.dto.EmployeeNodeDTO;
 import com.orange.hr.dto.EmployeeRequestDTO;
 import com.orange.hr.dto.EmployeeResponseDTO;
 import com.orange.hr.dto.SalaryDTO;
@@ -11,6 +10,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/employee")
@@ -52,9 +53,10 @@ public class EmployeeController {
         return new ResponseEntity<>(responseDTO, HttpStatus.OK);
 
     }
+
     @GetMapping("/{id}/subordinates")
-    public ResponseEntity<EmployeeNodeDTO> getSubordinates(@PathVariable("id") Integer id){
-        EmployeeNodeDTO employeeNodeDTO = employeeService.getSubordinates(id);
-        return new ResponseEntity<>(employeeNodeDTO,HttpStatus.OK);
+    public ResponseEntity<List<EmployeeResponseDTO>> getSubordinates(@PathVariable("id") Integer id) {
+        List<EmployeeResponseDTO> response = employeeService.getSubordinates(id);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }

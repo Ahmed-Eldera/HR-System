@@ -3,8 +3,8 @@ package com.orange.hr.integration;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.orange.hr.dto.EmployeeNodeDTO;
 import com.orange.hr.dto.EmployeeRequestDTO;
+import com.orange.hr.dto.EmployeeResponseDTO;
 import com.orange.hr.entity.Employee;
 import com.orange.hr.entity.Expertise;
 import com.orange.hr.enums.Gender;
@@ -21,6 +21,7 @@ import org.springframework.test.web.servlet.ResultActions;
 import java.time.LocalDate;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -28,11 +29,6 @@ import java.time.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 public class EmployeeControllerIntegrationTest extends AbstractTest {
     private static final int NON_EXISTENT_EMPLOYEE_ID = 999;
@@ -70,9 +66,9 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
     @Autowired
     EmployeeRepository employeeRepository;
     @Autowired
-    EmployeeMapper employeeMapper;
-    @Autowired
     private ObjectMapper objectMapper;
+    @Autowired
+    private EmployeeMapper employeeMapper;
 
     @Test
     public void AddEmpolyeeSuccessfully_WithFullData_ExpectCreated() throws Exception {
@@ -576,20 +572,30 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
         //                     |-> leaf1
         // root -> directChild |
         //                     |-> leaf2
+
+        Integer rootId = 1;
+        Integer directChildId = 2;
+        Integer leaf1Id = 3;
+        Integer leaf2Id = 4;
+
         //arrange
-        EmployeeNodeDTO leaf2 = new EmployeeNodeDTO(4, "Ahmed", null);
-        EmployeeNodeDTO leaf1 = new EmployeeNodeDTO(3, "Ahmed", null);
-        EmployeeNodeDTO directChild = new EmployeeNodeDTO(2, "Ahmed", List.of(leaf1, leaf2));
-        EmployeeNodeDTO root = new EmployeeNodeDTO(1, "Ahmed", List.of(directChild));
-        String ExpectedOutput = objectMapper.writeValueAsString(root);
+        Employee directChild = employeeRepository.findById(directChildId).get();
+        Employee leaf1 = employeeRepository.findById(leaf1Id).get();
+        Employee leaf2 = employeeRepository.findById(leaf2Id).get();
+        List<EmployeeResponseDTO> expectedSubs = new ArrayList<>();
+        expectedSubs.add(employeeMapper.toDTO(directChild));
+        expectedSubs.add(employeeMapper.toDTO(leaf1));
+        expectedSubs.add(employeeMapper.toDTO(leaf2));
+        String expectedOutput = objectMapper.writeValueAsString(expectedSubs);
+
 
         //act
-        ResultActions result = mockMvc.perform(get("/employee/" + EXISTING_EMPLOYEE_ID + "/subordinates"));
+        ResultActions result = mockMvc.perform(get("/employee/" + rootId + "/subordinates"));
 
         String actualOutput = result.andReturn().getResponse().getContentAsString();
         //assert
         result.andExpect(status().isOk());
-        JSONAssert.assertEquals(ExpectedOutput, actualOutput, JSONCompareMode.NON_EXTENSIBLE);
+        JSONAssert.assertEquals(expectedOutput, actualOutput, JSONCompareMode.NON_EXTENSIBLE);
 
     }
 

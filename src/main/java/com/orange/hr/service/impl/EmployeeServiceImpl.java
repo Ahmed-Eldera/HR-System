@@ -1,6 +1,5 @@
 package com.orange.hr.service.impl;
 
-import com.orange.hr.dto.EmployeeNodeDTO;
 import com.orange.hr.dto.EmployeeRequestDTO;
 import com.orange.hr.dto.EmployeeResponseDTO;
 import com.orange.hr.dto.SalaryDTO;
@@ -164,9 +163,22 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
-    public EmployeeNodeDTO getSubordinates(Integer id) {
+    public List<EmployeeResponseDTO> getSubordinates(Integer id) {
         Employee employee = employeeRepository.findById(id).orElseThrow(() -> new NoSuchEmployeeException(HttpStatus.BAD_REQUEST, "Can't find selected employee."));
-        EmployeeNodeDTO response = employeeMapper.toEmployeeNodeDTO(employee);
+        List<EmployeeResponseDTO> response = new ArrayList<>();
+        Queue<Employee> unVisitedEmployees = new LinkedList<>(); //subordinates who will be checked if they have subordinates themselves
+        unVisitedEmployees.add(employee);//we start by the manager to search for his subordinates
+        //searching for all the subordinates (bfs)
+        while (!unVisitedEmployees.isEmpty()) {
+            employee = unVisitedEmployees.poll();
+            List<Employee> subordinates = employee.getSubordinates();
+            if (!subordinates.isEmpty()) {
+                subordinates.forEach(e -> {
+                    response.add(employeeMapper.toDTO(e));
+                    unVisitedEmployees.add(e);
+                });
+            }
+        }
         return response;
     }
 }
