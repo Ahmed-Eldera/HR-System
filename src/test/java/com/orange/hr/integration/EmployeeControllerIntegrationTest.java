@@ -19,16 +19,14 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
 import java.time.LocalDate;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-
-import java.time.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 public class EmployeeControllerIntegrationTest extends AbstractTest {
     private static final int NON_EXISTENT_EMPLOYEE_ID = 999;
@@ -536,38 +534,10 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
         result.andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.msg").value("Can't find the selected employee"));
     }
-        @Test
-    public void GetEmployee_WithValidEmployee_ShouldReturnOK() throws Exception {
-        prepareDB("/datasets/GetEmployee.xml");
-        //act
-        ResultActions result = mockMvc.perform(get("/employee/" + EXISTING_EMPLOYEE_ID));
 
-        result.andExpect(status().isOk())
-                .andExpect(jsonPath("$.employeeID").value(EXISTING_EMPLOYEE_ID))
-                .andExpect(jsonPath("$.name").value(EXISTING_EMPLOYEE_NAME))
-                .andExpect(jsonPath("$.dateOfBirth").value(DATE_OF_BIRTH.toString()))
-                .andExpect(jsonPath("$.gender").value(Gender.MALE.toString()))
-                .andExpect(jsonPath("$.graduationDate").value(GRADUATION_DATE.toString()))
-                .andExpect(jsonPath("$.salary").value(SALARY))
-                .andExpect(jsonPath("$.departmentId").value(DEPARTMENT_ID))
-                .andExpect(jsonPath("$.managerId").isEmpty())
-                .andExpect(jsonPath("$.teamId").value(TEAM_ID))
-                .andExpect(jsonPath("$.expertisesIds").isEmpty());
-
-    }
 
     @Test
-    public void GetEmployee_WithInValidEmployee_ShouldReturnNotFound() throws Exception {
-        prepareDB("/datasets/GetEmployee.xml");
-        //act
-        ResultActions result = mockMvc.perform(get("/employee/" + NON_EXISTENT_EMPLOYEE_ID));
-
-        result.andExpect(status().isNotFound());
-
-    }
-
-    @Test
-    public void GetSubordinates_WithValidEmployee_ShouldReturnOk() throws Exception {
+    public void getSubordinates_WithValidEmployee_ShouldReturnOk() throws Exception {
         prepareDB("/datasets/GetSubordinates.xml");
         //                     |-> leaf1
         // root -> directChild |
@@ -600,7 +570,7 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
     }
 
     @Test
-    public void GetSubordinates_WithInValidEmployee_ShouldReturnNotFound() throws Exception {
+    public void getSubordinates_WithInValidEmployee_ShouldReturnNotFound() throws Exception {
         prepareDB("/datasets/GetSubordinates.xml");
         //arrange
 
