@@ -482,7 +482,7 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
     }
 
     @Test
-    public void GetEmployee_WithValidEmployee_ShouldReturnOK() throws Exception {
+    public void getEmployee_WithValidEmployee_ShouldReturnOK() throws Exception {
         prepareDB("/datasets/GetEmployee.xml");
         //act
         ResultActions result = mockMvc.perform(get("/employee/" + EXISTING_EMPLOYEE_ID));
@@ -502,7 +502,7 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
     }
 
     @Test
-    public void GetEmployee_WithInValidEmployee_ShouldReturnNotFound() throws Exception {
+    public void getEmployee_WithInValidEmployee_ShouldReturnNotFound() throws Exception {
         prepareDB("/datasets/GetEmployee.xml");
         //act
         ResultActions result = mockMvc.perform(get("/employee/" + NON_EXISTENT_EMPLOYEE_ID));
@@ -512,10 +512,10 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
     }
 
     @Test
-    public void GetSalary_WithValidEmployee_ShouldReturnOK() throws Exception {
+    public void getSalary_WithValidEmployee_ShouldReturnOK() throws Exception {
         prepareDB("/datasets/GetSalary.xml");
         //prepare
-        double netSalary = SALARY - INSURANCE - SALARY * TAX; //net = gross - fixed 500 and - 15% tax
+        Float netSalary = SALARY - INSURANCE - SALARY * TAX; //net = gross - fixed 500 and - 15% tax
         //act
         ResultActions result = mockMvc.perform(get("/employee/" + EXISTING_EMPLOYEE_ID + "/salary"));
 
@@ -525,13 +525,11 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
     }
 
     @Test
-    public void GetSalary_WithInValidEmployee_ShouldReturnNotFound() throws Exception {
+    public void getSalary_WithInValidEmployee_ShouldReturnNotFound() throws Exception {
         prepareDB("/datasets/GetSalary.xml");
-        //prepare
-        double netSalary = SALARY - INSURANCE - SALARY * TAX; //net = gross - fixed 500 and - 15% tax
         //act
         ResultActions result = mockMvc.perform(get("/employee/" + NON_EXISTENT_EMPLOYEE_ID + "/salary"));
-
+        //assert
         result.andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.msg").value("Can't find the selected employee"));
     }

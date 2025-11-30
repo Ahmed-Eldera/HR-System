@@ -15,16 +15,12 @@ import com.orange.hr.repository.ExpertiseRepository;
 import com.orange.hr.repository.TeamRepository;
 import com.orange.hr.service.EmployeeService;
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.criteria.CriteriaBuilder;
-import jakarta.persistence.criteria.CriteriaUpdate;
-import jakarta.persistence.criteria.Root;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 
 @Transactional
@@ -149,10 +145,12 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     public SalaryDTO getSalary(Integer id) {
-        Employee employee = employeeRepository.findById(id).orElseThrow(()->new NoSuchEmployeeException(HttpStatus.NOT_FOUND,"Can't find the selected employee"));
-        double gross = employee.getSalary();
-        double net = gross - gross*15/100 - 500;
-        SalaryDTO salaryDTO= new SalaryDTO(gross,net);
+        Employee employee = employeeRepository.findById(id).orElseThrow(() -> new NoSuchEmployeeException(HttpStatus.NOT_FOUND, "Can't find the selected employee"));
+        Float gross = employee.getSalary();
+        Float insurance = 500f;
+        Float taxRatio = 0.15f;
+        Float net = gross - gross * taxRatio - insurance;
+        SalaryDTO salaryDTO = new SalaryDTO(gross, net);
         return salaryDTO;
 
     }

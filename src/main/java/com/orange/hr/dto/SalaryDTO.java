@@ -10,6 +10,6 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class SalaryDTO {
-    private double gross;
-    private double net;
+    private Float gross;
+    private Float net;
 }
