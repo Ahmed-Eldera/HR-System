@@ -86,11 +86,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         }
 
         if (dto.getSalary() != null) {
-            if (dto.getSalary() >= 500) {
-                entity.setSalary(dto.getSalary());
-            } else {
-                throw new MyException(HttpStatus.BAD_REQUEST, "Salary must be at least 500");
-            }
+            entity.setSalary(dto.getSalary());
         }
 
         if (dto.getExpertise() != null) {

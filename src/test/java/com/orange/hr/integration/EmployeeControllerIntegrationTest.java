@@ -42,7 +42,7 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
     private static final LocalDate FUTURE_DATE_OF_BIRTH = LocalDate.of(2999, 2, 18);
     private static final LocalDate GRADUATION_DATE = LocalDate.of(2026, 2, 18);
     private static final LocalDate NEW_GRADUATION_DATE = LocalDate.of(2029, 2, 18);
-    private static final float SALARY = 500F;
+    private static final float SALARY = 2000F;
     private static final float INVALID_SALARY = 100F;
     private static final float NEW_SALARY = 550F;
     private static final int DEPARTMENT_ID = 1;
