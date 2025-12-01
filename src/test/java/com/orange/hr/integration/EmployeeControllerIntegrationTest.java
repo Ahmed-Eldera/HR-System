@@ -582,4 +582,23 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
                 .andExpect(jsonPath("$.msg").value("Can't find selected employee."));
 
     }
+
+    @Test
+    public void getDirectEmployees_GivenValidManager_ShouldReturnOk() throws Exception {
+        prepareDB("/datasets/EmployeeController/GetSubordinates.xml");
+        Integer sub1 = 3;
+        Integer sub2 = 4;
+        //arrange
+        List<Employee> employees = employeeRepository.findAllById(List.of(sub1,sub2));
+        List<EmployeeResponseDTO> dtos = new ArrayList<>();
+        employees.forEach(e->dtos.add(employeeMapper.toDTO(e)));
+        String expectedResponse = objectMapper.writeValueAsString(dtos)
+
+        //act
+        ResultActions result = mockMvc.perform(get("/employee?managerId=" + MANAGER_ID2));
+        String actualResponse = result.andReturn().getResponse().getContentAsString();
+        //assert
+        result.andExpect(status().isOk());
+        JSONAssert.assertEquals(expectedResponse,actualResponse,JSONCompareMode.NON_EXTENSIBLE);
+    }
 }
