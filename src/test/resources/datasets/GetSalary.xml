@@ -1,6 +1,7 @@
 <dataset>
     <departments department_id="1" name="Developers"/>
     <teams team_id="1" name="Project-X"/>
+    <employees_expertise/>
 
     <employees
             employee_id="1"

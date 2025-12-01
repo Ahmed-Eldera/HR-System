@@ -2,6 +2,7 @@ package com.orange.hr.service.impl;
 
 import com.orange.hr.dto.EmployeeRequestDTO;
 import com.orange.hr.dto.EmployeeResponseDTO;
+import com.orange.hr.dto.SalaryDTO;
 import com.orange.hr.entity.Department;
 import com.orange.hr.entity.Employee;
 import com.orange.hr.entity.Expertise;
@@ -14,9 +15,6 @@ import com.orange.hr.repository.ExpertiseRepository;
 import com.orange.hr.repository.TeamRepository;
 import com.orange.hr.service.EmployeeService;
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.criteria.CriteriaBuilder;
-import jakarta.persistence.criteria.CriteriaUpdate;
-import jakarta.persistence.criteria.Root;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -24,7 +22,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 
 @Transactional
 @Service
@@ -86,11 +86,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         }
 
         if (dto.getSalary() != null) {
-            if(dto.getSalary()>=500) {
-                entity.setSalary(dto.getSalary());
-            }else{
-                throw new MyException(HttpStatus.BAD_REQUEST,"Minimum salary is 500");
-            }
+            entity.setSalary(dto.getSalary());
         }
 
         if (dto.getExpertise() != null) {
@@ -139,7 +135,46 @@ public class EmployeeServiceImpl implements EmployeeService {
         }
         Integer newManagerId = employee.getManager().getEmployeeID();
         //reassign his subordinates to his manager before deleting him
-        employeeRepository.reassignSubordinates(id,newManagerId);
+        employeeRepository.reassignSubordinates(id, newManagerId);
         employeeRepository.deleteById(id);
+    }
+
+    @Override
+    public EmployeeResponseDTO getEmployee(Integer id) {
+        Employee entity = employeeRepository.findById(id).orElseThrow(() -> new NoSuchEmployeeException(HttpStatus.NOT_FOUND, "Employee Not Found"));
+        EmployeeResponseDTO dto = employeeMapper.toDTO(entity);
+        return dto;
+    }
+
+    @Override
+    public SalaryDTO getSalary(Integer id) {
+        Employee employee = employeeRepository.findById(id).orElseThrow(() -> new NoSuchEmployeeException(HttpStatus.NOT_FOUND, "Can't find the selected employee"));
+        Float gross = employee.getSalary();
+        Float INSURANCE = 500f;
+        Float TAXRATIO = 0.15f;
+        Float net = gross - gross * TAXRATIO - INSURANCE;
+        SalaryDTO salaryDTO = new SalaryDTO(gross, net);
+        return salaryDTO;
+
+    }
+
+    @Override
+    public List<EmployeeResponseDTO> getSubordinates(Integer id) {
+        Employee employee = employeeRepository.findById(id).orElseThrow(() -> new NoSuchEmployeeException(HttpStatus.BAD_REQUEST, "Can't find selected employee."));
+        List<EmployeeResponseDTO> response = new ArrayList<>();
+        Queue<Employee> unVisitedEmployees = new LinkedList<>(); //subordinates who will be checked if they have subordinates themselves
+        unVisitedEmployees.add(employee);//we start by the manager to search for his subordinates
+        //searching for all the subordinates (bfs)
+        while (!unVisitedEmployees.isEmpty()) {
+            employee = unVisitedEmployees.poll();
+            List<Employee> subordinates = employee.getSubordinates();
+            if (!subordinates.isEmpty()) {
+                subordinates.forEach(e -> {
+                    response.add(employeeMapper.toDTO(e));
+                    unVisitedEmployees.add(e);
+                });
+            }
+        }
+        return response;
     }
 }
