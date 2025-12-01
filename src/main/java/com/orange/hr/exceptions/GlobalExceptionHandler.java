@@ -13,23 +13,23 @@ import java.util.List;
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler({ MethodArgumentNotValidException.class })
+    @ExceptionHandler({MethodArgumentNotValidException.class})
     public ResponseEntity<Object> handleValidationException(MethodArgumentNotValidException exception) {
 
         CustomError error = new CustomError();
         StringBuffer msg = new StringBuffer();
         List<ObjectError> errors = exception.getBindingResult().getAllErrors();
-        for(ObjectError e: errors){
+        for (ObjectError e : errors) {
             msg.append(e.getDefaultMessage() + " ,");
         }
-
+        msg.delete(msg.length() - 2, msg.length());
         error.setMsg(msg.toString());
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
                 .body(error);
     }
 
-    @ExceptionHandler({ MyException.class })
+    @ExceptionHandler({MyException.class})
     public ResponseEntity<Object> handleRuntimeException(MyException exception) {
 
         CustomError error = new CustomError();

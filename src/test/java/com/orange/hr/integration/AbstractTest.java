@@ -6,7 +6,6 @@ import org.dbunit.DatabaseUnitException;
 import org.dbunit.database.DatabaseConfig;
 import org.dbunit.database.DatabaseConnection;
 import org.dbunit.database.IDatabaseConnection;
-import org.dbunit.dataset.DataSetException;
 import org.dbunit.dataset.IDataSet;
 import org.dbunit.dataset.datatype.DataType;
 import org.dbunit.dataset.datatype.DataTypeException;
@@ -40,13 +39,11 @@ import java.sql.Types;
 })
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class AbstractTest {
+    private static IDatabaseConnection dbUnitConnection;
     @Autowired
     private DataSource dataSource;
-
     @Autowired
-    public ObjectMapper objectMapper;
-
-    private static IDatabaseConnection dbUnitConnection;
+    private ObjectMapper objectMapper;
 
     @BeforeAll
     void setUp() throws Exception {
@@ -67,14 +64,9 @@ public class AbstractTest {
         objectMapper.clearCaches();
     }
 
-    public static class CustomH2DataTypeFactory extends H2DataTypeFactory {
-        @Override
-        public DataType createDataType(int sqlType, String sqlTypeName) throws DataTypeException {
-            if (sqlType == Types.OTHER && sqlTypeName.startsWith("ENUM")) {
-                return DataType.VARCHAR;
-            }
-            return super.createDataType(sqlType, sqlTypeName);
-        }
+    @BeforeEach
+    void setUpBeforeEach() {
+        objectMapper.clearCaches();
     }
 
     public void prepareDB(String path) throws DatabaseUnitException, SQLException {
@@ -84,5 +76,15 @@ public class AbstractTest {
         dbUnitConnection.getConnection().createStatement().execute("SET REFERENTIAL_INTEGRITY FALSE");
         DatabaseOperation.CLEAN_INSERT.execute(dbUnitConnection, dataSet);
         dbUnitConnection.getConnection().createStatement().execute("SET REFERENTIAL_INTEGRITY TRUE");
+    }
+
+    public static class CustomH2DataTypeFactory extends H2DataTypeFactory {
+        @Override
+        public DataType createDataType(int sqlType, String sqlTypeName) throws DataTypeException {
+            if (sqlType == Types.OTHER && sqlTypeName.startsWith("ENUM")) {
+                return DataType.VARCHAR;
+            }
+            return super.createDataType(sqlType, sqlTypeName);
+        }
     }
 }

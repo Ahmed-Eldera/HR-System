@@ -1,6 +1,7 @@
 <dataset>
     <departments department_id="1" name="Developers"/>
     <teams team_id="1" name="Project-X"/>
+    <employees_expertise />
 
     <employees
             employee_id="1"
@@ -8,7 +9,7 @@
             date_of_birth="2003-02-18"
             gender="MALE"
             graduation_date="2026-02-18"
-            salary="2000"
+            salary="500"
             department_id="1"
             team_id="1"
     />
