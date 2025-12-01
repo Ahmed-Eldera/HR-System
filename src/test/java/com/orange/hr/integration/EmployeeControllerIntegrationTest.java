@@ -70,7 +70,7 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
 
     @Test
     public void AddEmpolyeeSuccessfully_WithFullData_ExpectCreated() throws Exception {
-        prepareDB("/datasets/AddEmployeeDataset.xml");
+        prepareDB("/datasets/EmployeeController/AddEmployeeDataset.xml");
         //Arrange
         List<Integer> expertises = new ArrayList<>();
         expertises.add(EXPERTISE_ID);
@@ -106,7 +106,7 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
 
     @Test
     public void AddEmpolyeeSuccessfully_WithNoManager_ExpectCreated() throws Exception {
-        prepareDB("/datasets/AddEmployeeDataset.xml");
+        prepareDB("/datasets/EmployeeController/AddEmployeeDataset.xml");
         //Arrange
         List<Integer> expertises = new ArrayList<>();
         expertises.add(EXPERTISE_ID);
@@ -142,7 +142,7 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
 
     @Test
     public void AddEmpolyee_WithMissingData_ExpectBadRequest() throws Exception {
-        prepareDB("/datasets/AddEmployeeDataset.xml");
+        prepareDB("/datasets/EmployeeController/AddEmployeeDataset.xml");
         //Arrange
         List<Integer> expertises = new ArrayList<>();
         expertises.add(EXPERTISE_ID);
@@ -167,7 +167,7 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
 
     @Test
     public void AddEmpolyee_WithDepartmentNotValid_ExpectNotFound() throws Exception {
-        prepareDB("/datasets/AddEmployeeDataset.xml");
+        prepareDB("/datasets/EmployeeController/AddEmployeeDataset.xml");
         //Arrange
         List<Integer> expertises = new ArrayList<>();
         expertises.add(EXPERTISE_ID);
@@ -193,7 +193,7 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
 
     @Test
     public void AddEmpolyee_WithTeamNotValid_ExpectNotFound() throws Exception {
-        prepareDB("/datasets/AddEmployeeDataset.xml");
+        prepareDB("/datasets/EmployeeController/AddEmployeeDataset.xml");
         //Arrange
         List<Integer> expertises = new ArrayList<>();
         expertises.add(EXPERTISE_ID);
@@ -219,7 +219,7 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
 
     @Test
     public void AddEmpolyee_WithManagerNotValid_ExpectNotFound() throws Exception {
-        prepareDB("/datasets/AddEmployeeDataset.xml");
+        prepareDB("/datasets/EmployeeController/AddEmployeeDataset.xml");
         //Arrange
         List<Integer> expertises = new ArrayList<>();
         expertises.add(EXPERTISE_ID);
@@ -245,7 +245,7 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
 
     @Test
     public void AddEmpolyee_WithBirthDateNotValid_ExpectNotFound() throws Exception {
-        prepareDB("/datasets/AddEmployeeDataset.xml");
+        prepareDB("/datasets/EmployeeController/AddEmployeeDataset.xml");
         //Arrange
         List<Integer> expertises = new ArrayList<>();
         expertises.add(EXPERTISE_ID);
@@ -271,7 +271,7 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
 
     @Test
     public void AddEmpolyee_WithExpertiseNotValid_ExpectNotFound() throws Exception {
-        prepareDB("/datasets/AddEmployeeDataset.xml");
+        prepareDB("/datasets/EmployeeController/AddEmployeeDataset.xml");
         //Arrange
         List<Integer> expertises = new ArrayList<>();
         expertises.add(NON_EXISTENT_EXPERTISE_ID);
@@ -297,7 +297,7 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
 
     @Test
     public void modifyEmployee_WithValidData_ExpectOK() throws Exception {
-        prepareDB("/datasets/ModifyEmployeeDataset.xml");
+        prepareDB("/datasets/EmployeeController/ModifyEmployeeDataset.xml");
         //arrange
         List<Integer> expertises = new ArrayList<>();
         expertises.add(EXPERTISE_ID2);
@@ -333,7 +333,7 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
 
     @Test
     public void modifyEmployee_RemoveManager_ExpectOK() throws Exception {
-        prepareDB("/datasets/ModifyEmployeeDataset.xml");
+        prepareDB("/datasets/EmployeeController/ModifyEmployeeDataset.xml");
         //arrange
         List<Integer> expertises = new ArrayList<>();
         expertises.add(EXPERTISE_ID);
@@ -358,7 +358,7 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
 
     @Test
     public void modifyEmployee_PartialUpdateLeaveManagerAsItIs_ExpectOK() throws Exception {
-        prepareDB("/datasets/ModifyEmployeeDataset.xml");
+        prepareDB("/datasets/EmployeeController/ModifyEmployeeDataset.xml");
         //arrange
         List<Integer> expertises = new ArrayList<>();
         EmployeeRequestDTO employee = new EmployeeRequestDTO();
@@ -383,7 +383,7 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
 
     @Test
     public void modifyEmployee_RemoveExpertises_ExpectOK() throws Exception {
-        prepareDB("/datasets/ModifyEmployeeDataset.xml");
+        prepareDB("/datasets/EmployeeController/ModifyEmployeeDataset.xml");
         //arrange
         List<Integer> expertises = new ArrayList<>();
         EmployeeRequestDTO employee = new EmployeeRequestDTO();
@@ -410,7 +410,7 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
 
     @Test
     public void modifyEmployee_InValidSalary_ExpectBadRequest() throws Exception {
-        prepareDB("/datasets/ModifyEmployeeDataset.xml");
+        prepareDB("/datasets/EmployeeController/ModifyEmployeeDataset.xml");
         //arrange
         objectMapper = new ObjectMapper();
         List<Integer> expertises = new ArrayList<>();
@@ -428,7 +428,7 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
 
     @Test
     public void deleteEmployee_WithManager_ShouldReturnNoContent() throws Exception {
-        prepareDB("/datasets/DeleteEmployee.xml");
+        prepareDB("/datasets/EmployeeController/DeleteEmployee.xml");
         //act
         ResultActions result = mockMvc.perform(delete("/employee/" + EXISTING_EMPLOYEE_ID));
 
@@ -438,7 +438,7 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
 
     @Test
     public void deleteEmployee_WithNoManager_ShouldReturnConflict() throws Exception {
-        prepareDB("/datasets/DeleteEmployee.xml");
+        prepareDB("/datasets/EmployeeController/DeleteEmployee.xml");
         //arrange
         Employee entityBefore = employeeRepository.findById(EXISTING_EMPLOYEE_ID).get();
         String beforeVal = objectMapper.writeValueAsString(employeeMapper.toDTO(entityBefore));
@@ -454,7 +454,7 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
 
     @Test
     public void deleteEmployee_WithNonExistentEmployee_ShouldReturnNotFound() throws Exception {
-        prepareDB("/datasets/DeleteEmployee.xml");
+        prepareDB("/datasets/EmployeeController/DeleteEmployee.xml");
         //act
         ResultActions result = mockMvc.perform(delete("/employee/" + NON_EXISTENT_EMPLOYEE_ID));
 
@@ -464,7 +464,7 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
 
     @Test
     public void deleteEmployee_WithAManagerThatHasEmployees_ShouldMoveEmployeesToHisManager() throws Exception {
-        prepareDB("/datasets/DeleteEmployee.xml");
+        prepareDB("/datasets/EmployeeController/DeleteEmployee.xml");
         //arrange
         List<Employee> subordinatesBeforeReassign = employeeRepository.findById(EXISTING_EMPLOYEE_ID).get().getSubordinates();
         List<Integer> subordinatesIds = new ArrayList<>();
@@ -484,7 +484,7 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
 
     @Test
     public void getEmployee_WithValidEmployee_ShouldReturnOK() throws Exception {
-        prepareDB("/datasets/GetEmployee.xml");
+        prepareDB("/datasets/EmployeeController/GetEmployee.xml");
         //act
         ResultActions result = mockMvc.perform(get("/employee/" + EXISTING_EMPLOYEE_ID));
 
@@ -504,7 +504,7 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
 
     @Test
     public void getEmployee_WithInValidEmployee_ShouldReturnNotFound() throws Exception {
-        prepareDB("/datasets/GetEmployee.xml");
+        prepareDB("/datasets/EmployeeController/GetEmployee.xml");
         //act
         ResultActions result = mockMvc.perform(get("/employee/" + NON_EXISTENT_EMPLOYEE_ID));
 
@@ -514,7 +514,7 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
 
     @Test
     public void getSalary_WithValidEmployee_ShouldReturnOK() throws Exception {
-        prepareDB("/datasets/GetSalary.xml");
+        prepareDB("/datasets/EmployeeController/GetSalary.xml");
         //prepare
         Float netSalary = SALARY - INSURANCE - SALARY * TAX; //net = gross - fixed 500 and - 15% tax
         //act
@@ -527,7 +527,7 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
 
     @Test
     public void getSalary_WithInValidEmployee_ShouldReturnNotFound() throws Exception {
-        prepareDB("/datasets/GetSalary.xml");
+        prepareDB("/datasets/EmployeeController/GetSalary.xml");
         //act
         ResultActions result = mockMvc.perform(get("/employee/" + NON_EXISTENT_EMPLOYEE_ID + "/salary"));
         //assert
@@ -538,7 +538,7 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
 
     @Test
     public void getSubordinates_WithValidEmployee_ShouldReturnOk() throws Exception {
-        prepareDB("/datasets/GetSubordinates.xml");
+        prepareDB("/datasets/EmployeeController/GetSubordinates.xml");
         //                     |-> leaf1
         // root -> directChild |
         //                     |-> leaf2
@@ -571,7 +571,7 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
 
     @Test
     public void getSubordinates_WithInValidEmployee_ShouldReturnNotFound() throws Exception {
-        prepareDB("/datasets/GetSubordinates.xml");
+        prepareDB("/datasets/EmployeeController/GetSubordinates.xml");
         //arrange
 
         //act
@@ -582,5 +582,4 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
                 .andExpect(jsonPath("$.msg").value("Can't find selected employee."));
 
     }
-
 }
