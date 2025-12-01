@@ -11,8 +11,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
 @RequestMapping("/employee")
 public class EmployeeController {
@@ -52,11 +50,5 @@ public class EmployeeController {
         SalaryDTO responseDTO = employeeService.getSalary(id);
         return new ResponseEntity<>(responseDTO, HttpStatus.OK);
 
-    }
-
-    @GetMapping("/{id}/subordinates")
-    public ResponseEntity<List<EmployeeResponseDTO>> getSubordinates(@PathVariable("id") Integer id) {
-        List<EmployeeResponseDTO> response = employeeService.getSubordinates(id);
-        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }
