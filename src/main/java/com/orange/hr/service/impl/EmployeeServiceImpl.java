@@ -21,7 +21,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 
 @Transactional
 @Service
@@ -153,5 +156,25 @@ public class EmployeeServiceImpl implements EmployeeService {
         SalaryDTO salaryDTO = new SalaryDTO(gross, net);
         return salaryDTO;
 
+    }
+
+    @Override
+    public List<EmployeeResponseDTO> getSubordinates(Integer id) {
+        Employee employee = employeeRepository.findById(id).orElseThrow(() -> new NoSuchEmployeeException(HttpStatus.BAD_REQUEST, "Can't find selected employee."));
+        List<EmployeeResponseDTO> response = new ArrayList<>();
+        Queue<Employee> unVisitedEmployees = new LinkedList<>(); //subordinates who will be checked if they have subordinates themselves
+        unVisitedEmployees.add(employee);//we start by the manager to search for his subordinates
+        //searching for all the subordinates (bfs)
+        while (!unVisitedEmployees.isEmpty()) {
+            employee = unVisitedEmployees.poll();
+            List<Employee> subordinates = employee.getSubordinates();
+            if (!subordinates.isEmpty()) {
+                subordinates.forEach(e -> {
+                    response.add(employeeMapper.toDTO(e));
+                    unVisitedEmployees.add(e);
+                });
+            }
+        }
+        return response;
     }
 }
