@@ -589,16 +589,16 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
         Integer sub1 = 3;
         Integer sub2 = 4;
         //arrange
-        List<Employee> employees = employeeRepository.findAllById(List.of(sub1,sub2));
+        List<Employee> employees = employeeRepository.findAllById(List.of(sub1, sub2));
         List<EmployeeResponseDTO> dtos = new ArrayList<>();
-        employees.forEach(e->dtos.add(employeeMapper.toDTO(e)));
-        String expectedResponse = objectMapper.writeValueAsString(dtos)
+        employees.forEach(e -> dtos.add(employeeMapper.toDTO(e)));
+        String expectedResponse = objectMapper.writeValueAsString(dtos);
 
         //act
-        ResultActions result = mockMvc.perform(get("/employee?managerId=" + MANAGER_ID2));
+        ResultActions result = mockMvc.perform(get("/employee?managerId=" + MANAGER_ID2.get()));
         String actualResponse = result.andReturn().getResponse().getContentAsString();
         //assert
         result.andExpect(status().isOk());
-        JSONAssert.assertEquals(expectedResponse,actualResponse,JSONCompareMode.NON_EXTENSIBLE);
+        JSONAssert.assertEquals(expectedResponse, actualResponse, JSONCompareMode.NON_EXTENSIBLE);
     }
 }
