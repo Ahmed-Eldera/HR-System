@@ -543,24 +543,24 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
         // root -> directChild |
         //                     |-> leaf2
 
-        Integer rootId = 1;
-        Integer directChildId = 2;
-        Integer leaf1Id = 3;
-        Integer leaf2Id = 4;
+        Integer ROOT_ID = 1;
+        Integer DIRECT_CHILD_ID = 2;
+        Integer LEAF_ID = 3;
+        Integer LEAF2_ID = 4;
 
         //arrange
-        Employee directChild = employeeRepository.findById(directChildId).get();
-        Employee leaf1 = employeeRepository.findById(leaf1Id).get();
-        Employee leaf2 = employeeRepository.findById(leaf2Id).get();
+        Employee DIRECT_CHILD = employeeRepository.findById(DIRECT_CHILD_ID).get();
+        Employee LEAF1 = employeeRepository.findById(LEAF_ID).get();
+        Employee LEAF2 = employeeRepository.findById(LEAF2_ID).get();
         List<EmployeeResponseDTO> expectedSubs = new ArrayList<>();
-        expectedSubs.add(employeeMapper.toDTO(directChild));
-        expectedSubs.add(employeeMapper.toDTO(leaf1));
-        expectedSubs.add(employeeMapper.toDTO(leaf2));
+        expectedSubs.add(employeeMapper.toDTO(DIRECT_CHILD));
+        expectedSubs.add(employeeMapper.toDTO(LEAF1));
+        expectedSubs.add(employeeMapper.toDTO(LEAF2));
         String expectedOutput = objectMapper.writeValueAsString(expectedSubs);
 
 
         //act
-        ResultActions result = mockMvc.perform(get("/employee/" + rootId + "/subordinates"));
+        ResultActions result = mockMvc.perform(get("/employee/" + ROOT_ID + "/subordinates"));
 
         String actualOutput = result.andReturn().getResponse().getContentAsString();
         //assert
