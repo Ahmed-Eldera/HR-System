@@ -30,7 +30,7 @@ public class EmployeeMapper {
         response.setSalary(entity.getSalary());
         response.setGraduationDate(entity.getGraduationDate());
         response.setDateOfBirth(entity.getDateOfBirth());
-        if (entity.getManager() != null) {
+        if(entity.getManager()!=null) {
             response.setManagerId(entity.getManager().getEmployeeID());
         }
         response.setDepartmentId(entity.getDepartment().getDepartment_Id());

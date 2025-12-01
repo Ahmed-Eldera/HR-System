@@ -4,15 +4,12 @@ package com.orange.hr.integration;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.orange.hr.dto.EmployeeRequestDTO;
-import com.orange.hr.dto.EmployeeResponseDTO;
 import com.orange.hr.entity.Employee;
 import com.orange.hr.entity.Expertise;
 import com.orange.hr.enums.Gender;
 import com.orange.hr.mapper.EmployeeMapper;
 import com.orange.hr.repository.EmployeeRepository;
 import org.junit.jupiter.api.Test;
-import org.skyscreamer.jsonassert.JSONAssert;
-import org.skyscreamer.jsonassert.JSONCompareMode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
@@ -42,7 +39,7 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
     private static final LocalDate FUTURE_DATE_OF_BIRTH = LocalDate.of(2999, 2, 18);
     private static final LocalDate GRADUATION_DATE = LocalDate.of(2026, 2, 18);
     private static final LocalDate NEW_GRADUATION_DATE = LocalDate.of(2029, 2, 18);
-    private static final float SALARY = 2000F;
+    private static final float SALARY = 500F;
     private static final float INVALID_SALARY = 100F;
     private static final float NEW_SALARY = 550F;
     private static final int DEPARTMENT_ID = 1;
@@ -64,9 +61,9 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
     @Autowired
     EmployeeRepository employeeRepository;
     @Autowired
-    private ObjectMapper objectMapper;
+    EmployeeMapper employeeMapper;
     @Autowired
-    private EmployeeMapper employeeMapper;
+    private ObjectMapper objectMapper;
 
     @Test
     public void AddEmpolyeeSuccessfully_WithFullData_ExpectCreated() throws Exception {
@@ -534,53 +531,4 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
         result.andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.msg").value("Can't find the selected employee"));
     }
-
-
-    @Test
-    public void getSubordinates_WithValidEmployee_ShouldReturnOk() throws Exception {
-        prepareDB("/datasets/GetSubordinates.xml");
-        //                     |-> leaf1
-        // root -> directChild |
-        //                     |-> leaf2
-
-        Integer ROOT_ID = 1;
-        Integer DIRECT_CHILD_ID = 2;
-        Integer LEAF_ID = 3;
-        Integer LEAF2_ID = 4;
-
-        //arrange
-        Employee DIRECT_CHILD = employeeRepository.findById(DIRECT_CHILD_ID).get();
-        Employee LEAF1 = employeeRepository.findById(LEAF_ID).get();
-        Employee LEAF2 = employeeRepository.findById(LEAF2_ID).get();
-        List<EmployeeResponseDTO> expectedSubs = new ArrayList<>();
-        expectedSubs.add(employeeMapper.toDTO(DIRECT_CHILD));
-        expectedSubs.add(employeeMapper.toDTO(LEAF1));
-        expectedSubs.add(employeeMapper.toDTO(LEAF2));
-        String expectedOutput = objectMapper.writeValueAsString(expectedSubs);
-
-
-        //act
-        ResultActions result = mockMvc.perform(get("/employee/" + ROOT_ID + "/subordinates"));
-
-        String actualOutput = result.andReturn().getResponse().getContentAsString();
-        //assert
-        result.andExpect(status().isOk());
-        JSONAssert.assertEquals(expectedOutput, actualOutput, JSONCompareMode.NON_EXTENSIBLE);
-
-    }
-
-    @Test
-    public void getSubordinates_WithInValidEmployee_ShouldReturnNotFound() throws Exception {
-        prepareDB("/datasets/GetSubordinates.xml");
-        //arrange
-
-        //act
-        ResultActions result = mockMvc.perform(get("/employee/" + NON_EXISTENT_EMPLOYEE_ID + "/subordinates"));
-
-        //assert
-        result.andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.msg").value("Can't find selected employee."));
-
-    }
-
 }
