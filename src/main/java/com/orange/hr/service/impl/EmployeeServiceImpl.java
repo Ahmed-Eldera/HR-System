@@ -142,4 +142,11 @@ public class EmployeeServiceImpl implements EmployeeService {
         employeeRepository.reassignSubordinates(id,newManagerId);
         employeeRepository.deleteById(id);
     }
+
+    @Override
+    public EmployeeResponseDTO getEmployee(Integer id) {
+        Employee entity = employeeRepository.findById(id).orElseThrow(() -> new NoSuchEmployeeException(HttpStatus.NOT_FOUND, "Employee Not Found"));
+        EmployeeResponseDTO dto = employeeMapper.toDTO(entity);
+        return dto;
+    }
 }
