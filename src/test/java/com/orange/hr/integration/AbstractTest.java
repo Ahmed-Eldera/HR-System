@@ -41,9 +41,9 @@ import java.sql.Types;
 public class AbstractTest {
     private static IDatabaseConnection dbUnitConnection;
     @Autowired
-    ObjectMapper objectMapper;
-    @Autowired
     private DataSource dataSource;
+    @Autowired
+    private ObjectMapper objectMapper;
 
     @BeforeAll
     void setUp() throws Exception {
