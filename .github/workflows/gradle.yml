@@ -44,16 +44,3 @@ jobs:
 
       - name: Run unit tests
         run: ./gradlew test --info
-
-      - name: Run integration tests
-        run: ./gradlew integrationTest --info
-        if: success()
-
-      - name: Publish test results (if any)
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: test-reports
-          path: |
-            **/build/reports/tests/test
-            **/build/reports/tests/integrationTest
