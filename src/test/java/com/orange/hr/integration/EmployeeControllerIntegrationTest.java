@@ -601,4 +601,16 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
         result.andExpect(status().isOk());
         JSONAssert.assertEquals(expectedResponse, actualResponse, JSONCompareMode.NON_EXTENSIBLE);
     }
+
+    @Test
+    public void getDirectEmployees_GivenInValidManager_ShouldReturnNotFound() throws Exception {
+        prepareDB("/datasets/EmployeeController/GetSubordinates.xml");
+
+        //act
+        ResultActions result = mockMvc.perform(get("/employee?managerId=" + NON_EXISTENT_MANAGER_ID.get()));
+        String actualResponse = result.andReturn().getResponse().getContentAsString();
+        //assert
+        result.andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.msg").value("Can't find such Manager."));
+    }
 }
