@@ -58,12 +58,10 @@ public class EmployeeServiceImpl implements EmployeeService {
                 manager = employeeRepository.findById(employee.getManagerId().get()).orElseThrow(() -> new NoSuchEmployeeException(HttpStatus.NOT_FOUND, "Can't find the Selected Manager"));
             }
         }
-
         List<Expertise> expertises = expertiseRepository.findAllById(employee.getExpertise());
         if (expertises.size() != employee.getExpertise().size()) {
             throw new NoSuchExpertiseException(HttpStatus.NOT_FOUND, "Can't find the Selected Expertise");
         }
-
         //saving the employee
         Employee entity = employeeMapper.toEntity(employee);
         entity.setDepartment(dept);
@@ -150,8 +148,8 @@ public class EmployeeServiceImpl implements EmployeeService {
     public SalaryDTO getSalary(Integer id) {
         Employee employee = employeeRepository.findById(id).orElseThrow(() -> new NoSuchEmployeeException(HttpStatus.NOT_FOUND, "Can't find the selected employee"));
         Float gross = employee.getSalary();
-        Float INSURANCE = 500f;
-        Float TAXRATIO = 0.15f;
+        final Float INSURANCE = 500f;
+        final Float TAXRATIO = 0.15f;
         Float net = gross - gross * TAXRATIO - INSURANCE;
         SalaryDTO salaryDTO = new SalaryDTO(gross, net);
         return salaryDTO;
@@ -162,7 +160,8 @@ public class EmployeeServiceImpl implements EmployeeService {
     public List<EmployeeResponseDTO> getSubordinates(Integer id) {
         Employee employee = employeeRepository.findById(id).orElseThrow(() -> new NoSuchEmployeeException(HttpStatus.BAD_REQUEST, "Can't find selected employee."));
         List<EmployeeResponseDTO> response = new ArrayList<>();
-        Queue<Employee> unVisitedEmployees = new LinkedList<>(); //subordinates who will be checked if they have subordinates themselves
+        //subordinates who will be checked if they have subordinates themselves
+        Queue<Employee> unVisitedEmployees = new LinkedList<>();
         unVisitedEmployees.add(employee);//we start by the manager to search for his subordinates
         //searching for all the subordinates (bfs)
         while (!unVisitedEmployees.isEmpty()) {

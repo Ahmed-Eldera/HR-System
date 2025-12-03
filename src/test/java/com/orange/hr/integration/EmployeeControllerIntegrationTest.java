@@ -541,10 +541,10 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
         // root -> directChild |
         //                     |-> leaf2
 
-        Integer ROOT_ID = 1;
-        Integer DIRECT_CHILD_ID = 2;
-        Integer LEAF_ID = 3;
-        Integer LEAF2_ID = 4;
+        final Integer ROOT_ID = 1;
+        final Integer DIRECT_CHILD_ID = 2;
+        final Integer LEAF_ID = 3;
+        final Integer LEAF2_ID = 4;
 
         //arrange
         Employee DIRECT_CHILD = employeeRepository.findById(DIRECT_CHILD_ID).get();

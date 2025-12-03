@@ -33,7 +33,7 @@ public class EmployeeMapper {
         if (entity.getManager() != null) {
             response.setManagerId(entity.getManager().getEmployeeID());
         }
-        response.setDepartmentId(entity.getDepartment().getDepartment_Id());
+        response.setDepartmentId(entity.getDepartment().getDepartmentId());
         response.setExpertisesIds(entity.getExpertises()
                 .stream()
                 .map(Expertise::getExpertiseId)
