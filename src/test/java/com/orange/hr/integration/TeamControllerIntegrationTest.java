@@ -1,8 +1,6 @@
 package com.orange.hr.integration;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.orange.hr.dto.EmployeeResponseDTO;
-import com.orange.hr.entity.Employee;
 import com.orange.hr.entity.Team;
 import com.orange.hr.mapper.EmployeeMapper;
 import com.orange.hr.repository.TeamRepository;
@@ -13,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -28,8 +25,6 @@ public class TeamControllerIntegrationTest extends AbstractTest {
     @Autowired
     private TeamRepository teamRepository;
     @Autowired
-    private ObjectMapper objectMapper;
-    @Autowired
     private EmployeeMapper employeeMapper;
 
     @Test
@@ -37,10 +32,9 @@ public class TeamControllerIntegrationTest extends AbstractTest {
         prepareDB("/datasets/TeamController/getMembersInTeam.xml");
         //arrange
         Team team = teamRepository.findById(TEAM_ID).get();
-        List<Employee> members = team.getMembers();
-        List<EmployeeResponseDTO> dtos = new ArrayList<>();
-        members.forEach(e -> dtos.add(employeeMapper.toDTO(e)));
-        String expectedOutput = objectMapper.writeValueAsString(dtos);
+        List<EmployeeResponseDTO> members = team.getMembers().stream()
+                .map(employeeMapper::toDTO).toList();
+        String expectedOutput = objectMapper.writeValueAsString(members);
         //act
         ResultActions result = mockMvc.perform(get("/team/" + TEAM_ID + "/members"));
         String actualOutput = result.andReturn().getResponse().getContentAsString();
