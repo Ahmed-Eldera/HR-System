@@ -182,8 +182,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     public List<EmployeeResponseDTO> getDirectSubordinates(Integer managerId) {
         Employee manager = employeeRepository.findById(managerId).orElseThrow(() -> new NoSuchEmployeeException(HttpStatus.NOT_FOUND, "Can't find such Manager."));
         List<Employee> subs = employeeRepository.findByManager(manager);
-        List<EmployeeResponseDTO> response = new ArrayList<>();
-        subs.forEach(e -> response.add(employeeMapper.toDTO(e)));
+        List<EmployeeResponseDTO> response = subs.stream().map(employeeMapper::toDTO).toList();
         return response;
     }
 }

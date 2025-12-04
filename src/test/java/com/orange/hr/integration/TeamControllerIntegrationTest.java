@@ -13,7 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -38,8 +37,7 @@ public class TeamControllerIntegrationTest extends AbstractTest {
         //arrange
         Team team = teamRepository.findById(TEAM_ID).get();
         List<Employee> members = team.getMembers();
-        List<EmployeeResponseDTO> dtos = new ArrayList<>();
-        members.forEach(e -> dtos.add(employeeMapper.toDTO(e)));
+        List<EmployeeResponseDTO> dtos = members.stream().map(employeeMapper::toDTO).toList();
         String expectedOutput = objectMapper.writeValueAsString(dtos);
         //act
         ResultActions result = mockMvc.perform(get("/team/" + TEAM_ID + "/members"));
