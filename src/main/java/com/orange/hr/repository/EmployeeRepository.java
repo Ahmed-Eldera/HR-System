@@ -25,17 +25,17 @@ public interface EmployeeRepository extends JpaRepository<Employee, Integer> {
     @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Transactional
     @Query(value = """
-            WITH RECURSIVE employee_hierarchy (
-                employee_id,
-                name,
-                date_of_birth,
-                gender,
-                graduation_date,
-                salary,
-                department_id,
-                team_id,
-                manager_id
-            ) AS (
+            WITH RECURSIVE employee_hierarchy(
+                                                 employee_id,
+                                                 name,
+                                                 date_of_birth,
+                                                 gender,
+                                                 graduation_date,
+                                                 salary,
+                                                 department_id,
+                                                 team_id,
+                                                 manager_id
+                                             ) AS (
                 SELECT
                     employee_id,
                     name,
@@ -48,9 +48,9 @@ public interface EmployeeRepository extends JpaRepository<Employee, Integer> {
                     manager_id
                 FROM employees
                 WHERE employee_id = :managerId
-                        
+                       
                 UNION ALL
-                        
+                       
                 SELECT
                     e.employee_id,
                     e.name,
@@ -62,11 +62,20 @@ public interface EmployeeRepository extends JpaRepository<Employee, Integer> {
                     e.team_id,
                     e.manager_id
                 FROM employees e
-                INNER JOIN employee_hierarchy eh ON e.manager_id = eh.employee_id
+                INNER JOIN employee_hierarchy eh
+                    ON e.manager_id = eh.employee_id
             )
-            SELECT * FROM employee_hierarchy;
-                        
-            """,
+            SELECT
+                eh.*,
+                ex.expertise_id,
+                ex.name as expertise_name
+            FROM employee_hierarchy eh
+            LEFT JOIN employees_expertise ee
+                ON eh.employee_id = ee.employee_id
+            LEFT JOIN expertises ex
+                ON ee.expertise_id = ex.expertise_id
+            ORDER BY eh.employee_id;
+                        """,
             nativeQuery = true)
     List<Employee> findSubordinatesRec(@Param("managerId") Integer managerId);
 }

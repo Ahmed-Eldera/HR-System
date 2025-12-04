@@ -156,10 +156,10 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     public List<EmployeeResponseDTO> getSubordinates(Integer id) {
-        Employee employee = employeeRepository.findById(id).orElseThrow(() -> new NoSuchEmployeeException(HttpStatus.BAD_REQUEST, "Can't find selected employee."));
         List<EmployeeResponseDTO> response = employeeRepository.findSubordinatesRec(id)
-                .stream().map(e -> employeeMapper.toDTO(e))
+                .stream()
+                .map(e -> employeeMapper.toDTO(e))
                 .toList();
-        return response.subList(1, response.size());
+        return response;
     }
 }

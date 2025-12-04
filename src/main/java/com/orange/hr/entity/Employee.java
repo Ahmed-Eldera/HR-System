@@ -39,7 +39,7 @@ public class Employee {
     private LocalDate graduationDate;
     @Column(nullable = false)
     private Float salary;
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "department_id", nullable = false)
     private Department department;
     @ManyToOne(fetch = FetchType.LAZY)
