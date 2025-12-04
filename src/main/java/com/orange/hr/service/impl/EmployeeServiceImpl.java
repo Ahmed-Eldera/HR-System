@@ -124,7 +124,8 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     public void deleteEmployeeAndReassignSubordinates(Integer id) {
-        Employee employee = employeeRepository.findById(id).orElseThrow(() -> new NoSuchEmployeeException(HttpStatus.NOT_FOUND, "Can't find Such Employee"));
+        Employee employee = employeeRepository.findById(id)
+                .orElseThrow(() -> new NoSuchEmployeeException(HttpStatus.NOT_FOUND, "Can't find Such Employee"));
         if (employee.getManager() == null) {
             throw new MyException(HttpStatus.CONFLICT, "Can't delete a super manager");
         }
@@ -156,7 +157,9 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Override
     public List<EmployeeResponseDTO> getSubordinates(Integer id) {
         Employee employee = employeeRepository.findById(id).orElseThrow(() -> new NoSuchEmployeeException(HttpStatus.BAD_REQUEST, "Can't find selected employee."));
-        List<EmployeeResponseDTO> response = employeeRepository.findSubordinatesRec(id).stream().map(e -> employeeMapper.toDTO(e)).toList();
+        List<EmployeeResponseDTO> response = employeeRepository.findSubordinatesRec(id)
+                .stream().map(e -> employeeMapper.toDTO(e))
+                .toList();
         return response.subList(1, response.size());
     }
 }

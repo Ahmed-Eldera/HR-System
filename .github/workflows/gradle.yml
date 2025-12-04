@@ -44,3 +44,9 @@ jobs:
 
       - name: Run unit tests
         run: ./gradlew test --info
+
+      - name: Lint src code
+        run: ./gradlew checkStyleMain
+
+      - name: Lint test code
+        run: ./gradlew checkStyleTest
