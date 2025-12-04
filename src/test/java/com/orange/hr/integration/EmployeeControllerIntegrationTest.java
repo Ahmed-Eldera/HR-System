@@ -64,8 +64,6 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
     @Autowired
     EmployeeRepository employeeRepository;
     @Autowired
-    private ObjectMapper objectMapper;
-    @Autowired
     private EmployeeMapper employeeMapper;
 
     @Test

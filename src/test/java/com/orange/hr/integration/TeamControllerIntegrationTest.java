@@ -1,8 +1,6 @@
 package com.orange.hr.integration;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.orange.hr.dto.EmployeeResponseDTO;
-import com.orange.hr.entity.Employee;
 import com.orange.hr.entity.Team;
 import com.orange.hr.mapper.EmployeeMapper;
 import com.orange.hr.repository.TeamRepository;
@@ -26,8 +24,6 @@ public class TeamControllerIntegrationTest extends AbstractTest {
     MockMvc mockMvc;
     @Autowired
     private TeamRepository teamRepository;
-    @Autowired
-    private ObjectMapper objectMapper;
     @Autowired
     private EmployeeMapper employeeMapper;
 
