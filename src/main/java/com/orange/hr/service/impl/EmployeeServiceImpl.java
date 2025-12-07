@@ -1,5 +1,6 @@
 package com.orange.hr.service.impl;
 
+import com.orange.hr.dto.EmployeeHierarchyProjection;
 import com.orange.hr.dto.EmployeeRequestDTO;
 import com.orange.hr.dto.EmployeeResponseDTO;
 import com.orange.hr.dto.SalaryDTO;
@@ -156,10 +157,12 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     public List<EmployeeResponseDTO> getSubordinates(Integer id) {
-        List<EmployeeResponseDTO> response = employeeRepository.findSubordinatesRec(id)
-                .stream()
-                .map(e -> employeeMapper.toDTO(e))
-                .toList();
-        return response;
+        if (employeeRepository.existsById(id)) {
+            List<EmployeeHierarchyProjection> employees = employeeRepository.findSubordinatesRec(id);
+            List<EmployeeResponseDTO> response = employeeMapper.ProjectionToDTO(employees);
+            return response;
+        } else {
+            throw new NoSuchEmployeeException(HttpStatus.NOT_FOUND, "Can't find such employee.");
+        }
     }
 }

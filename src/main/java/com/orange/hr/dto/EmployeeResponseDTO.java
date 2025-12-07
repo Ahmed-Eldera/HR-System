@@ -1,7 +1,6 @@
 package com.orange.hr.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.orange.hr.enums.Gender;
 import lombok.*;
 

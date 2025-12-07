@@ -2,7 +2,6 @@ package com.orange.hr.integration;
 
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.orange.hr.dto.EmployeeRequestDTO;
 import com.orange.hr.dto.EmployeeResponseDTO;
 import com.orange.hr.entity.Employee;
@@ -415,7 +414,6 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
     public void modifyEmployee_InValidSalary_ExpectBadRequest() throws Exception {
         prepareDB("/datasets/EmployeeController/ModifyEmployeeDataset.xml");
         //arrange
-        objectMapper = new ObjectMapper();
         List<Integer> expertises = new ArrayList<>();
         EmployeeRequestDTO employee = new EmployeeRequestDTO();
         employee.setSalary(INVALID_SALARY);
@@ -585,8 +583,8 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
         ResultActions result = mockMvc.perform(get("/employee/" + NON_EXISTENT_EMPLOYEE_ID + "/subordinates"));
 
         //assert
-        result.andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.msg").value("Can't find selected employee."));
+        result.andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.msg").value("Can't find such employee."));
 
     }
 }

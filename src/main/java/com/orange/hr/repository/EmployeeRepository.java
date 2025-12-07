@@ -1,5 +1,6 @@
 package com.orange.hr.repository;
 
+import com.orange.hr.dto.EmployeeHierarchyProjection;
 import com.orange.hr.entity.Employee;
 import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -74,8 +75,9 @@ public interface EmployeeRepository extends JpaRepository<Employee, Integer> {
                 ON eh.employee_id = ee.employee_id
             LEFT JOIN expertises ex
                 ON ee.expertise_id = ex.expertise_id
-            ORDER BY eh.employee_id;
+            ORDER BY eh.employee_id
+            offset 1;
                         """,
             nativeQuery = true)
-    List<Employee> findSubordinatesRec(@Param("managerId") Integer managerId);
+    List<EmployeeHierarchyProjection> findSubordinatesRec(@Param("managerId") Integer managerId);
 }
