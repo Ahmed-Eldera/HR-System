@@ -27,16 +27,16 @@ public interface EmployeeRepository extends JpaRepository<Employee, Integer> {
     @Transactional
     @Query(value = """
             WITH RECURSIVE employee_hierarchy(
-                                                 employee_id,
-                                                 name,
-                                                 date_of_birth,
-                                                 gender,
-                                                 graduation_date,
-                                                 salary,
-                                                 department_id,
-                                                 team_id,
-                                                 manager_id
-                                             ) AS (
+                employee_id,
+                name,
+                date_of_birth,
+                gender,
+                graduation_date,
+                salary,
+                department_id,
+                team_id,
+                manager_id
+            ) AS (
                 SELECT
                     employee_id,
                     name,
@@ -49,9 +49,9 @@ public interface EmployeeRepository extends JpaRepository<Employee, Integer> {
                     manager_id
                 FROM employees
                 WHERE employee_id = :managerId
-                       
+
                 UNION ALL
-                       
+
                 SELECT
                     e.employee_id,
                     e.name,
@@ -69,15 +69,16 @@ public interface EmployeeRepository extends JpaRepository<Employee, Integer> {
             SELECT
                 eh.*,
                 ex.expertise_id,
-                ex.name as expertise_name
+                ex.name AS expertise_name
             FROM employee_hierarchy eh
             LEFT JOIN employees_expertise ee
                 ON eh.employee_id = ee.employee_id
             LEFT JOIN expertises ex
                 ON ee.expertise_id = ex.expertise_id
-            ORDER BY eh.employee_id
-            offset 1;
-                        """,
+            WHERE eh.employee_id != :managerId 
+            ORDER BY eh.employee_id;
+
+                                    """,
             nativeQuery = true)
     List<EmployeeHierarchyProjection> findSubordinatesRec(@Param("managerId") Integer managerId);
 }
