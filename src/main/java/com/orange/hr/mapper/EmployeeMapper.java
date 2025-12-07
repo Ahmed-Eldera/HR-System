@@ -47,7 +47,7 @@ public class EmployeeMapper {
         return response;
     }
 
-    public List<EmployeeResponseDTO> ProjectionToDTO(List<EmployeeHierarchyProjection> rows) {
+    public List<EmployeeResponseDTO> projectionToDTO(List<EmployeeHierarchyProjection> rows) {
         Map<Integer, EmployeeResponseDTO> map = new LinkedHashMap<>();
 
         for (EmployeeHierarchyProjection row : rows) {

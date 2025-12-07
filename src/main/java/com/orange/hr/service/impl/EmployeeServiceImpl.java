@@ -159,7 +159,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     public List<EmployeeResponseDTO> getSubordinates(Integer id) {
         if (employeeRepository.existsById(id)) {
             List<EmployeeHierarchyProjection> employees = employeeRepository.findSubordinatesRec(id);
-            List<EmployeeResponseDTO> response = employeeMapper.ProjectionToDTO(employees);
+            List<EmployeeResponseDTO> response = employeeMapper.projectionToDTO(employees);
             return response;
         } else {
             throw new NoSuchEmployeeException(HttpStatus.NOT_FOUND, "Can't find such employee.");
