@@ -50,9 +50,9 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
     private static final int TEAM_ID = 1;
     private static final int TEAM_ID2 = 2;
     private static final int NON_EXISTENT_TEAM_ID = 9876;
-    private static final Optional<Integer> MANAGER_ID = Optional.of(1);
-    private static final Optional<Integer> MANAGER_ID2 = Optional.of(2);
-    private static final Optional<Integer> NON_EXISTENT_MANAGER_ID = Optional.of(99);
+    private static final Integer MANAGER_ID = 1;
+    private static final Integer MANAGER_ID2 = 2;
+    private static final Integer NON_EXISTENT_MANAGER_ID = 99;
     private static final int EXPERTISE_ID = 1;
     private static final int EXPERTISE_ID2 = 1;
     private static final int NON_EXISTENT_EXPERTISE_ID = 123;
@@ -79,7 +79,7 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
                 GRADUATION_DATE,
                 SALARY,
                 DEPARTMENT_ID,
-                MANAGER_ID,
+                Optional.of(MANAGER_ID),
                 TEAM_ID,
                 expertises
         );
@@ -178,7 +178,7 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
                 GRADUATION_DATE,
                 SALARY,
                 NON_EXISTENT_DEPARTMENT_ID,
-                MANAGER_ID,
+                Optional.of(MANAGER_ID),
                 TEAM_ID,
                 expertises
         );
@@ -204,7 +204,7 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
                 GRADUATION_DATE,
                 SALARY,
                 DEPARTMENT_ID,
-                MANAGER_ID,
+                Optional.of(MANAGER_ID),
                 NON_EXISTENT_TEAM_ID,
                 expertises
         );
@@ -230,7 +230,7 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
                 GRADUATION_DATE,
                 SALARY,
                 DEPARTMENT_ID,
-                NON_EXISTENT_MANAGER_ID,
+                Optional.of(NON_EXISTENT_MANAGER_ID),
                 TEAM_ID,
                 expertises
         );
@@ -256,7 +256,7 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
                 GRADUATION_DATE,
                 SALARY,
                 DEPARTMENT_ID,
-                MANAGER_ID,
+                Optional.of(MANAGER_ID),
                 TEAM_ID,
                 expertises
         );
@@ -282,7 +282,7 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
                 GRADUATION_DATE,
                 SALARY,
                 DEPARTMENT_ID,
-                MANAGER_ID,
+                Optional.of(MANAGER_ID),
                 TEAM_ID,
                 expertises
         );
@@ -308,7 +308,7 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
                 NEW_GRADUATION_DATE,
                 NEW_SALARY,
                 DEPARTMENT_ID2,
-                MANAGER_ID2,
+                Optional.of(MANAGER_ID2),
                 TEAM_ID2,
                 expertises
         );
@@ -375,7 +375,7 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
                 .andExpect(jsonPath("$.graduationDate").value(GRADUATION_DATE.toString()))
                 .andExpect(jsonPath("$.salary").value(SALARY))
                 .andExpect(jsonPath("$.departmentId").value(DEPARTMENT_ID))
-                .andExpect(jsonPath("$.managerId").value(MANAGER_ID2.get()))
+                .andExpect(jsonPath("$.managerId").value(MANAGER_ID2))
                 .andExpect(jsonPath("$.teamId").value(TEAM_ID))
                 .andExpect(jsonPath("$.expertisesIds").value(expertises));
     }
@@ -404,7 +404,7 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
                 .andExpect(jsonPath("$.graduationDate").value(GRADUATION_DATE.toString()))
                 .andExpect(jsonPath("$.salary").value(SALARY))
                 .andExpect(jsonPath("$.departmentId").value(DEPARTMENT_ID))
-                .andExpect(jsonPath("$.managerId").value(MANAGER_ID2.get()))
+                .andExpect(jsonPath("$.managerId").value(MANAGER_ID2))
                 .andExpect(jsonPath("$.teamId").value(TEAM_ID))
                 .andExpect(jsonPath("$.expertisesIds").value(expertises));
         assertTrue(expertisesAfter.isEmpty());
@@ -586,5 +586,36 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
         result.andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.msg").value("Can't find such employee."));
 
+    }
+
+    @Test
+    public void getDirectEmployees_GivenValidManager_ShouldReturnOk() throws Exception {
+        prepareDB("/datasets/EmployeeController/GetSubordinates.xml");
+        Integer sub1 = 3;
+        Integer sub2 = 4;
+        //arrange
+        List<Employee> employees = employeeRepository.findAllById(List.of(sub1, sub2));
+        List<EmployeeResponseDTO> dtos = employees.stream().map(employeeMapper::toDTO).toList();
+
+        String expectedResponse = objectMapper.writeValueAsString(dtos);
+
+        //act
+        ResultActions result = mockMvc.perform(get("/employee?managerId=" + MANAGER_ID2));
+        String actualResponse = result.andReturn().getResponse().getContentAsString();
+        //assert
+        result.andExpect(status().isOk());
+        JSONAssert.assertEquals(expectedResponse, actualResponse, JSONCompareMode.NON_EXTENSIBLE);
+    }
+
+    @Test
+    public void getDirectEmployees_GivenInValidManager_ShouldReturnNotFound() throws Exception {
+        prepareDB("/datasets/EmployeeController/GetSubordinates.xml");
+
+        //act
+        ResultActions result = mockMvc.perform(get("/employee?managerId=" + NON_EXISTENT_MANAGER_ID));
+        String actualResponse = result.andReturn().getResponse().getContentAsString();
+        //assert
+        result.andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.msg").value("Can't find such Manager."));
     }
 }

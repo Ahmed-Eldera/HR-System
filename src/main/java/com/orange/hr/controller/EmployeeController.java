@@ -59,4 +59,10 @@ public class EmployeeController {
         List<EmployeeResponseDTO> response = employeeService.getSubordinates(id);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
+
+    @GetMapping
+    public ResponseEntity<List<EmployeeResponseDTO>> getDirectSubordinates(@RequestParam("managerId") Integer managerId) {
+        List<EmployeeResponseDTO> response = employeeService.getDirectSubordinates(managerId);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
 }

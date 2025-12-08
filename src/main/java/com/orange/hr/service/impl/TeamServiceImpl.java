@@ -12,7 +12,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -27,8 +26,7 @@ public class TeamServiceImpl implements TeamService {
     public List<EmployeeResponseDTO> getMembers(Integer teamId) {
         Team team = teamRepository.findById(teamId).orElseThrow(() -> new NoSuchTeamException(HttpStatus.NOT_FOUND, "Can't find selected Team."));
         List<Employee> members = team.getMembers();
-        List<EmployeeResponseDTO> response = new ArrayList<>();
-        members.forEach(e -> response.add(employeeMapper.toDTO(e)));
+        List<EmployeeResponseDTO> response = members.stream().map(employeeMapper::toDTO).toList();
         return response;
     }
 }

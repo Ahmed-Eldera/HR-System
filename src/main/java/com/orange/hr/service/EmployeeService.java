@@ -18,4 +18,7 @@ public interface EmployeeService {
     public SalaryDTO getSalary(Integer id);
 
     public List<EmployeeResponseDTO> getSubordinates(Integer id);
+
+    public List<EmployeeResponseDTO> getDirectSubordinates(Integer managerId);
+
 }

@@ -32,9 +32,9 @@ public class TeamControllerIntegrationTest extends AbstractTest {
         prepareDB("/datasets/TeamController/getMembersInTeam.xml");
         //arrange
         Team team = teamRepository.findById(TEAM_ID).get();
-        List<EmployeeResponseDTO> members = team.getMembers().stream()
-                .map(employeeMapper::toDTO).toList();
-        String expectedOutput = objectMapper.writeValueAsString(members);
+        List<Employee> members = team.getMembers();
+        List<EmployeeResponseDTO> dtos = members.stream().map(employeeMapper::toDTO).toList();
+        String expectedOutput = objectMapper.writeValueAsString(dtos);
         //act
         ResultActions result = mockMvc.perform(get("/team/" + TEAM_ID + "/members"));
         String actualOutput = result.andReturn().getResponse().getContentAsString();
