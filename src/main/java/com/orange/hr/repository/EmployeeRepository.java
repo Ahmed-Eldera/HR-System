@@ -81,6 +81,7 @@ public interface EmployeeRepository extends JpaRepository<Employee, Integer> {
                                     """,
             nativeQuery = true)
     List<EmployeeHierarchyProjection> findSubordinatesRec(@Param("managerId") Integer managerId);
+
     List<Employee> findByManager(Employee manager);
 
 }
