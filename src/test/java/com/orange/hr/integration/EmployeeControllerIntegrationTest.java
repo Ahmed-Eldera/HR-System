@@ -2,7 +2,6 @@ package com.orange.hr.integration;
 
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.orange.hr.dto.EmployeeRequestDTO;
 import com.orange.hr.dto.EmployeeResponseDTO;
 import com.orange.hr.entity.Employee;
@@ -67,7 +66,7 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
     private EmployeeMapper employeeMapper;
 
     @Test
-    public void AddEmpolyeeSuccessfully_WithFullData_ExpectCreated() throws Exception {
+    public void addEmpolyeeSuccessfully_WithFullData_ExpectCreated() throws Exception {
         prepareDB("/datasets/EmployeeController/AddEmployeeDataset.xml");
         //Arrange
         List<Integer> expertises = new ArrayList<>();
@@ -103,7 +102,7 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
     }
 
     @Test
-    public void AddEmpolyeeSuccessfully_WithNoManager_ExpectCreated() throws Exception {
+    public void addEmpolyeeSuccessfully_WithNoManager_ExpectCreated() throws Exception {
         prepareDB("/datasets/EmployeeController/AddEmployeeDataset.xml");
         //Arrange
         List<Integer> expertises = new ArrayList<>();
@@ -122,8 +121,10 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
         );
 
         //act
-        ResultActions result = mockMvc.perform(post("/employee").contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(employee)));
+        ResultActions result = mockMvc
+                .perform(post("/employee")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(employee)));
         //assert
         result.andExpect(status().isCreated())
                 .andExpect(jsonPath("$.employeeID").isNumber())
@@ -139,7 +140,7 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
     }
 
     @Test
-    public void AddEmpolyee_WithMissingData_ExpectBadRequest() throws Exception {
+    public void addEmpolyee_WithMissingData_ExpectBadRequest() throws Exception {
         prepareDB("/datasets/EmployeeController/AddEmployeeDataset.xml");
         //Arrange
         List<Integer> expertises = new ArrayList<>();
@@ -164,7 +165,7 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
     }
 
     @Test
-    public void AddEmpolyee_WithDepartmentNotValid_ExpectNotFound() throws Exception {
+    public void addEmpolyee_WithDepartmentNotValid_ExpectNotFound() throws Exception {
         prepareDB("/datasets/EmployeeController/AddEmployeeDataset.xml");
         //Arrange
         List<Integer> expertises = new ArrayList<>();
@@ -190,7 +191,7 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
     }
 
     @Test
-    public void AddEmpolyee_WithTeamNotValid_ExpectNotFound() throws Exception {
+    public void addEmpolyee_WithTeamNotValid_ExpectNotFound() throws Exception {
         prepareDB("/datasets/EmployeeController/AddEmployeeDataset.xml");
         //Arrange
         List<Integer> expertises = new ArrayList<>();
@@ -216,7 +217,7 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
     }
 
     @Test
-    public void AddEmpolyee_WithManagerNotValid_ExpectNotFound() throws Exception {
+    public void addEmpolyee_WithManagerNotValid_ExpectNotFound() throws Exception {
         prepareDB("/datasets/EmployeeController/AddEmployeeDataset.xml");
         //Arrange
         List<Integer> expertises = new ArrayList<>();
@@ -242,7 +243,7 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
     }
 
     @Test
-    public void AddEmpolyee_WithBirthDateNotValid_ExpectNotFound() throws Exception {
+    public void addEmpolyee_WithBirthDateNotValid_ExpectNotFound() throws Exception {
         prepareDB("/datasets/EmployeeController/AddEmployeeDataset.xml");
         //Arrange
         List<Integer> expertises = new ArrayList<>();
@@ -268,7 +269,7 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
     }
 
     @Test
-    public void AddEmpolyee_WithExpertiseNotValid_ExpectNotFound() throws Exception {
+    public void addEmpolyee_WithExpertiseNotValid_ExpectNotFound() throws Exception {
         prepareDB("/datasets/EmployeeController/AddEmployeeDataset.xml");
         //Arrange
         List<Integer> expertises = new ArrayList<>();
@@ -388,8 +389,11 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
         employee.setName(NEW_EMPLOYEE_NAME);
         employee.setExpertise(expertises);
         //act
-        ResultActions result = mockMvc.perform(patch("/employee/" + EXISTING_EMPLOYEE_ID).contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL).writeValueAsString(employee)));
+        ResultActions result = mockMvc.perform(patch("/employee/" + EXISTING_EMPLOYEE_ID)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper
+                        .setSerializationInclusion(JsonInclude.Include.NON_NULL)
+                        .writeValueAsString(employee)));
         //arrange
         List<Expertise> expertisesAfter = employeeRepository.findById(EXISTING_EMPLOYEE_ID).get().getExpertises();
         //assert
@@ -410,14 +414,15 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
     public void modifyEmployee_InValidSalary_ExpectBadRequest() throws Exception {
         prepareDB("/datasets/EmployeeController/ModifyEmployeeDataset.xml");
         //arrange
-        objectMapper = new ObjectMapper();
         List<Integer> expertises = new ArrayList<>();
         EmployeeRequestDTO employee = new EmployeeRequestDTO();
         employee.setSalary(INVALID_SALARY);
         employee.setExpertise(expertises);
         //act
         ResultActions result = mockMvc.perform(patch("/employee/" + EXISTING_EMPLOYEE_ID).contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL).writeValueAsString(employee)));
+                .content(objectMapper
+                        .setSerializationInclusion(JsonInclude.Include.NON_NULL)
+                        .writeValueAsString(employee)));
         //assert
         result.andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.msg").value("must be greater than or equal to 500")); //assert the change happened
@@ -464,7 +469,9 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
     public void deleteEmployee_WithAManagerThatHasEmployees_ShouldMoveEmployeesToHisManager() throws Exception {
         prepareDB("/datasets/EmployeeController/DeleteEmployee.xml");
         //arrange
-        List<Employee> subordinatesBeforeReassign = employeeRepository.findById(EXISTING_EMPLOYEE_ID).get().getSubordinates();
+        List<Employee> subordinatesBeforeReassign = employeeRepository.findById(EXISTING_EMPLOYEE_ID)
+                .get()
+                .getSubordinates();
         List<Integer> subordinatesIds = new ArrayList<>();
         for (Employee emp : subordinatesBeforeReassign) {
             subordinatesIds.add(emp.getEmployeeID());
@@ -541,19 +548,19 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
         // root -> directChild |
         //                     |-> leaf2
 
-        Integer ROOT_ID = 1;
-        Integer DIRECT_CHILD_ID = 2;
-        Integer LEAF_ID = 3;
-        Integer LEAF2_ID = 4;
+        final Integer ROOT_ID = 1;
+        final Integer DIRECT_CHILD_ID = 2;
+        final Integer LEAF_ID = 3;
+        final Integer LEAF2_ID = 4;
 
         //arrange
-        Employee DIRECT_CHILD = employeeRepository.findById(DIRECT_CHILD_ID).get();
-        Employee LEAF1 = employeeRepository.findById(LEAF_ID).get();
-        Employee LEAF2 = employeeRepository.findById(LEAF2_ID).get();
+        Employee directChild = employeeRepository.findById(DIRECT_CHILD_ID).get();
+        Employee leaf1 = employeeRepository.findById(LEAF_ID).get();
+        Employee leaf2 = employeeRepository.findById(LEAF2_ID).get();
         List<EmployeeResponseDTO> expectedSubs = new ArrayList<>();
-        expectedSubs.add(employeeMapper.toDTO(DIRECT_CHILD));
-        expectedSubs.add(employeeMapper.toDTO(LEAF1));
-        expectedSubs.add(employeeMapper.toDTO(LEAF2));
+        expectedSubs.add(employeeMapper.toDTO(directChild));
+        expectedSubs.add(employeeMapper.toDTO(leaf1));
+        expectedSubs.add(employeeMapper.toDTO(leaf2));
         String expectedOutput = objectMapper.writeValueAsString(expectedSubs);
 
 
@@ -576,8 +583,8 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
         ResultActions result = mockMvc.perform(get("/employee/" + NON_EXISTENT_EMPLOYEE_ID + "/subordinates"));
 
         //assert
-        result.andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.msg").value("Can't find selected employee."));
+        result.andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.msg").value("Can't find such employee."));
 
     }
 

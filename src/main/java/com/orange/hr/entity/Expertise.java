@@ -1,5 +1,6 @@
 package com.orange.hr.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -22,6 +23,7 @@ public class Expertise {
 
     private String name;
 
-    @ManyToMany(mappedBy = "expertises")
+    @ManyToMany(mappedBy = "expertises", fetch = FetchType.LAZY)
+    @JsonBackReference
     private List<Employee> professionals;
 }

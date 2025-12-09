@@ -4,7 +4,7 @@ import com.orange.hr.dto.EmployeeRequestDTO;
 import com.orange.hr.dto.EmployeeResponseDTO;
 import com.orange.hr.dto.SalaryDTO;
 import com.orange.hr.service.EmployeeService;
-import com.orange.hr.validationGroups.Always;
+import com.orange.hr.validation.Always;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

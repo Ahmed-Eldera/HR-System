@@ -1,11 +1,16 @@
 package com.orange.hr.mapper;
 
+import com.orange.hr.dto.EmployeeHierarchyProjection;
 import com.orange.hr.dto.EmployeeRequestDTO;
 import com.orange.hr.dto.EmployeeResponseDTO;
 import com.orange.hr.entity.Employee;
 import com.orange.hr.entity.Expertise;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Component
@@ -33,7 +38,7 @@ public class EmployeeMapper {
         if (entity.getManager() != null) {
             response.setManagerId(entity.getManager().getEmployeeID());
         }
-        response.setDepartmentId(entity.getDepartment().getDepartment_Id());
+        response.setDepartmentId(entity.getDepartment().getDepartmentId());
         response.setExpertisesIds(entity.getExpertises()
                 .stream()
                 .map(Expertise::getExpertiseId)
@@ -41,4 +46,33 @@ public class EmployeeMapper {
         response.setTeamId(entity.getTeam().getTeamId());
         return response;
     }
+
+    public List<EmployeeResponseDTO> projectionToDTO(List<EmployeeHierarchyProjection> rows) {
+        Map<Integer, EmployeeResponseDTO> map = new LinkedHashMap<>();
+
+        for (EmployeeHierarchyProjection row : rows) {
+            map.putIfAbsent(row.getEmployeeId(),
+                    new EmployeeResponseDTO(
+                            row.getEmployeeId(),
+                            row.getName(),
+                            row.getDateOfBirth(),
+                            row.getGender(),
+                            row.getGraduationDate(),
+                            row.getSalary(),
+                            row.getDepartmentId(),
+                            row.getManagerId(),
+                            row.getTeamId(),
+                            new ArrayList<>()
+                    )
+            );
+
+            if (row.getExpertiseId() != null) {
+                map.get(row.getEmployeeId()).getExpertisesIds()
+                        .add(row.getExpertiseId());
+            }
+        }
+
+        return new ArrayList<>(map.values());
+    }
+
 }
