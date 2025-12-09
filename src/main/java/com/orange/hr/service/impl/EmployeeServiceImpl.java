@@ -1,5 +1,6 @@
 package com.orange.hr.service.impl;
 
+import com.orange.hr.dto.EmployeeHierarchyProjection;
 import com.orange.hr.dto.EmployeeRequestDTO;
 import com.orange.hr.dto.EmployeeResponseDTO;
 import com.orange.hr.dto.SalaryDTO;
@@ -21,10 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Queue;
 
 @Transactional
 @Service
@@ -58,12 +56,10 @@ public class EmployeeServiceImpl implements EmployeeService {
                 manager = employeeRepository.findById(employee.getManagerId().get()).orElseThrow(() -> new NoSuchEmployeeException(HttpStatus.NOT_FOUND, "Can't find the Selected Manager"));
             }
         }
-
         List<Expertise> expertises = expertiseRepository.findAllById(employee.getExpertise());
         if (expertises.size() != employee.getExpertise().size()) {
             throw new NoSuchExpertiseException(HttpStatus.NOT_FOUND, "Can't find the Selected Expertise");
         }
-
         //saving the employee
         Employee entity = employeeMapper.toEntity(employee);
         entity.setDepartment(dept);
@@ -150,8 +146,8 @@ public class EmployeeServiceImpl implements EmployeeService {
     public SalaryDTO getSalary(Integer id) {
         Employee employee = employeeRepository.findById(id).orElseThrow(() -> new NoSuchEmployeeException(HttpStatus.NOT_FOUND, "Can't find the selected employee"));
         Float gross = employee.getSalary();
-        Float INSURANCE = 500f;
-        Float TAXRATIO = 0.15f;
+        final Float INSURANCE = 500f;
+        final Float TAXRATIO = 0.15f;
         Float net = gross - gross * TAXRATIO - INSURANCE;
         SalaryDTO salaryDTO = new SalaryDTO(gross, net);
         return salaryDTO;
@@ -160,21 +156,11 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     public List<EmployeeResponseDTO> getSubordinates(Integer id) {
-        Employee employee = employeeRepository.findById(id).orElseThrow(() -> new NoSuchEmployeeException(HttpStatus.BAD_REQUEST, "Can't find selected employee."));
-        List<EmployeeResponseDTO> response = new ArrayList<>();
-        Queue<Employee> unVisitedEmployees = new LinkedList<>(); //subordinates who will be checked if they have subordinates themselves
-        unVisitedEmployees.add(employee);//we start by the manager to search for his subordinates
-        //searching for all the subordinates (bfs)
-        while (!unVisitedEmployees.isEmpty()) {
-            employee = unVisitedEmployees.poll();
-            List<Employee> subordinates = employee.getSubordinates();
-            if (!subordinates.isEmpty()) {
-                subordinates.forEach(e -> {
-                    response.add(employeeMapper.toDTO(e));
-                    unVisitedEmployees.add(e);
-                });
-            }
+        if (!employeeRepository.existsById(id)) {
+            throw new NoSuchEmployeeException(HttpStatus.NOT_FOUND, "Can't find such employee.");
         }
+        List<EmployeeHierarchyProjection> employees = employeeRepository.findSubordinatesRec(id);
+        List<EmployeeResponseDTO> response = employeeMapper.projectionToDTO(employees);
         return response;
     }
 

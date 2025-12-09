@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name="departments")
+@Table(name = "departments")
 @Setter
 @Getter
 @NoArgsConstructor
@@ -15,8 +15,8 @@ import lombok.Setter;
 public class Department {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="department_id")
-    private Integer department_Id;
+    @Column(name = "department_id")
+    private Integer departmentId;
 
     private String name;
 

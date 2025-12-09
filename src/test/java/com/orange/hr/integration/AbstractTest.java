@@ -64,10 +64,6 @@ public class AbstractTest {
         objectMapper.clearCaches();
     }
 
-    @BeforeEach
-    void setUpBeforeEach() {
-        objectMapper.clearCaches();
-    }
 
     public void prepareDB(String path) throws DatabaseUnitException, SQLException {
 
