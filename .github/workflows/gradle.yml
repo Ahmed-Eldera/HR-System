@@ -44,3 +44,14 @@ jobs:
 
       - name: Run unit tests
         run: ./gradlew test --info
+
+      - name: Login and push to Github Registry
+        run: |
+          docker login --username Ahmed-Eldera --password ${{secrets.GHR_TOKEN}} ghcr.io
+          
+          IMAGE=ghcr.io/ahmed-eldera/hr
+          VERSION=${{ github.sha }}
+
+          docker build . -t $IMAGE:latest -t $IMAGE:$VERSION
+          docker push $IMAGE:latest
+          docker push $IMAGE:$VERSION
