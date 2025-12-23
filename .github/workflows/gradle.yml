@@ -90,17 +90,6 @@ jobs:
           VERSION=$(git describe --tags --abbrev=0)
           echo "RELEASE_VERSION=$VERSION" >> $GITHUB_ENV
 
-      - name: Download JAR artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: app-jar
-          path: build/libs
-
-      - name: Upload JAR to GitHub release
-        run: |
-          gh release upload $RELEASE_VERSION ./build/libs/*.jar --clobber
-        env:
-          GH_TOKEN: ${{ secrets.GH_TOKEN }}
 
       - name: Build & push Docker image
         run: |
