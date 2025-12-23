@@ -90,6 +90,11 @@ jobs:
           VERSION=$(git describe --tags --abbrev=0)
           echo "RELEASE_VERSION=$VERSION" >> $GITHUB_ENV
 
+      - name: Download JAR artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: app-jar
+          path: build/libs
 
       - name: Build & push Docker image
         run: |
