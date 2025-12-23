@@ -1,3 +1,10 @@
+# [1.1.0](https://github.com/Ahmed-Eldera/HR-System/compare/v1.0.0...v1.1.0) (2025-12-23)
+
+
+### Features
+
+* adding jar to release ([ee2d868](https://github.com/Ahmed-Eldera/HR-System/commit/ee2d8687940335617430b8a1c0b60ccc5c9446de))
+
 # 1.0.0 (2025-12-23)
 
 
