@@ -1,11 +1,4 @@
-# This workflow uses actions that are not certified by GitHub.
-# They are provided by a third-party and are governed by
-# separate terms of service, privacy policy, and support
-# documentation.
-# This workflow will build a Java project with Gradle and cache/restore any dependencies to improve the workflow execution time
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-java-with-gradle
-
-name: Java CI with Gradle
+name: CI + Release
 
 on:
   push:
@@ -13,34 +6,120 @@ on:
   pull_request:
     branches: [ "**" ]
 
-jobs:
-  build:
+permissions:
+  contents: write
+  packages: write
+  actions: read
+  checks: write
 
+jobs:
+  scan:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+  build:
+    runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v4
-      - name: Set up JDK 21
-        uses: actions/setup-java@v4
+
+      - uses: actions/setup-java@v4
         with:
           java-version: '21'
           distribution: 'temurin'
 
-      - name: Give Gradle permission
-        run: chmod +x ./gradlew
-      
-      # Configure Gradle for optimal use in GitHub Actions, including caching of downloaded dependencies.
-      # See: https://github.com/gradle/actions/blob/main/setup-gradle/README.md
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@af1da67850ed9a4cedd57bfd976089dd991e2582 # v4.0.0
+      - run: chmod +x ./gradlew
+      - run: ./gradlew clean build
 
-      - name: Build with Gradle Wrapper
-        run: ./gradlew build
+      - name: Upload HTML Test Report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: junit-html-report
+          path: build/reports/tests/test/
+          overwrite: true
+      - name: Run Hadolint
+        uses: hadolint/hadolint-action@v3.1.0
+        with:
+          dockerfile: Dockerfile
+          failure-threshold: error
 
-      - name: Build and run all tests
-        run: ./gradlew clean build --info
+      - name: Upload JAR artifact
+        if: github.ref == 'refs/heads/main'
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-jar
+          path: build/libs/*.jar
 
-      - name: Run unit tests
-        run: ./gradlew test --info
+  release:
+    needs: build
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Login to GHCR
+        run: echo "${{ secrets.GH_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+      - run: |
+          npm ci
+          npm install --save-dev conventional-changelog-conventionalcommits
+
+
+      - name: Run semantic-release
+        id: semantic
+        run: npx semantic-release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+
+      - name: Get release version
+        id: get_version
+        run: |
+          VERSION=$(git describe --tags --abbrev=0)
+          echo "RELEASE_VERSION=$VERSION" >> $GITHUB_ENV
+
+      - name: Download JAR artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: app-jar
+          path: build/libs
+
+      - name: Upload JAR to GitHub release
+        run: |
+          gh release upload $RELEASE_VERSION ./build/libs/*.jar --clobber
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+
+      - name: Build & push Docker image
+        run: |
+          IMAGE=ghcr.io/ahmed-eldera/hr
+          echo "MYIMAGE=$IMAGE" >> $GITHUB_ENV
+          VERSION=$RELEASE_VERSION
+          docker build . -t $IMAGE:latest -t $IMAGE:$VERSION
+          docker push $IMAGE:latest
+          docker push $IMAGE:$VERSION
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@0.33.1
+        with:
+          image-ref: ${{env.MYIMAGE}}:${{env.RELEASE_VERSION}}
+          format: 'table'
+          exit-code: '1'
+          ignore-unfixed: true
+          vuln-type: 'os,library'
+          severity: 'CRITICAL,HIGH'
+
