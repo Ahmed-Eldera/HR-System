@@ -4,6 +4,7 @@ package com.orange.hr.integration;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.orange.hr.dto.EmployeeRequestDTO;
 import com.orange.hr.dto.EmployeeResponseDTO;
+import com.orange.hr.dto.LeaveRequestDTO;
 import com.orange.hr.entity.Employee;
 import com.orange.hr.entity.Expertise;
 import com.orange.hr.enums.Gender;
@@ -617,5 +618,24 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
         //assert
         result.andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.msg").value("Can't find such Manager."));
+    }
+
+    @Test
+    public void addLeave_GivenValidDataAndNoDeduction_ShouldReturnCreated() throws Exception {
+        prepareDB("/datasets/EmployeeController/addLeave.xml");
+        //arrange
+        LeaveRequestDTO leave = new LeaveRequestDTO(LocalDate.of(2000, 1, 1));
+        //act
+        ResultActions result = mockMvc.perform(post("/employee/" + EXISTING_EMPLOYEE_ID + "/leave")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper
+                        .setSerializationInclusion(JsonInclude.Include.NON_NULL)
+                        .writeValueAsString(leave)));
+        //assert
+        result.andExpect(status().isCreated())
+                .andExpect(jsonPath("$.employeeId").value(EXISTING_EMPLOYEE_ID))
+                .andExpect(jsonPath("$.date").value(leave.getDate()))
+                .andExpect(jsonPath("$.id").isNotEmpty());
+
     }
 }
