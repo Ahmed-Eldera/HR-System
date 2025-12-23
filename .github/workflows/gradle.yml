@@ -96,6 +96,12 @@ jobs:
           name: app-jar
           path: build/libs
 
+      - name: Upload JAR to GitHub release
+        run: |
+          gh release upload $RELEASE_VERSION ./build/libs/*.jar --clobber
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+
       - name: Build & push Docker image
         run: |
           IMAGE=ghcr.io/ahmed-eldera/hr
