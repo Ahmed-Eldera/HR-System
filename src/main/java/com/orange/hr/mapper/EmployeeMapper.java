@@ -23,6 +23,8 @@ public class EmployeeMapper {
         employee.setGraduationDate(dto.getGraduationDate());
         employee.setSalary(dto.getSalary());
         employee.setGender(dto.getGender());
+        employee.setHiringDate(dto.getHiringDate());
+        employee.setYoe(dto.getYoe());
 
         return employee;
     }

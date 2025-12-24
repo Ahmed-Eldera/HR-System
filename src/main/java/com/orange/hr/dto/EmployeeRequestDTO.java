@@ -48,4 +48,9 @@ public class EmployeeRequestDTO {
     @NotNull(message = "Team can't be null")
     private Integer teamId;
     private List<Integer> expertise;
+    @NotNull(message = "hiring date can't be null")
+    private LocalDate hiringDate;
+    @NotNull(message = "years of experience can't be null.")
+    private Integer yoe;
+
 }

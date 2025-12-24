@@ -10,7 +10,7 @@ import java.time.LocalDate;
 @Getter
 @AllArgsConstructor
 public class LeaveResponseDTO {
-    Integer Id;
+    Integer id;
     Integer employeeId;
     LocalDate date;
 

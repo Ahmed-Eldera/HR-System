@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 @Transactional
@@ -32,6 +33,8 @@ public class EmployeeServiceImpl implements EmployeeService {
     private EntityManager entityManager;
     @Autowired
     private LeaveRepository leaveRepository;
+    @Autowired
+    private AdjustmentRepository adjustmentRepository;
 
 
     public EmployeeResponseDTO addEmployee(EmployeeRequestDTO employee) {
@@ -169,6 +172,12 @@ public class EmployeeServiceImpl implements EmployeeService {
     public LeaveResponseDTO addLeave(Integer employeeId, LeaveRequestDTO requestDTO) {
         Employee employee = employeeRepository.findById(employeeId).orElseThrow(() -> new NoSuchEmployeeException(HttpStatus.NOT_FOUND, "Can't find selected employee."));
         Leave leave = leaveRepository.save(new Leave(null, employee, requestDTO.getDate()));
+        long totalLeaves = leaveRepository.countByEmployeeAndDateGreaterThanEqual(employee, LocalDate.of(LocalDate.now().getYear(), 01, 01)) + 1; //because the last leave is not committed yet
+        long NoOfYears = employee.getYoe() + ChronoUnit.YEARS.between(employee.getHiringDate(), LocalDate.now());
+        if ((totalLeaves > 21 && NoOfYears < 30) || totalLeaves > 30) {
+            Adjustment adjustment = new Adjustment(null, employee, -500d, LocalDate.now());
+            adjustmentRepository.save(adjustment);
+        }
         return new LeaveResponseDTO(leave.getLeaveID(), employeeId, requestDTO.getDate());
     }
 }

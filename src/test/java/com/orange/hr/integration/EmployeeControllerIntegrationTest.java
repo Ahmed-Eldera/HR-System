@@ -7,9 +7,12 @@ import com.orange.hr.dto.EmployeeResponseDTO;
 import com.orange.hr.dto.LeaveRequestDTO;
 import com.orange.hr.entity.Employee;
 import com.orange.hr.entity.Expertise;
+import com.orange.hr.entity.Leave;
 import com.orange.hr.enums.Gender;
 import com.orange.hr.mapper.EmployeeMapper;
+import com.orange.hr.repository.AdjustmentRepository;
 import com.orange.hr.repository.EmployeeRepository;
+import com.orange.hr.repository.LeaveRepository;
 import org.junit.jupiter.api.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
@@ -59,12 +62,19 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
     private static final int NON_EXISTENT_EXPERTISE_ID = 123;
     private static final int INSURANCE = 500;
     private static final float TAX = 0.15f;
+    private static final LocalDate HIRING_DATE = LocalDate.now();
+    private static final int YOE = 0;
+
     @Autowired
     MockMvc mockMvc;
     @Autowired
-    EmployeeRepository employeeRepository;
+    private EmployeeRepository employeeRepository;
     @Autowired
     private EmployeeMapper employeeMapper;
+    @Autowired
+    private AdjustmentRepository adjustmentRepository;
+    @Autowired
+    private LeaveRepository leaveRepository;
 
     @Test
     public void addEmpolyeeSuccessfully_WithFullData_ExpectCreated() throws Exception {
@@ -82,7 +92,9 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
                 DEPARTMENT_ID,
                 Optional.of(MANAGER_ID),
                 TEAM_ID,
-                expertises
+                expertises,
+                HIRING_DATE,
+                YOE
         );
 
         //act
@@ -90,7 +102,7 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
                 .content(objectMapper.writeValueAsString(employee)));
         //assert
         result.andExpect(status().isCreated())
-                .andExpect(jsonPath("$.employeeID").value(employee.getEmployeeId()))
+                .andExpect(jsonPath("$.employeeID").isNumber())
                 .andExpect(jsonPath("$.name").value(employee.getName()))
                 .andExpect(jsonPath("$.dateOfBirth").value(employee.getDateOfBirth().toString()))
                 .andExpect(jsonPath("$.gender").value(employee.getGender().toString()))
@@ -118,7 +130,10 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
                 DEPARTMENT_ID,
                 Optional.empty(),
                 TEAM_ID,
-                expertises
+                expertises,
+                HIRING_DATE,
+                YOE
+
         );
 
         //act
@@ -156,7 +171,10 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
                 DEPARTMENT_ID,
                 null,
                 TEAM_ID,
-                expertises
+                expertises,
+                HIRING_DATE,
+                YOE
+
         );
         //act
         ResultActions result = mockMvc.perform(post("/employee").contentType(MediaType.APPLICATION_JSON)
@@ -181,7 +199,10 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
                 NON_EXISTENT_DEPARTMENT_ID,
                 Optional.of(MANAGER_ID),
                 TEAM_ID,
-                expertises
+                expertises,
+                HIRING_DATE,
+                YOE
+
         );
         //act
         ResultActions result = mockMvc.perform(post("/employee").contentType(MediaType.APPLICATION_JSON)
@@ -207,7 +228,10 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
                 DEPARTMENT_ID,
                 Optional.of(MANAGER_ID),
                 NON_EXISTENT_TEAM_ID,
-                expertises
+                expertises,
+                HIRING_DATE,
+                YOE
+
         );
         //act
         ResultActions result = mockMvc.perform(post("/employee").contentType(MediaType.APPLICATION_JSON)
@@ -233,7 +257,10 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
                 DEPARTMENT_ID,
                 Optional.of(NON_EXISTENT_MANAGER_ID),
                 TEAM_ID,
-                expertises
+                expertises,
+                HIRING_DATE,
+                YOE
+
         );
         //act
         ResultActions result = mockMvc.perform(post("/employee").contentType(MediaType.APPLICATION_JSON)
@@ -259,7 +286,10 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
                 DEPARTMENT_ID,
                 Optional.of(MANAGER_ID),
                 TEAM_ID,
-                expertises
+                expertises,
+                HIRING_DATE,
+                YOE
+
         );
         //act
         ResultActions result = mockMvc.perform(post("/employee").contentType(MediaType.APPLICATION_JSON)
@@ -285,7 +315,10 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
                 DEPARTMENT_ID,
                 Optional.of(MANAGER_ID),
                 TEAM_ID,
-                expertises
+                expertises,
+                HIRING_DATE,
+                YOE
+
         );
         //act
         ResultActions result = mockMvc.perform(post("/employee").contentType(MediaType.APPLICATION_JSON)
@@ -311,7 +344,9 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
                 DEPARTMENT_ID2,
                 Optional.of(MANAGER_ID2),
                 TEAM_ID2,
-                expertises
+                expertises,
+                HIRING_DATE,
+                YOE
         );
         objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
         //act
@@ -621,10 +656,12 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
     }
 
     @Test
-    public void addLeave_GivenValidDataAndNoDeduction_ShouldReturnCreated() throws Exception {
-        prepareDB("/datasets/EmployeeController/addLeave.xml");
+    public void addLeave_Given_YOE_LessThan30AndNoDeduction_ShouldReturnCreated() throws Exception {
+        prepareDB("/datasets/EmployeeController/AddLeave.xml");
         //arrange
+        Employee employee = employeeRepository.findById(EXISTING_EMPLOYEE_ID).get();
         LeaveRequestDTO leave = new LeaveRequestDTO(LocalDate.of(2000, 1, 1));
+        double NoOfadjustmentsBefore = adjustmentRepository.countByEmployeeAndDateGreaterThanEqual(employee, LocalDate.now().withDayOfMonth(1));
         //act
         ResultActions result = mockMvc.perform(post("/employee/" + EXISTING_EMPLOYEE_ID + "/leave")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -636,6 +673,89 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
                 .andExpect(jsonPath("$.employeeId").value(EXISTING_EMPLOYEE_ID))
                 .andExpect(jsonPath("$.date").value(leave.getDate().toString()))
                 .andExpect(jsonPath("$.id").isNotEmpty());
+        double NoOfadjustmentsAfter = adjustmentRepository.countByEmployeeAndDateGreaterThanEqual(employee, LocalDate.now().withDayOfMonth(1));
+        assertEquals(NoOfadjustmentsBefore, NoOfadjustmentsAfter);
 
+    }
+
+    @Test
+    public void addLeave_GivenYOELessThan30AndDeduction_ShouldReturnCreated() throws Exception {
+        prepareDB("/datasets/EmployeeController/AddLeave.xml");
+        //arrange
+        Employee employee = employeeRepository.findById(EXISTING_EMPLOYEE_ID).get();
+        //give the employee 21 leaves
+        for (int i = 1; i <= 21; i++) {
+            leaveRepository.save(new Leave(null, employee, LocalDate.now().withDayOfMonth(i)));
+        }
+        LeaveRequestDTO leave = new LeaveRequestDTO(LocalDate.of(2000, 1, 1));
+        double NoOfadjustmentsBefore = adjustmentRepository.countByEmployeeAndDateGreaterThanEqual(employee, LocalDate.now().withDayOfMonth(1));
+        //act
+        ResultActions result = mockMvc.perform(post("/employee/" + EXISTING_EMPLOYEE_ID + "/leave")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper
+                        .setSerializationInclusion(JsonInclude.Include.NON_NULL)
+                        .writeValueAsString(leave)));
+        //assert
+        result.andExpect(status().isCreated())
+                .andExpect(jsonPath("$.employeeId").value(EXISTING_EMPLOYEE_ID))
+                .andExpect(jsonPath("$.date").value(leave.getDate().toString()))
+                .andExpect(jsonPath("$.id").isNotEmpty());
+        double NoOfadjustmentsAfter = adjustmentRepository.countByEmployeeAndDateGreaterThanEqual(employee, LocalDate.now().withDayOfMonth(1));
+        //assert an adjustment (deduction) is made
+        assertEquals(NoOfadjustmentsBefore + 1, NoOfadjustmentsAfter);
+    }
+
+    @Test
+    public void addLeave_GivenEmployeeYOEGreaterThan30AndDeduction_ShouldReturnCreated() throws Exception {
+        prepareDB("/datasets/EmployeeController/AddLeave.xml");
+        //arrange
+        Employee employee = employeeRepository.findById(EXISTING_EMPLOYEE_ID2).get();
+        //give the employee 30 leaves
+        for (int i = 1; i <= 30; i++) {
+            leaveRepository.save(new Leave(null, employee, LocalDate.now().withDayOfMonth(i)));
+        }
+        LeaveRequestDTO leave = new LeaveRequestDTO(LocalDate.of(2000, 1, 1));
+        double NoOfadjustmentsBefore = adjustmentRepository.countByEmployeeAndDateGreaterThanEqual(employee, LocalDate.now().withDayOfMonth(1));
+        //act
+        ResultActions result = mockMvc.perform(post("/employee/" + EXISTING_EMPLOYEE_ID2 + "/leave")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper
+                        .setSerializationInclusion(JsonInclude.Include.NON_NULL)
+                        .writeValueAsString(leave)));
+        //assert
+        result.andExpect(status().isCreated())
+                .andExpect(jsonPath("$.employeeId").value(EXISTING_EMPLOYEE_ID2))
+                .andExpect(jsonPath("$.date").value(leave.getDate().toString()))
+                .andExpect(jsonPath("$.id").isNotEmpty());
+        double NoOfadjustmentsAfter = adjustmentRepository.countByEmployeeAndDateGreaterThanEqual(employee, LocalDate.now().withDayOfMonth(1));
+        //assert an adjustment (deduction) is made
+        assertEquals(NoOfadjustmentsBefore + 1, NoOfadjustmentsAfter);
+    }
+
+    @Test
+    public void addLeave_GivenEmployeeYOEGreaterThan30AndLeavesBetween21And30NoDeduction_ShouldReturnCreated() throws Exception {
+        prepareDB("/datasets/EmployeeController/AddLeave.xml");
+        //arrange
+        Employee employee = employeeRepository.findById(EXISTING_EMPLOYEE_ID2).get();
+        //give the employee 30 leaves
+        for (int i = 1; i <= 21; i++) {
+            leaveRepository.save(new Leave(null, employee, LocalDate.now().withDayOfMonth(i)));
+        }
+        LeaveRequestDTO leave = new LeaveRequestDTO(LocalDate.of(2000, 1, 1));
+        double NoOfadjustmentsBefore = adjustmentRepository.countByEmployeeAndDateGreaterThanEqual(employee, LocalDate.now().withDayOfMonth(1));
+        //act
+        ResultActions result = mockMvc.perform(post("/employee/" + EXISTING_EMPLOYEE_ID2 + "/leave")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper
+                        .setSerializationInclusion(JsonInclude.Include.NON_NULL)
+                        .writeValueAsString(leave)));
+        //assert
+        result.andExpect(status().isCreated())
+                .andExpect(jsonPath("$.employeeId").value(EXISTING_EMPLOYEE_ID2))
+                .andExpect(jsonPath("$.date").value(leave.getDate().toString()))
+                .andExpect(jsonPath("$.id").isNotEmpty());
+        double NoOfadjustmentsAfter = adjustmentRepository.countByEmployeeAndDateGreaterThanEqual(employee, LocalDate.now().withDayOfMonth(1));
+        //assert an adjustment (deduction) is made
+        assertEquals(NoOfadjustmentsBefore, NoOfadjustmentsAfter);
     }
 }
