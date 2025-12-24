@@ -172,9 +172,11 @@ public class EmployeeServiceImpl implements EmployeeService {
     public LeaveResponseDTO addLeave(Integer employeeId, LeaveRequestDTO requestDTO) {
         Employee employee = employeeRepository.findById(employeeId).orElseThrow(() -> new NoSuchEmployeeException(HttpStatus.NOT_FOUND, "Can't find selected employee."));
         Leave leave = leaveRepository.save(new Leave(null, employee, requestDTO.getDate()));
-        long totalLeaves = leaveRepository.countByEmployeeAndDateGreaterThanEqual(employee, LocalDate.of(LocalDate.now().getYear(), 01, 01)) + 1; //because the last leave is not committed yet
-        long NoOfYears = employee.getYoe() + ChronoUnit.YEARS.between(employee.getHiringDate(), LocalDate.now());
-        if ((totalLeaves > 21 && NoOfYears < 30) || totalLeaves > 30) {
+        long totalLeaves = leaveRepository.countByEmployeeAndDateGreaterThanEqual(
+                employee,
+                LocalDate.of(LocalDate.now().getYear(), 01, 01)) + 1; //+1 because the last leave is not committed yet
+        long noOfYears = employee.getYoe() + ChronoUnit.YEARS.between(employee.getHiringDate(), LocalDate.now());
+        if ((totalLeaves > 21 && noOfYears < 30) || totalLeaves > 30) {
             Adjustment adjustment = new Adjustment(null, employee, -500d, LocalDate.now());
             adjustmentRepository.save(adjustment);
         }
