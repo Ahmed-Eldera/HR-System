@@ -661,7 +661,9 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
         //arrange
         Employee employee = employeeRepository.findById(EXISTING_EMPLOYEE_ID).get();
         LeaveRequestDTO leave = new LeaveRequestDTO(LocalDate.of(2000, 1, 1));
-        double NoOfadjustmentsBefore = adjustmentRepository.countByEmployeeAndDateGreaterThanEqual(employee, LocalDate.now().withDayOfMonth(1));
+        double noOfadjustmentsBefore = adjustmentRepository.countByEmployeeAndDateGreaterThanEqual(
+                employee,
+                LocalDate.now().withDayOfMonth(1));
         //act
         ResultActions result = mockMvc.perform(post("/employee/" + EXISTING_EMPLOYEE_ID + "/leave")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -673,8 +675,10 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
                 .andExpect(jsonPath("$.employeeId").value(EXISTING_EMPLOYEE_ID))
                 .andExpect(jsonPath("$.date").value(leave.getDate().toString()))
                 .andExpect(jsonPath("$.id").isNotEmpty());
-        double NoOfadjustmentsAfter = adjustmentRepository.countByEmployeeAndDateGreaterThanEqual(employee, LocalDate.now().withDayOfMonth(1));
-        assertEquals(NoOfadjustmentsBefore, NoOfadjustmentsAfter);
+        double noOfadjustmentsAfter = adjustmentRepository.countByEmployeeAndDateGreaterThanEqual(
+                employee,
+                LocalDate.now().withDayOfMonth(1));
+        assertEquals(noOfadjustmentsBefore, noOfadjustmentsAfter);
 
     }
 
@@ -688,7 +692,9 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
             leaveRepository.save(new Leave(null, employee, LocalDate.now().withDayOfMonth(i)));
         }
         LeaveRequestDTO leave = new LeaveRequestDTO(LocalDate.of(2000, 1, 1));
-        double NoOfadjustmentsBefore = adjustmentRepository.countByEmployeeAndDateGreaterThanEqual(employee, LocalDate.now().withDayOfMonth(1));
+        double noOfadjustmentsBefore = adjustmentRepository.countByEmployeeAndDateGreaterThanEqual(
+                employee,
+                LocalDate.now().withDayOfMonth(1));
         //act
         ResultActions result = mockMvc.perform(post("/employee/" + EXISTING_EMPLOYEE_ID + "/leave")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -700,13 +706,15 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
                 .andExpect(jsonPath("$.employeeId").value(EXISTING_EMPLOYEE_ID))
                 .andExpect(jsonPath("$.date").value(leave.getDate().toString()))
                 .andExpect(jsonPath("$.id").isNotEmpty());
-        double NoOfadjustmentsAfter = adjustmentRepository.countByEmployeeAndDateGreaterThanEqual(employee, LocalDate.now().withDayOfMonth(1));
+        double noOfadjustmentsAfter = adjustmentRepository.countByEmployeeAndDateGreaterThanEqual(
+                employee,
+                LocalDate.now().withDayOfMonth(1));
         //assert an adjustment (deduction) is made
-        assertEquals(NoOfadjustmentsBefore + 1, NoOfadjustmentsAfter);
+        assertEquals(noOfadjustmentsBefore + 1, noOfadjustmentsAfter);
     }
 
     @Test
-    public void addLeave_GivenEmployeeYOEGreaterThan30AndDeduction_ShouldReturnCreated() throws Exception {
+    public void addLeave_GivenYOEGreaterThan30AndDeduction_ShouldReturnCreated() throws Exception {
         prepareDB("/datasets/EmployeeController/AddLeave.xml");
         //arrange
         Employee employee = employeeRepository.findById(EXISTING_EMPLOYEE_ID2).get();
@@ -715,7 +723,9 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
             leaveRepository.save(new Leave(null, employee, LocalDate.now().withDayOfMonth(i)));
         }
         LeaveRequestDTO leave = new LeaveRequestDTO(LocalDate.of(2000, 1, 1));
-        double NoOfadjustmentsBefore = adjustmentRepository.countByEmployeeAndDateGreaterThanEqual(employee, LocalDate.now().withDayOfMonth(1));
+        double noOfadjustmentsBefore = adjustmentRepository.countByEmployeeAndDateGreaterThanEqual(
+                employee,
+                LocalDate.now().withDayOfMonth(1));
         //act
         ResultActions result = mockMvc.perform(post("/employee/" + EXISTING_EMPLOYEE_ID2 + "/leave")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -727,13 +737,15 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
                 .andExpect(jsonPath("$.employeeId").value(EXISTING_EMPLOYEE_ID2))
                 .andExpect(jsonPath("$.date").value(leave.getDate().toString()))
                 .andExpect(jsonPath("$.id").isNotEmpty());
-        double NoOfadjustmentsAfter = adjustmentRepository.countByEmployeeAndDateGreaterThanEqual(employee, LocalDate.now().withDayOfMonth(1));
+        double noOfadjustmentsAfter = adjustmentRepository.countByEmployeeAndDateGreaterThanEqual(
+                employee,
+                LocalDate.now().withDayOfMonth(1));
         //assert an adjustment (deduction) is made
-        assertEquals(NoOfadjustmentsBefore + 1, NoOfadjustmentsAfter);
+        assertEquals(noOfadjustmentsBefore + 1, noOfadjustmentsAfter);
     }
 
     @Test
-    public void addLeave_GivenEmployeeYOEGreaterThan30AndLeavesBetween21And30NoDeduction_ShouldReturnCreated() throws Exception {
+    public void addLeave_GivenYOEMoreThan30AndLeavesBetween21And30NoDeduction_ShouldReturnCreated() throws Exception {
         prepareDB("/datasets/EmployeeController/AddLeave.xml");
         //arrange
         Employee employee = employeeRepository.findById(EXISTING_EMPLOYEE_ID2).get();
@@ -742,7 +754,9 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
             leaveRepository.save(new Leave(null, employee, LocalDate.now().withDayOfMonth(i)));
         }
         LeaveRequestDTO leave = new LeaveRequestDTO(LocalDate.of(2000, 1, 1));
-        double NoOfadjustmentsBefore = adjustmentRepository.countByEmployeeAndDateGreaterThanEqual(employee, LocalDate.now().withDayOfMonth(1));
+        double noOfadjustmentsBefore = adjustmentRepository.countByEmployeeAndDateGreaterThanEqual(
+                employee,
+                LocalDate.now().withDayOfMonth(1));
         //act
         ResultActions result = mockMvc.perform(post("/employee/" + EXISTING_EMPLOYEE_ID2 + "/leave")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -754,8 +768,10 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
                 .andExpect(jsonPath("$.employeeId").value(EXISTING_EMPLOYEE_ID2))
                 .andExpect(jsonPath("$.date").value(leave.getDate().toString()))
                 .andExpect(jsonPath("$.id").isNotEmpty());
-        double NoOfadjustmentsAfter = adjustmentRepository.countByEmployeeAndDateGreaterThanEqual(employee, LocalDate.now().withDayOfMonth(1));
+        double noOfadjustmentsAfter = adjustmentRepository.countByEmployeeAndDateGreaterThanEqual(
+                employee,
+                LocalDate.now().withDayOfMonth(1));
         //assert an adjustment (deduction) is made
-        assertEquals(NoOfadjustmentsBefore, NoOfadjustmentsAfter);
+        assertEquals(noOfadjustmentsBefore, noOfadjustmentsAfter);
     }
 }
