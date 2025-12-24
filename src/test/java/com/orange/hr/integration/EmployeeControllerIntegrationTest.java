@@ -634,7 +634,7 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
         //assert
         result.andExpect(status().isCreated())
                 .andExpect(jsonPath("$.employeeId").value(EXISTING_EMPLOYEE_ID))
-                .andExpect(jsonPath("$.date").value(leave.getDate()))
+                .andExpect(jsonPath("$.date").value(leave.getDate().toString()))
                 .andExpect(jsonPath("$.id").isNotEmpty());
 
     }

@@ -1,19 +1,10 @@
 package com.orange.hr.service.impl;
 
-import com.orange.hr.dto.EmployeeHierarchyProjection;
-import com.orange.hr.dto.EmployeeRequestDTO;
-import com.orange.hr.dto.EmployeeResponseDTO;
-import com.orange.hr.dto.SalaryDTO;
-import com.orange.hr.entity.Department;
-import com.orange.hr.entity.Employee;
-import com.orange.hr.entity.Expertise;
-import com.orange.hr.entity.Team;
+import com.orange.hr.dto.*;
+import com.orange.hr.entity.*;
 import com.orange.hr.exceptions.*;
 import com.orange.hr.mapper.EmployeeMapper;
-import com.orange.hr.repository.DepartmentRepository;
-import com.orange.hr.repository.EmployeeRepository;
-import com.orange.hr.repository.ExpertiseRepository;
-import com.orange.hr.repository.TeamRepository;
+import com.orange.hr.repository.*;
 import com.orange.hr.service.EmployeeService;
 import jakarta.persistence.EntityManager;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +30,8 @@ public class EmployeeServiceImpl implements EmployeeService {
     private EmployeeMapper employeeMapper;
     @Autowired
     private EntityManager entityManager;
+    @Autowired
+    private LeaveRepository leaveRepository;
 
 
     public EmployeeResponseDTO addEmployee(EmployeeRequestDTO employee) {
@@ -170,5 +163,12 @@ public class EmployeeServiceImpl implements EmployeeService {
         List<Employee> subs = employeeRepository.findByManager(manager);
         List<EmployeeResponseDTO> response = subs.stream().map(employeeMapper::toDTO).toList();
         return response;
+    }
+
+    @Override
+    public LeaveResponseDTO addLeave(Integer employeeId, LeaveRequestDTO requestDTO) {
+        Employee employee = employeeRepository.findById(employeeId).orElseThrow(() -> new NoSuchEmployeeException(HttpStatus.NOT_FOUND, "Can't find selected employee."));
+        Leave leave = leaveRepository.save(new Leave(null, employee, requestDTO.getDate()));
+        return new LeaveResponseDTO(leave.getLeaveID(), employeeId, requestDTO.getDate());
     }
 }
