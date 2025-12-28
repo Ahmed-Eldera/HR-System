@@ -171,13 +171,20 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Override
     public LeaveResponseDTO addLeave(Integer employeeId, LeaveRequestDTO requestDTO) {
         Employee employee = employeeRepository.findById(employeeId).orElseThrow(() -> new NoSuchEmployeeException(HttpStatus.NOT_FOUND, "Can't find selected employee."));
-        Leave leave = leaveRepository.save(new Leave(null, employee, requestDTO.getDate()));
-        long totalLeaves = leaveRepository.countByEmployeeAndDateGreaterThanEqual(
+        Leave leave = leaveRepository.saveAndFlush(new Leave(null, employee, requestDTO.getDate()));
+        LocalDate yearStart = LocalDate.of(LocalDate.now().getYear(), 01, 01);
+        LocalDate yearEnd = yearStart.plusYears(1);
+        long totalLeaves = leaveRepository.countByEmployeeAndDateGreaterThanEqualAndDateLessThan(
                 employee,
-                LocalDate.of(LocalDate.now().getYear(), 01, 01)) + 1; //+1 because the last leave is not committed yet
+                yearStart,
+                yearEnd) + 1; //+1 because the last leave is not committed yet
         long noOfYears = employee.getYoe() + ChronoUnit.YEARS.between(employee.getHiringDate(), LocalDate.now());
-        if ((totalLeaves > 21 && noOfYears < 30) || totalLeaves > 30) {
-            Adjustment adjustment = new Adjustment(null, employee, -500d, LocalDate.now());
+        int maxAllowedLeavesForJuniors = 21;
+        int maxAllowedLeavesForSeniors = 30;
+        int seniorMinYoe = 10;
+        if ((totalLeaves > maxAllowedLeavesForJuniors && noOfYears < seniorMinYoe) || totalLeaves > maxAllowedLeavesForSeniors) {
+            double deductionAmount = -500d;
+            Adjustment adjustment = new Adjustment(null, employee, deductionAmount, leave.getDate());
             adjustmentRepository.save(adjustment);
         }
         return new LeaveResponseDTO(leave.getLeaveID(), employeeId, requestDTO.getDate());

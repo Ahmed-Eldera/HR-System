@@ -9,6 +9,6 @@ import java.time.LocalDate;
 
 @Repository
 public interface AdjustmentRepository extends JpaRepository<Adjustment, Integer> {
-    long countByEmployeeAndDateGreaterThanEqual(Employee employee, LocalDate date);
+    long countByEmployeeAndDateGreaterThanEqualAndDateLessThan(Employee employee, LocalDate startDate, LocalDate endDate);
 
 }

@@ -9,5 +9,5 @@ import java.time.LocalDate;
 
 @Repository
 public interface LeaveRepository extends JpaRepository<Leave, Integer> {
-    long countByEmployeeAndDateGreaterThanEqual(Employee employee, LocalDate date);
+    long countByEmployeeAndDateGreaterThanEqualAndDateLessThan(Employee employee, LocalDate startDate, LocalDate endDate);
 }
