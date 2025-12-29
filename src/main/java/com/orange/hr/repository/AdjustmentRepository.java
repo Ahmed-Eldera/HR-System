@@ -11,4 +11,6 @@ import java.time.LocalDate;
 public interface AdjustmentRepository extends JpaRepository<Adjustment, Integer> {
     long countByEmployeeAndDateGreaterThanEqualAndDateLessThan(Employee employee, LocalDate startDate, LocalDate endDate);
 
+    boolean existsByDate(LocalDate date);
+
 }

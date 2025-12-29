@@ -170,21 +170,25 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     public LeaveResponseDTO addLeave(Integer employeeId, LeaveRequestDTO requestDTO) {
+        if (requestDTO.getDate().getYear() > LocalDate.now().getYear()) {
+            throw new InValidDateException(HttpStatus.BAD_REQUEST, "You can only record leaves in the current year.");
+        }
         Employee employee = employeeRepository.findById(employeeId).orElseThrow(() -> new NoSuchEmployeeException(HttpStatus.NOT_FOUND, "Can't find selected employee."));
-        Leave leave = leaveRepository.saveAndFlush(new Leave(null, employee, requestDTO.getDate()));
         LocalDate yearStart = LocalDate.of(LocalDate.now().getYear(), 01, 01);
         LocalDate yearEnd = yearStart.plusYears(1);
+        Leave leave = leaveRepository.saveAndFlush(new Leave(null, employee, requestDTO.getDate()));
         long totalLeaves = leaveRepository.countByEmployeeAndDateGreaterThanEqualAndDateLessThan(
                 employee,
                 yearStart,
-                yearEnd) + 1; //+1 because the last leave is not committed yet
+                yearEnd);
         long noOfYears = employee.getYoe() + ChronoUnit.YEARS.between(employee.getHiringDate(), LocalDate.now());
         int maxAllowedLeavesForJuniors = 21;
         int maxAllowedLeavesForSeniors = 30;
         int seniorMinYoe = 10;
         if ((totalLeaves > maxAllowedLeavesForJuniors && noOfYears < seniorMinYoe) || totalLeaves > maxAllowedLeavesForSeniors) {
             double deductionAmount = -500d;
-            Adjustment adjustment = new Adjustment(null, employee, deductionAmount, leave.getDate());
+            LocalDate adjustmentDate = leave.getDate().isAfter(LocalDate.now()) ? leave.getDate() : LocalDate.now();
+            Adjustment adjustment = new Adjustment(null, employee, deductionAmount, adjustmentDate);
             adjustmentRepository.save(adjustment);
         }
         return new LeaveResponseDTO(leave.getLeaveID(), employeeId, requestDTO.getDate());

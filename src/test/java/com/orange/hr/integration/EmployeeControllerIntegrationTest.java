@@ -84,12 +84,35 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
         //Arrange
         List<Integer> expertises = new ArrayList<>();
         expertises.add(EXPERTISE_ID);
-        EmployeeRequestDTO employee = new EmployeeRequestDTO(NEW_EMPLOYEE_ID, NEW_EMPLOYEE_NAME, DATE_OF_BIRTH, Gender.MALE, GRADUATION_DATE, SALARY, DEPARTMENT_ID, Optional.of(MANAGER_ID), TEAM_ID, expertises, HIRING_DATE, YOE);
+        EmployeeRequestDTO employee = new EmployeeRequestDTO(
+                NEW_EMPLOYEE_ID,
+                NEW_EMPLOYEE_NAME,
+                DATE_OF_BIRTH,
+                Gender.MALE,
+                GRADUATION_DATE,
+                SALARY,
+                DEPARTMENT_ID,
+                Optional.of(MANAGER_ID),
+                TEAM_ID,
+                expertises,
+                HIRING_DATE,
+                YOE);
 
         //act
-        ResultActions result = mockMvc.perform(post("/employee").contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(employee)));
+        ResultActions result = mockMvc.perform(post("/employee")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(employee)));
         //assert
-        result.andExpect(status().isCreated()).andExpect(jsonPath("$.employeeID").isNumber()).andExpect(jsonPath("$.name").value(employee.getName())).andExpect(jsonPath("$.dateOfBirth").value(employee.getDateOfBirth().toString())).andExpect(jsonPath("$.gender").value(employee.getGender().toString())).andExpect(jsonPath("$.graduationDate").value(employee.getGraduationDate().toString())).andExpect(jsonPath("$.salary").value(employee.getSalary())).andExpect(jsonPath("$.departmentId").value(employee.getDepartmentId())).andExpect(jsonPath("$.managerId").value(employee.getManagerId().get())).andExpect(jsonPath("$.teamId").value(employee.getTeamId())).andExpect(jsonPath("$.expertisesIds").value(employee.getExpertise()));
+        result.andExpect(status().isCreated()).andExpect(jsonPath("$.employeeID").isNumber())
+                .andExpect(jsonPath("$.name").value(employee.getName()))
+                .andExpect(jsonPath("$.dateOfBirth").value(employee.getDateOfBirth().toString()))
+                .andExpect(jsonPath("$.gender").value(employee.getGender().toString()))
+                .andExpect(jsonPath("$.graduationDate").value(employee.getGraduationDate().toString()))
+                .andExpect(jsonPath("$.salary").value(employee.getSalary()))
+                .andExpect(jsonPath("$.departmentId").value(employee.getDepartmentId()))
+                .andExpect(jsonPath("$.managerId").value(employee.getManagerId().get()))
+                .andExpect(jsonPath("$.teamId").value(employee.getTeamId()))
+                .andExpect(jsonPath("$.expertisesIds").value(employee.getExpertise()));
     }
 
     @Test
@@ -98,14 +121,36 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
         //Arrange
         List<Integer> expertises = new ArrayList<>();
         expertises.add(EXPERTISE_ID);
-        EmployeeRequestDTO employee = new EmployeeRequestDTO(NEW_EMPLOYEE_ID, NEW_EMPLOYEE_NAME, DATE_OF_BIRTH, Gender.MALE, GRADUATION_DATE, SALARY, DEPARTMENT_ID, Optional.empty(), TEAM_ID, expertises, HIRING_DATE, YOE
-
-        );
+        EmployeeRequestDTO employee = new EmployeeRequestDTO(
+                NEW_EMPLOYEE_ID,
+                NEW_EMPLOYEE_NAME,
+                DATE_OF_BIRTH,
+                Gender.MALE,
+                GRADUATION_DATE,
+                SALARY,
+                DEPARTMENT_ID,
+                Optional.empty(),
+                TEAM_ID,
+                expertises,
+                HIRING_DATE,
+                YOE);
 
         //act
-        ResultActions result = mockMvc.perform(post("/employee").contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(employee)));
+        ResultActions result = mockMvc.perform(post("/employee")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(employee)));
         //assert
-        result.andExpect(status().isCreated()).andExpect(jsonPath("$.employeeID").isNumber()).andExpect(jsonPath("$.name").value(employee.getName())).andExpect(jsonPath("$.dateOfBirth").value(employee.getDateOfBirth().toString())).andExpect(jsonPath("$.gender").value(employee.getGender().toString())).andExpect(jsonPath("$.graduationDate").value(employee.getGraduationDate().toString())).andExpect(jsonPath("$.salary").value(employee.getSalary())).andExpect(jsonPath("$.departmentId").value(employee.getDepartmentId())).andExpect(jsonPath("$.managerId").isEmpty()).andExpect(jsonPath("$.teamId").value(employee.getTeamId())).andExpect(jsonPath("$.expertisesIds").value(employee.getExpertise()));
+        result.andExpect(status().isCreated())
+                .andExpect(jsonPath("$.employeeID").isNumber())
+                .andExpect(jsonPath("$.name").value(employee.getName()))
+                .andExpect(jsonPath("$.dateOfBirth").value(employee.getDateOfBirth().toString()))
+                .andExpect(jsonPath("$.gender").value(employee.getGender().toString()))
+                .andExpect(jsonPath("$.graduationDate").value(employee.getGraduationDate().toString()))
+                .andExpect(jsonPath("$.salary").value(employee.getSalary()))
+                .andExpect(jsonPath("$.departmentId").value(employee.getDepartmentId()))
+                .andExpect(jsonPath("$.managerId").isEmpty())
+                .andExpect(jsonPath("$.teamId").value(employee.getTeamId()))
+                .andExpect(jsonPath("$.expertisesIds").value(employee.getExpertise()));
     }
 
     @Test
@@ -115,11 +160,21 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
         List<Integer> expertises = new ArrayList<>();
         expertises.add(EXPERTISE_ID);
         EmployeeRequestDTO employee = new EmployeeRequestDTO(NEW_EMPLOYEE_ID, null,  //missing name
-                DATE_OF_BIRTH, Gender.MALE, GRADUATION_DATE, SALARY, DEPARTMENT_ID, null, TEAM_ID, expertises, HIRING_DATE, YOE
-
+                DATE_OF_BIRTH,
+                Gender.MALE,
+                GRADUATION_DATE,
+                SALARY,
+                DEPARTMENT_ID,
+                null,
+                TEAM_ID,
+                expertises,
+                HIRING_DATE,
+                YOE
         );
         //act
-        ResultActions result = mockMvc.perform(post("/employee").contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(employee)));
+        ResultActions result = mockMvc.perform(post("/employee")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(employee)));
         //assert
         result.andExpect(status().isBadRequest());
     }
@@ -130,13 +185,27 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
         //Arrange
         List<Integer> expertises = new ArrayList<>();
         expertises.add(EXPERTISE_ID);
-        EmployeeRequestDTO employee = new EmployeeRequestDTO(NEW_EMPLOYEE_ID, NEW_EMPLOYEE_NAME, DATE_OF_BIRTH, Gender.MALE, GRADUATION_DATE, SALARY, NON_EXISTENT_DEPARTMENT_ID, Optional.of(MANAGER_ID), TEAM_ID, expertises, HIRING_DATE, YOE
-
+        EmployeeRequestDTO employee = new EmployeeRequestDTO(
+                NEW_EMPLOYEE_ID,
+                NEW_EMPLOYEE_NAME,
+                DATE_OF_BIRTH,
+                Gender.MALE,
+                GRADUATION_DATE,
+                SALARY,
+                NON_EXISTENT_DEPARTMENT_ID,
+                Optional.of(MANAGER_ID),
+                TEAM_ID,
+                expertises,
+                HIRING_DATE,
+                YOE
         );
         //act
-        ResultActions result = mockMvc.perform(post("/employee").contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(employee)));
+        ResultActions result = mockMvc.perform(post("/employee")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(employee)));
         //assert
-        result.andExpect(status().isNotFound()).andExpect(jsonPath("$.msg").value("Can't find the Selected Department"));
+        result.andExpect(status().isNotFound()).andExpect(jsonPath("$.msg")
+                .value("Can't find the Selected Department"));
     }
 
     @Test
@@ -145,13 +214,27 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
         //Arrange
         List<Integer> expertises = new ArrayList<>();
         expertises.add(EXPERTISE_ID);
-        EmployeeRequestDTO employee = new EmployeeRequestDTO(NEW_EMPLOYEE_ID, NEW_EMPLOYEE_NAME, DATE_OF_BIRTH, Gender.MALE, GRADUATION_DATE, SALARY, DEPARTMENT_ID, Optional.of(MANAGER_ID), NON_EXISTENT_TEAM_ID, expertises, HIRING_DATE, YOE
-
+        EmployeeRequestDTO employee = new EmployeeRequestDTO(
+                NEW_EMPLOYEE_ID,
+                NEW_EMPLOYEE_NAME,
+                DATE_OF_BIRTH,
+                Gender.MALE,
+                GRADUATION_DATE,
+                SALARY,
+                DEPARTMENT_ID,
+                Optional.of(MANAGER_ID),
+                NON_EXISTENT_TEAM_ID,
+                expertises,
+                HIRING_DATE,
+                YOE
         );
         //act
-        ResultActions result = mockMvc.perform(post("/employee").contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(employee)));
+        ResultActions result = mockMvc.perform(post("/employee")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(employee)));
         //assert
-        result.andExpect(status().isNotFound()).andExpect(jsonPath("$.msg").value("Can't find the Selected Team"));
+        result.andExpect(status().isNotFound()).andExpect(jsonPath("$.msg")
+                .value("Can't find the Selected Team"));
     }
 
     @Test
@@ -160,13 +243,27 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
         //Arrange
         List<Integer> expertises = new ArrayList<>();
         expertises.add(EXPERTISE_ID);
-        EmployeeRequestDTO employee = new EmployeeRequestDTO(NEW_EMPLOYEE_ID, NEW_EMPLOYEE_NAME, DATE_OF_BIRTH, Gender.MALE, GRADUATION_DATE, SALARY, DEPARTMENT_ID, Optional.of(NON_EXISTENT_MANAGER_ID), TEAM_ID, expertises, HIRING_DATE, YOE
-
+        EmployeeRequestDTO employee = new EmployeeRequestDTO(
+                NEW_EMPLOYEE_ID,
+                NEW_EMPLOYEE_NAME,
+                DATE_OF_BIRTH,
+                Gender.MALE,
+                GRADUATION_DATE,
+                SALARY,
+                DEPARTMENT_ID,
+                Optional.of(NON_EXISTENT_MANAGER_ID),
+                TEAM_ID,
+                expertises,
+                HIRING_DATE,
+                YOE
         );
         //act
-        ResultActions result = mockMvc.perform(post("/employee").contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(employee)));
+        ResultActions result = mockMvc.perform(post("/employee")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(employee)));
         //assert
-        result.andExpect(status().isNotFound()).andExpect(jsonPath("$.msg").value("Can't find the Selected Manager"));
+        result.andExpect(status().isNotFound()).andExpect(jsonPath("$.msg")
+                .value("Can't find the Selected Manager"));
     }
 
     @Test
@@ -175,13 +272,27 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
         //Arrange
         List<Integer> expertises = new ArrayList<>();
         expertises.add(EXPERTISE_ID);
-        EmployeeRequestDTO employee = new EmployeeRequestDTO(NEW_EMPLOYEE_ID, NEW_EMPLOYEE_NAME, FUTURE_DATE_OF_BIRTH, Gender.MALE, GRADUATION_DATE, SALARY, DEPARTMENT_ID, Optional.of(MANAGER_ID), TEAM_ID, expertises, HIRING_DATE, YOE
-
+        EmployeeRequestDTO employee = new EmployeeRequestDTO(
+                NEW_EMPLOYEE_ID,
+                NEW_EMPLOYEE_NAME,
+                FUTURE_DATE_OF_BIRTH,
+                Gender.MALE,
+                GRADUATION_DATE,
+                SALARY,
+                DEPARTMENT_ID,
+                Optional.of(MANAGER_ID),
+                TEAM_ID,
+                expertises,
+                HIRING_DATE,
+                YOE
         );
         //act
-        ResultActions result = mockMvc.perform(post("/employee").contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(employee)));
+        ResultActions result = mockMvc.perform(post("/employee")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(employee)));
         //assert
-        result.andExpect(status().isBadRequest()).andExpect(jsonPath("$.msg").value("Birth date can't be in the future"));
+        result.andExpect(status().isBadRequest()).andExpect(jsonPath("$.msg")
+                .value("Birth date can't be in the future"));
     }
 
     @Test
@@ -190,13 +301,28 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
         //Arrange
         List<Integer> expertises = new ArrayList<>();
         expertises.add(NON_EXISTENT_EXPERTISE_ID);
-        EmployeeRequestDTO employee = new EmployeeRequestDTO(NEW_EMPLOYEE_ID, NEW_EMPLOYEE_NAME, DATE_OF_BIRTH, Gender.MALE, GRADUATION_DATE, SALARY, DEPARTMENT_ID, Optional.of(MANAGER_ID), TEAM_ID, expertises, HIRING_DATE, YOE
-
+        EmployeeRequestDTO employee = new EmployeeRequestDTO(
+                NEW_EMPLOYEE_ID,
+                NEW_EMPLOYEE_NAME,
+                DATE_OF_BIRTH,
+                Gender.MALE,
+                GRADUATION_DATE,
+                SALARY,
+                DEPARTMENT_ID,
+                Optional.of(MANAGER_ID),
+                TEAM_ID,
+                expertises,
+                HIRING_DATE,
+                YOE
         );
         //act
-        ResultActions result = mockMvc.perform(post("/employee").contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(employee)));
+        ResultActions result = mockMvc.perform(post("/employee")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(employee)));
         //assert
-        result.andExpect(status().isNotFound()).andExpect(jsonPath("$.msg").value("Can't find the Selected Expertise"));
+        result.andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.msg")
+                        .value("Can't find the Selected Expertise"));
     }
 
     @Test
@@ -205,12 +331,36 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
         //arrange
         List<Integer> expertises = new ArrayList<>();
         expertises.add(EXPERTISE_ID2);
-        EmployeeRequestDTO employee = new EmployeeRequestDTO(null, NEW_EMPLOYEE_NAME, NEW_DATE_OF_BIRTH, Gender.FEMALE, NEW_GRADUATION_DATE, NEW_SALARY, DEPARTMENT_ID2, Optional.of(MANAGER_ID2), TEAM_ID2, expertises, HIRING_DATE, YOE);
+        EmployeeRequestDTO employee = new EmployeeRequestDTO(
+                null,
+                NEW_EMPLOYEE_NAME,
+                NEW_DATE_OF_BIRTH,
+                Gender.FEMALE,
+                NEW_GRADUATION_DATE,
+                NEW_SALARY,
+                DEPARTMENT_ID2,
+                Optional.of(MANAGER_ID2),
+                TEAM_ID2,
+                expertises,
+                HIRING_DATE,
+                YOE
+        );
         objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
         //act
-        ResultActions result = mockMvc.perform(patch("/employee/" + EXISTING_EMPLOYEE_ID).contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(employee)));
+        ResultActions result = mockMvc.perform(patch("/employee/" + EXISTING_EMPLOYEE_ID)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(employee)));
         //assert
-        result.andExpect(status().isOk()).andExpect(jsonPath("$.name").value(employee.getName())).andExpect(jsonPath("$.dateOfBirth").value(employee.getDateOfBirth().toString())).andExpect(jsonPath("$.gender").value(employee.getGender().toString())).andExpect(jsonPath("$.graduationDate").value(employee.getGraduationDate().toString())).andExpect(jsonPath("$.salary").value(employee.getSalary())).andExpect(jsonPath("$.departmentId").value(employee.getDepartmentId())).andExpect(jsonPath("$.managerId").value(employee.getManagerId().get())).andExpect(jsonPath("$.teamId").value(employee.getTeamId())).andExpect(jsonPath("$.expertisesIds").value(employee.getExpertise()));
+        result.andExpect(status().isOk())
+                .andExpect(jsonPath("$.name").value(employee.getName()))
+                .andExpect(jsonPath("$.dateOfBirth").value(employee.getDateOfBirth().toString()))
+                .andExpect(jsonPath("$.gender").value(employee.getGender().toString()))
+                .andExpect(jsonPath("$.graduationDate").value(employee.getGraduationDate().toString()))
+                .andExpect(jsonPath("$.salary").value(employee.getSalary()))
+                .andExpect(jsonPath("$.departmentId").value(employee.getDepartmentId()))
+                .andExpect(jsonPath("$.managerId").value(employee.getManagerId().get()))
+                .andExpect(jsonPath("$.teamId").value(employee.getTeamId()))
+                .andExpect(jsonPath("$.expertisesIds").value(employee.getExpertise()));
 
     }
 
@@ -226,7 +376,14 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
         ResultActions result = mockMvc.perform(patch("/employee/" + EXISTING_EMPLOYEE_ID).contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(employee)));
         //assert
         result.andExpect(status().isOk()).andExpect(jsonPath("$.name").value(EXISTING_EMPLOYEE_NAME)) //assert the change happened
-                .andExpect(jsonPath("$.dateOfBirth").value(DATE_OF_BIRTH.toString())).andExpect(jsonPath("$.gender").value(Gender.MALE.toString())).andExpect(jsonPath("$.graduationDate").value(GRADUATION_DATE.toString())).andExpect(jsonPath("$.salary").value(SALARY)).andExpect(jsonPath("$.departmentId").value(DEPARTMENT_ID)).andExpect(jsonPath("$.managerId").isEmpty()).andExpect(jsonPath("$.teamId").value(TEAM_ID)).andExpect(jsonPath("$.expertisesIds").value(expertises));
+                .andExpect(jsonPath("$.dateOfBirth").value(DATE_OF_BIRTH.toString()))
+                .andExpect(jsonPath("$.gender").value(Gender.MALE.toString()))
+                .andExpect(jsonPath("$.graduationDate").value(GRADUATION_DATE.toString()))
+                .andExpect(jsonPath("$.salary").value(SALARY))
+                .andExpect(jsonPath("$.departmentId").value(DEPARTMENT_ID))
+                .andExpect(jsonPath("$.managerId").isEmpty())
+                .andExpect(jsonPath("$.teamId").value(TEAM_ID))
+                .andExpect(jsonPath("$.expertisesIds").value(expertises));
 
     }
 
@@ -456,13 +613,21 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
         Employee employee = employeeRepository.findById(EXISTING_EMPLOYEE_ID).get();
         LocalDate leaveDate = LocalDate.of(2000, 01, 01);
         LeaveRequestDTO leave = new LeaveRequestDTO(leaveDate);
-        double noOfadjustmentsBefore = adjustmentRepository.countByEmployeeAndDateGreaterThanEqualAndDateLessThan(employee, leaveDate, leaveDate.plusMonths(1));
+        double noOfadjustmentsBefore = adjustmentRepository.countByEmployeeAndDateGreaterThanEqualAndDateLessThan(
+                employee,
+                leaveDate,
+                leaveDate.plusMonths(1));
         //act
         ResultActions result = mockMvc.perform(post("/employee/" + EXISTING_EMPLOYEE_ID + "/leave").contentType(MediaType.APPLICATION_JSON).content(objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL).writeValueAsString(leave)));
         //assert
-        result.andExpect(status().isCreated()).andExpect(jsonPath("$.employeeId").value(EXISTING_EMPLOYEE_ID)).andExpect(jsonPath("$.date").value(leave.getDate().toString())).andExpect(jsonPath("$.id").isNotEmpty());
+        result.andExpect(status().isCreated()).andExpect(jsonPath("$.employeeId").value(EXISTING_EMPLOYEE_ID))
+                .andExpect(jsonPath("$.date").value(leave.getDate().toString()))
+                .andExpect(jsonPath("$.id").isNotEmpty());
         //assert no deduction happened
-        double noOfadjustmentsAfter = adjustmentRepository.countByEmployeeAndDateGreaterThanEqualAndDateLessThan(employee, leaveDate, leaveDate.plusMonths(1));
+        double noOfadjustmentsAfter = adjustmentRepository.countByEmployeeAndDateGreaterThanEqualAndDateLessThan(
+                employee,
+                leaveDate,
+                leaveDate.plusMonths(1));
         assertEquals(noOfadjustmentsBefore, noOfadjustmentsAfter);
 
     }
@@ -482,13 +647,21 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
             for (int i = 1; i <= maxAllowedLeaves; i++) {
                 leaveRepository.save(new Leave(null, employee, leaveDate.withDayOfMonth(i)));
             }
-            LeaveRequestDTO leave = new LeaveRequestDTO(LocalDate.of(2000, 1, 1));
-            double noOfadjustmentsBefore = adjustmentRepository.countByEmployeeAndDateGreaterThanEqualAndDateLessThan(employee, leaveDate, leaveDate.plusMonths(1));
+            LeaveRequestDTO leave = new LeaveRequestDTO(leaveDate);
+            double noOfadjustmentsBefore = adjustmentRepository.countByEmployeeAndDateGreaterThanEqualAndDateLessThan(
+                    employee,
+                    leaveDate,
+                    leaveDate.plusMonths(1));
             //act
             ResultActions result = mockMvc.perform(post("/employee/" + EXISTING_EMPLOYEE_ID + "/leave").contentType(MediaType.APPLICATION_JSON).content(objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL).writeValueAsString(leave)));
             //assert
-            result.andExpect(status().isCreated()).andExpect(jsonPath("$.employeeId").value(EXISTING_EMPLOYEE_ID)).andExpect(jsonPath("$.date").value(leave.getDate().toString())).andExpect(jsonPath("$.id").isNotEmpty());
-            double noOfadjustmentsAfter = adjustmentRepository.countByEmployeeAndDateGreaterThanEqualAndDateLessThan(employee, leaveDate, leaveDate.plusMonths(1));
+            result.andExpect(status().isCreated()).andExpect(jsonPath("$.employeeId").value(EXISTING_EMPLOYEE_ID))
+                    .andExpect(jsonPath("$.date").value(leave.getDate().toString()))
+                    .andExpect(jsonPath("$.id").isNotEmpty());
+            double noOfadjustmentsAfter = adjustmentRepository.countByEmployeeAndDateGreaterThanEqualAndDateLessThan(
+                    employee,
+                    leaveDate,
+                    leaveDate.plusMonths(1));
             //assert an adjustment (deduction) is made
             assertEquals(noOfadjustmentsBefore + 1, noOfadjustmentsAfter);
         }
@@ -511,13 +684,19 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
                 leaves.add(new Leave(null, employee, leaveDate));
             }
             leaveRepository.saveAll(leaves);
-            LeaveRequestDTO leave = new LeaveRequestDTO(LocalDate.of(2000, 1, 1));
-            double noOfadjustmentsBefore = adjustmentRepository.countByEmployeeAndDateGreaterThanEqualAndDateLessThan(employee, leaveDate, leaveDate.plusMonths(1));
+            LeaveRequestDTO leave = new LeaveRequestDTO(leaveDate);
+            double noOfadjustmentsBefore = adjustmentRepository.countByEmployeeAndDateGreaterThanEqualAndDateLessThan(
+                    employee,
+                    leaveDate,
+                    leaveDate.plusMonths(1));
             //act
             ResultActions result = mockMvc.perform(post("/employee/" + EXISTING_EMPLOYEE_ID2 + "/leave").contentType(MediaType.APPLICATION_JSON).content(objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL).writeValueAsString(leave)));
             //assert
             result.andExpect(status().isCreated()).andExpect(jsonPath("$.employeeId").value(EXISTING_EMPLOYEE_ID2)).andExpect(jsonPath("$.date").value(leave.getDate().toString())).andExpect(jsonPath("$.id").isNotEmpty());
-            double noOfadjustmentsAfter = adjustmentRepository.countByEmployeeAndDateGreaterThanEqualAndDateLessThan(employee, leaveDate, leaveDate.plusMonths(1));
+            double noOfadjustmentsAfter = adjustmentRepository.countByEmployeeAndDateGreaterThanEqualAndDateLessThan(
+                    employee,
+                    leaveDate,
+                    leaveDate.plusMonths(1));
             //assert an adjustment (deduction) is made
             assertEquals(noOfadjustmentsBefore + 1, noOfadjustmentsAfter);
         }
@@ -537,14 +716,77 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
             leaves.add(new Leave(null, employee, LocalDate.now()));
         }
         leaveRepository.saveAll(leaves);
-        LeaveRequestDTO leave = new LeaveRequestDTO(LocalDate.of(2000, 1, 1));
-        double noOfadjustmentsBefore = adjustmentRepository.countByEmployeeAndDateGreaterThanEqualAndDateLessThan(employee, leaveDate, leaveDate.plusMonths(1));
+        LeaveRequestDTO leave = new LeaveRequestDTO(leaveDate);
+        double noOfadjustmentsBefore = adjustmentRepository.countByEmployeeAndDateGreaterThanEqualAndDateLessThan(
+                employee,
+                leaveDate,
+                leaveDate.plusMonths(1));
         //act
         ResultActions result = mockMvc.perform(post("/employee/" + EXISTING_EMPLOYEE_ID2 + "/leave").contentType(MediaType.APPLICATION_JSON).content(objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL).writeValueAsString(leave)));
         //assert
         result.andExpect(status().isCreated()).andExpect(jsonPath("$.employeeId").value(EXISTING_EMPLOYEE_ID2)).andExpect(jsonPath("$.date").value(leave.getDate().toString())).andExpect(jsonPath("$.id").isNotEmpty());
-        double noOfadjustmentsAfter = adjustmentRepository.countByEmployeeAndDateGreaterThanEqualAndDateLessThan(employee, leaveDate, leaveDate.plusMonths(1));
+        double noOfadjustmentsAfter = adjustmentRepository.countByEmployeeAndDateGreaterThanEqualAndDateLessThan(
+                employee,
+                leaveDate,
+                leaveDate.plusMonths(1));
         //assert an adjustment (deduction) is made
         assertEquals(noOfadjustmentsBefore, noOfadjustmentsAfter);
+    }
+
+    @Test
+    public void addLeave_GivenLeaveInPastMonth_ShouldReturnCreatedWithDeductionInThisMonth() throws Exception {
+        prepareDB("/datasets/EmployeeController/AddLeave.xml");
+        LocalDate fixedNow = LocalDate.of(2000, 3, 1);
+
+        try (MockedStatic<LocalDate> date = Mockito.mockStatic(LocalDate.class, Mockito.CALLS_REAL_METHODS)) {
+            date.when(LocalDate::now).thenReturn(fixedNow);
+            //arrange
+            Employee employee = employeeRepository.findById(EXISTING_EMPLOYEE_ID2).get();
+            List<Leave> leaves = new ArrayList<>();
+            LocalDate leaveDate = LocalDate.of(2000, 2, 01);
+            //give the employee 30 leaves
+            int maxAllowedLeaves = 30;
+            for (int i = 1; i <= maxAllowedLeaves; i++) {
+                leaves.add(new Leave(null, employee, leaveDate));
+            }
+            leaveRepository.saveAll(leaves);
+            LeaveRequestDTO leave = new LeaveRequestDTO(leaveDate);
+            LocalDate adjustmentDate = LocalDate.now();
+            double noOfadjustmentsBefore = adjustmentRepository.countByEmployeeAndDateGreaterThanEqualAndDateLessThan(
+                    employee,
+                    adjustmentDate,
+                    adjustmentDate.plusMonths(1));
+            //act
+            ResultActions result = mockMvc.perform(post("/employee/" + EXISTING_EMPLOYEE_ID2 + "/leave").contentType(MediaType.APPLICATION_JSON).content(objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL).writeValueAsString(leave)));
+            //assert
+            result.andExpect(status().isCreated()).andExpect(jsonPath("$.employeeId").value(EXISTING_EMPLOYEE_ID2)).andExpect(jsonPath("$.date").value(leave.getDate().toString())).andExpect(jsonPath("$.id").isNotEmpty());
+            double noOfadjustmentsAfter = adjustmentRepository.countByEmployeeAndDateGreaterThanEqualAndDateLessThan(
+                    employee,
+                    adjustmentDate,
+                    adjustmentDate.plusMonths(1));
+            //assert an adjustment (deduction) is made
+            assertTrue(adjustmentRepository.existsByDate(LocalDate.now()));
+            assertEquals(noOfadjustmentsBefore + 1, noOfadjustmentsAfter);
+        }
+    }
+
+    @Test
+    public void addLeave_GivenTheLeaveInTheNextYear_ShouldReturnBadRequest() throws Exception {
+        prepareDB("/datasets/EmployeeController/AddLeave.xml");
+        LocalDate fixedNow = LocalDate.of(2000, 3, 1);
+
+        try (MockedStatic<LocalDate> date = Mockito.mockStatic(LocalDate.class, Mockito.CALLS_REAL_METHODS)) {
+            date.when(LocalDate::now).thenReturn(fixedNow);
+            //arrange
+            LocalDate leaveDate = fixedNow.plusYears(1);
+            LeaveRequestDTO leave = new LeaveRequestDTO(leaveDate);
+            //act
+            ResultActions result = mockMvc.perform(post("/employee/" + EXISTING_EMPLOYEE_ID2 + "/leave")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL).writeValueAsString(leave)));
+            //assert
+            result.andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.msg").value("You can only record leaves in the current year."));
+        }
     }
 }
