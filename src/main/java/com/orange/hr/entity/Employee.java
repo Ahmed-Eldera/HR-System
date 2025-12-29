@@ -51,4 +51,8 @@ public class Employee {
     @OneToMany(mappedBy = "manager", fetch = FetchType.LAZY)
     @JsonBackReference
     private List<Employee> subordinates;
+    @Column(name = "yoe")
+    private Integer yoe;
+    @Column(name = "hiring_date")
+    private LocalDate hiringDate;
 }

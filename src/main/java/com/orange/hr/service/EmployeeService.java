@@ -1,8 +1,6 @@
 package com.orange.hr.service;
 
-import com.orange.hr.dto.EmployeeRequestDTO;
-import com.orange.hr.dto.EmployeeResponseDTO;
-import com.orange.hr.dto.SalaryDTO;
+import com.orange.hr.dto.*;
 
 import java.util.List;
 
@@ -20,5 +18,7 @@ public interface EmployeeService {
     public List<EmployeeResponseDTO> getSubordinates(Integer id);
 
     public List<EmployeeResponseDTO> getDirectSubordinates(Integer managerId);
+
+    public LeaveResponseDTO addLeave(Integer employeeId, LeaveRequestDTO requestDTO);
 
 }

@@ -1,19 +1,10 @@
 package com.orange.hr.service.impl;
 
-import com.orange.hr.dto.EmployeeHierarchyProjection;
-import com.orange.hr.dto.EmployeeRequestDTO;
-import com.orange.hr.dto.EmployeeResponseDTO;
-import com.orange.hr.dto.SalaryDTO;
-import com.orange.hr.entity.Department;
-import com.orange.hr.entity.Employee;
-import com.orange.hr.entity.Expertise;
-import com.orange.hr.entity.Team;
+import com.orange.hr.dto.*;
+import com.orange.hr.entity.*;
 import com.orange.hr.exceptions.*;
 import com.orange.hr.mapper.EmployeeMapper;
-import com.orange.hr.repository.DepartmentRepository;
-import com.orange.hr.repository.EmployeeRepository;
-import com.orange.hr.repository.ExpertiseRepository;
-import com.orange.hr.repository.TeamRepository;
+import com.orange.hr.repository.*;
 import com.orange.hr.service.EmployeeService;
 import jakarta.persistence.EntityManager;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 @Transactional
@@ -39,6 +31,10 @@ public class EmployeeServiceImpl implements EmployeeService {
     private EmployeeMapper employeeMapper;
     @Autowired
     private EntityManager entityManager;
+    @Autowired
+    private LeaveRepository leaveRepository;
+    @Autowired
+    private AdjustmentRepository adjustmentRepository;
 
 
     public EmployeeResponseDTO addEmployee(EmployeeRequestDTO employee) {
@@ -170,5 +166,31 @@ public class EmployeeServiceImpl implements EmployeeService {
         List<Employee> subs = employeeRepository.findByManager(manager);
         List<EmployeeResponseDTO> response = subs.stream().map(employeeMapper::toDTO).toList();
         return response;
+    }
+
+    @Override
+    public LeaveResponseDTO addLeave(Integer employeeId, LeaveRequestDTO requestDTO) {
+        if (requestDTO.getDate().getYear() > LocalDate.now().getYear()) {
+            throw new InValidDateException(HttpStatus.BAD_REQUEST, "You can only record leaves in the current year.");
+        }
+        Employee employee = employeeRepository.findById(employeeId).orElseThrow(() -> new NoSuchEmployeeException(HttpStatus.NOT_FOUND, "Can't find selected employee."));
+        LocalDate yearStart = LocalDate.of(LocalDate.now().getYear(), 01, 01);
+        LocalDate yearEnd = yearStart.plusYears(1);
+        Leave leave = leaveRepository.saveAndFlush(new Leave(null, employee, requestDTO.getDate()));
+        long totalLeaves = leaveRepository.countByEmployeeAndDateGreaterThanEqualAndDateLessThan(
+                employee,
+                yearStart,
+                yearEnd);
+        long noOfYears = employee.getYoe() + ChronoUnit.YEARS.between(employee.getHiringDate(), LocalDate.now());
+        int maxAllowedLeavesForJuniors = 21;
+        int maxAllowedLeavesForSeniors = 30;
+        int seniorMinYoe = 10;
+        if ((totalLeaves > maxAllowedLeavesForJuniors && noOfYears < seniorMinYoe) || totalLeaves > maxAllowedLeavesForSeniors) {
+            double deductionAmount = -500d;
+            LocalDate adjustmentDate = leave.getDate().isAfter(LocalDate.now()) ? leave.getDate() : LocalDate.now();
+            Adjustment adjustment = new Adjustment(null, employee, deductionAmount, adjustmentDate);
+            adjustmentRepository.save(adjustment);
+        }
+        return new LeaveResponseDTO(leave.getLeaveID(), employeeId, requestDTO.getDate());
     }
 }

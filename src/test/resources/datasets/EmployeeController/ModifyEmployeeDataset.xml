@@ -15,6 +15,8 @@
             department_id="1"
             team_id="1"
             manager_id="2"
+            hiring_date="2000-01-01"
+            yoe="30"
     />
     <employees
             employee_id="2"
@@ -25,6 +27,8 @@
             salary="2000"
             department_id="1"
             team_id="1"
+            hiring_date="2000-01-01"
+            yoe="30"
     />
 
     <expertises expertise_id="1" name="java"/>
