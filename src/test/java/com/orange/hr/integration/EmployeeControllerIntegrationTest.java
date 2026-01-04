@@ -629,8 +629,8 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
     @Test
     public void addLeave_GivenValidDate_ShouldReturnCreated() throws Exception {
         prepareDB("/datasets/EmployeeController/AddLeave.xml");
+        //mocking
         LocalDate fixedNow = LocalDate.of(2000, 1, 1);
-
         try (MockedStatic<LocalDate> date = Mockito.mockStatic(LocalDate.class, Mockito.CALLS_REAL_METHODS)) {
             date.when(LocalDate::now).thenReturn(fixedNow);
             //arrange
@@ -652,8 +652,8 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
     @Test
     public void addLeave_GivenInValidDate_ShouldReturnBadRequest() throws Exception {
         prepareDB("/datasets/EmployeeController/AddLeave.xml");
+        //mocking
         LocalDate fixedNow = LocalDate.of(2000, 1, 1);
-
         try (MockedStatic<LocalDate> date = Mockito.mockStatic(LocalDate.class, Mockito.CALLS_REAL_METHODS)) {
             date.when(LocalDate::now).thenReturn(fixedNow);
             //arrange
@@ -669,8 +669,8 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
     @Test
     public void addLeave_GivenInValidEmployee_ShouldReturnNotFound() throws Exception {
         prepareDB("/datasets/EmployeeController/AddLeave.xml");
+        //mocking
         LocalDate fixedNow = LocalDate.of(2000, 1, 1);
-
         try (MockedStatic<LocalDate> date = Mockito.mockStatic(LocalDate.class, Mockito.CALLS_REAL_METHODS)) {
             date.when(LocalDate::now).thenReturn(fixedNow);
             //arrange

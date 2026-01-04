@@ -168,6 +168,6 @@ public class EmployeeServiceImpl implements EmployeeService {
         }
         Employee employee = employeeRepository.findById(employeeId).orElseThrow(() -> new NoSuchEmployeeException(HttpStatus.NOT_FOUND, "Can't find selected employee."));
         Leave leave = leaveRepository.save(new Leave(null, employee, requestDTO.getDate(), null));
-        return new LeaveResponseDTO(leave.getLeaveID(), employeeId, requestDTO.getDate());
+        return new LeaveResponseDTO(leave.getLeaveID(), employeeId, leave.getDate(), leave.getCreatedAt());
     }
 }
