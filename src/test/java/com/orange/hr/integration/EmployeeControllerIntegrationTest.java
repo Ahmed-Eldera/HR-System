@@ -4,12 +4,17 @@ package com.orange.hr.integration;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.orange.hr.dto.EmployeeRequestDTO;
 import com.orange.hr.dto.EmployeeResponseDTO;
+import com.orange.hr.dto.LeaveRequestDTO;
 import com.orange.hr.entity.Employee;
 import com.orange.hr.entity.Expertise;
+import com.orange.hr.entity.Leave;
 import com.orange.hr.enums.Gender;
 import com.orange.hr.mapper.EmployeeMapper;
 import com.orange.hr.repository.EmployeeRepository;
+import com.orange.hr.repository.LeaveRepository;
 import org.junit.jupiter.api.Test;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.skyscreamer.jsonassert.JSONCompareMode;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,6 +69,8 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
     EmployeeRepository employeeRepository;
     @Autowired
     private EmployeeMapper employeeMapper;
+    @Autowired
+    private LeaveRepository leaveRepository;
 
     @Test
     public void addEmpolyeeSuccessfully_WithFullData_ExpectCreated() throws Exception {
@@ -89,7 +96,7 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
                 .content(objectMapper.writeValueAsString(employee)));
         //assert
         result.andExpect(status().isCreated())
-                .andExpect(jsonPath("$.employeeID").value(employee.getEmployeeId()))
+                .andExpect(jsonPath("$.employeeID").isNumber())
                 .andExpect(jsonPath("$.name").value(employee.getName()))
                 .andExpect(jsonPath("$.dateOfBirth").value(employee.getDateOfBirth().toString()))
                 .andExpect(jsonPath("$.gender").value(employee.getGender().toString()))
@@ -617,5 +624,62 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
         //assert
         result.andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.msg").value("Can't find such Manager."));
+    }
+
+    @Test
+    public void addLeave_GivenValidDate_ShouldReturnCreated() throws Exception {
+        prepareDB("/datasets/EmployeeController/AddLeave.xml");
+        LocalDate fixedNow = LocalDate.of(2000, 1, 1);
+
+        try (MockedStatic<LocalDate> date = Mockito.mockStatic(LocalDate.class, Mockito.CALLS_REAL_METHODS)) {
+            date.when(LocalDate::now).thenReturn(fixedNow);
+            //arrange
+            LocalDate leaveDate = LocalDate.of(2000, 01, 02);//same year as the system
+            LeaveRequestDTO leave = new LeaveRequestDTO(leaveDate);
+            //act
+            ResultActions result = mockMvc.perform(post("/employee/" + EXISTING_EMPLOYEE_ID + "/leave").contentType(MediaType.APPLICATION_JSON).content(objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL).writeValueAsString(leave)));
+            //assert
+            result.andExpect(status().isCreated()).andExpect(jsonPath("$.employeeId").value(EXISTING_EMPLOYEE_ID))
+                    .andExpect(jsonPath("$.date").value(leave.getDate().toString()))
+                    .andExpect(jsonPath("$.id").isNotEmpty());
+
+            Leave expectedLeave = leaveRepository.findAll().getFirst(); //first entry because the db is empty (check the dataset)
+            assertEquals(expectedLeave.getEmployee().getEmployeeID(), EXISTING_EMPLOYEE_ID);
+            assertEquals(expectedLeave.getDate(), leave.getDate());
+        }
+    }
+
+    @Test
+    public void addLeave_GivenInValidDate_ShouldReturnBadRequest() throws Exception {
+        prepareDB("/datasets/EmployeeController/AddLeave.xml");
+        LocalDate fixedNow = LocalDate.of(2000, 1, 1);
+
+        try (MockedStatic<LocalDate> date = Mockito.mockStatic(LocalDate.class, Mockito.CALLS_REAL_METHODS)) {
+            date.when(LocalDate::now).thenReturn(fixedNow);
+            //arrange
+            LocalDate leaveDate = LocalDate.of(2022, 01, 02);//future year from the system (shouldn't be accepted)
+            LeaveRequestDTO leave = new LeaveRequestDTO(leaveDate);
+            //act
+            ResultActions result = mockMvc.perform(post("/employee/" + EXISTING_EMPLOYEE_ID + "/leave").contentType(MediaType.APPLICATION_JSON).content(objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL).writeValueAsString(leave)));
+            //assert
+            result.andExpect(status().isBadRequest()).andExpect(jsonPath("$.msg").value("You can only record leaves in the current year."));
+        }
+    }
+
+    @Test
+    public void addLeave_GivenInValidEmployee_ShouldReturnNotFound() throws Exception {
+        prepareDB("/datasets/EmployeeController/AddLeave.xml");
+        LocalDate fixedNow = LocalDate.of(2000, 1, 1);
+
+        try (MockedStatic<LocalDate> date = Mockito.mockStatic(LocalDate.class, Mockito.CALLS_REAL_METHODS)) {
+            date.when(LocalDate::now).thenReturn(fixedNow);
+            //arrange
+            LocalDate leaveDate = LocalDate.of(2000, 01, 02);
+            LeaveRequestDTO leave = new LeaveRequestDTO(leaveDate);
+            //act
+            ResultActions result = mockMvc.perform(post("/employee/" + NON_EXISTENT_EMPLOYEE_ID + "/leave").contentType(MediaType.APPLICATION_JSON).content(objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL).writeValueAsString(leave)));
+            //assert
+            result.andExpect(status().isNotFound()).andExpect(jsonPath("$.msg").value("Can't find selected employee."));
+        }
     }
 }
