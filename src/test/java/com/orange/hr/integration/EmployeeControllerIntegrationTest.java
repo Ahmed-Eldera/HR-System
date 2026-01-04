@@ -637,13 +637,16 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
             LocalDate leaveDate = LocalDate.of(2000, 01, 02);//same year as the system
             LeaveRequestDTO leave = new LeaveRequestDTO(leaveDate);
             //act
-            ResultActions result = mockMvc.perform(post("/employee/" + EXISTING_EMPLOYEE_ID + "/leave").contentType(MediaType.APPLICATION_JSON).content(objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL).writeValueAsString(leave)));
+            ResultActions result = mockMvc.perform(post("/employee/" + EXISTING_EMPLOYEE_ID + "/leave")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL)
+                            .writeValueAsString(leave)));
             //assert
             result.andExpect(status().isCreated()).andExpect(jsonPath("$.employeeId").value(EXISTING_EMPLOYEE_ID))
                     .andExpect(jsonPath("$.date").value(leave.getDate().toString()))
                     .andExpect(jsonPath("$.id").isNotEmpty());
 
-            Leave expectedLeave = leaveRepository.findAll().getFirst(); //first entry because the db is empty (check the dataset)
+            Leave expectedLeave = leaveRepository.findAll().getFirst();//1st entry because db is empty (check dataset)
             assertEquals(expectedLeave.getEmployee().getEmployeeID(), EXISTING_EMPLOYEE_ID);
             assertEquals(expectedLeave.getDate(), leave.getDate());
         }
@@ -660,9 +663,13 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
             LocalDate leaveDate = LocalDate.of(2022, 01, 02);//future year from the system (shouldn't be accepted)
             LeaveRequestDTO leave = new LeaveRequestDTO(leaveDate);
             //act
-            ResultActions result = mockMvc.perform(post("/employee/" + EXISTING_EMPLOYEE_ID + "/leave").contentType(MediaType.APPLICATION_JSON).content(objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL).writeValueAsString(leave)));
+            ResultActions result = mockMvc.perform(post("/employee/" + EXISTING_EMPLOYEE_ID + "/leave")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL)
+                            .writeValueAsString(leave)));
             //assert
-            result.andExpect(status().isBadRequest()).andExpect(jsonPath("$.msg").value("You can only record leaves in the current year."));
+            result.andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.msg").value("You can only record leaves in the current year."));
         }
     }
 
@@ -677,9 +684,13 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
             LocalDate leaveDate = LocalDate.of(2000, 01, 02);
             LeaveRequestDTO leave = new LeaveRequestDTO(leaveDate);
             //act
-            ResultActions result = mockMvc.perform(post("/employee/" + NON_EXISTENT_EMPLOYEE_ID + "/leave").contentType(MediaType.APPLICATION_JSON).content(objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL).writeValueAsString(leave)));
+            ResultActions result = mockMvc.perform(post("/employee/" + NON_EXISTENT_EMPLOYEE_ID + "/leave")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL)
+                            .writeValueAsString(leave)));
             //assert
-            result.andExpect(status().isNotFound()).andExpect(jsonPath("$.msg").value("Can't find selected employee."));
+            result.andExpect(status().isNotFound())
+                    .andExpect(jsonPath("$.msg").value("Can't find selected employee."));
         }
     }
 }
