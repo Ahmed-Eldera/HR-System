@@ -170,4 +170,10 @@ public class EmployeeServiceImpl implements EmployeeService {
         Leave leave = leaveRepository.save(new Leave(null, employee, requestDTO.getDate(), null));
         return new LeaveResponseDTO(leave.getLeaveID(), employeeId, leave.getDate(), leave.getCreatedAt());
     }
+
+    @Override
+    public BonusResponseDTO addBonus(Integer employeeId, BonusRequestDTO requestDTO) {
+        Employee employee = employeeRepository.findById(employeeId).orElseThrow(() -> new NoSuchEmployeeException(HttpStatus.NOT_FOUND, "No Such Employee."));
+
+    }
 }
