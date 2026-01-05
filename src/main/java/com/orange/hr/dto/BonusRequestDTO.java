@@ -9,6 +9,6 @@ import lombok.Setter;
 @Getter
 @AllArgsConstructor
 public class BonusRequestDTO {
-    @Positive
+    @Positive(message = "amount can't be negative.")
     Double amount;
 }

@@ -6,11 +6,13 @@ import com.orange.hr.dto.BonusRequestDTO;
 import com.orange.hr.dto.EmployeeRequestDTO;
 import com.orange.hr.dto.EmployeeResponseDTO;
 import com.orange.hr.dto.LeaveRequestDTO;
+import com.orange.hr.entity.Adjustment;
 import com.orange.hr.entity.Employee;
 import com.orange.hr.entity.Expertise;
 import com.orange.hr.entity.Leave;
 import com.orange.hr.enums.Gender;
 import com.orange.hr.mapper.EmployeeMapper;
+import com.orange.hr.repository.AdjustmentRepository;
 import com.orange.hr.repository.EmployeeRepository;
 import com.orange.hr.repository.LeaveRepository;
 import org.junit.jupiter.api.Test;
@@ -72,6 +74,8 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
     private EmployeeMapper employeeMapper;
     @Autowired
     private LeaveRepository leaveRepository;
+    @Autowired
+    private AdjustmentRepository adjustmentRepository;
 
     @Test
     public void addEmpolyeeSuccessfully_WithFullData_ExpectCreated() throws Exception {
@@ -704,22 +708,55 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
         prepareDB("/datasets/EmployeeController/AddBonus.xml");
 
         //arrange
-        Double BonusAmount = 500d;
-        BonusRequestDTO bonus = new BonusRequestDTO(BonusAmount);
+        Double bonusAmount = 500d;
+        BonusRequestDTO bonus = new BonusRequestDTO(bonusAmount);
         //act
         ResultActions result = mockMvc.perform(post("/employee/" + EXISTING_EMPLOYEE_ID + "/bonus")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL)
                         .writeValueAsString(bonus)));
-        System.out.println(result.andReturn().getResponse().getContentAsString());
         //assert
         result.andExpect(status().isCreated())
                 .andExpect(jsonPath("$.id").isNumber())
                 .andExpect(jsonPath("$.employeeId").value(EXISTING_EMPLOYEE_ID))
-                .andExpect(jsonPath("$.amount").value(BonusAmount))
+                .andExpect(jsonPath("$.amount").value(bonusAmount))
                 .andExpect(jsonPath("$.createdAt").isNotEmpty());
+        List<Adjustment> totalAdjustment = adjustmentRepository.findAll();
+        Integer noOfInsertedBonuses = 1;
+        assertEquals(noOfInsertedBonuses, totalAdjustment.size());
+    }
 
+    @Test
+    public void addBonus_GivenInValidEmployee_ShouldReturnNotFound() throws Exception {
+        prepareDB("/datasets/EmployeeController/AddBonus.xml");
 
+        //arrange
+        Double bonusAmount = 500d;
+        BonusRequestDTO bonus = new BonusRequestDTO(bonusAmount);
+        //act
+        ResultActions result = mockMvc.perform(post("/employee/" + NON_EXISTENT_EMPLOYEE_ID + "/bonus")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL)
+                        .writeValueAsString(bonus)));
+        //assert
+        result.andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.msg").value("No Such Employee."));
+    }
+
+    public void addBonus_GivenNegativeAmount_ShouldReturnNotFound() throws Exception {
+        prepareDB("/datasets/EmployeeController/AddBonus.xml");
+
+        //arrange
+        Double bonusAmount = -500d;
+        BonusRequestDTO bonus = new BonusRequestDTO(bonusAmount);
+        //act
+        ResultActions result = mockMvc.perform(post("/employee/" + EXISTING_EMPLOYEE_ID + "/bonus")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL)
+                        .writeValueAsString(bonus)));
+        //assert
+        result.andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("amount can't be negative."));
     }
 }
 

@@ -185,7 +185,11 @@ public class EmployeeServiceImpl implements EmployeeService {
                 .employee(employee)
                 .build();
         adjustmentRepository.save(bonus);
-        BonusResponseDTO response = new BonusResponseDTO(bonus.getAdjustmentId(), employeeId, bonus.getAmount(), bonus.getCreatedAt().toLocalDate());
+        BonusResponseDTO response = new BonusResponseDTO(
+                bonus.getAdjustmentId(),
+                employeeId,
+                bonus.getAmount(),
+                bonus.getCreatedAt().toLocalDate());
         return response;
     }
 }
