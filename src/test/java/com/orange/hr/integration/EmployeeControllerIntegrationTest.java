@@ -646,10 +646,10 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
                     .andExpect(jsonPath("$.date").value(leave.getDate().toString()))
                     .andExpect(jsonPath("$.id").isNumber())
                     .andExpect(jsonPath("$.createdAt").isNotEmpty());
-            List<Leave> TotalLeaves = leaveRepository.findAll();
+            List<Leave> totalLeaves = leaveRepository.findAll();
             Integer numberOfInsertedLeaves = 1;
-            assertEquals(numberOfInsertedLeaves, TotalLeaves.size());
-            Leave expectedLeave = TotalLeaves.getFirst();//1st entry because db is empty (check dataset)
+            assertEquals(numberOfInsertedLeaves, totalLeaves.size());
+            Leave expectedLeave = totalLeaves.getFirst();//1st entry because db is empty (check dataset)
             assertEquals(expectedLeave.getEmployee().getEmployeeID(), EXISTING_EMPLOYEE_ID);
             assertEquals(expectedLeave.getDate(), leave.getDate());
         }
