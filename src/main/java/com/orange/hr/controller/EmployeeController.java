@@ -70,7 +70,7 @@ public class EmployeeController {
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
-    @PostMapping("/{Id}/leave")
+    @PostMapping("/{Id}/bonus")
     public ResponseEntity<BonusResponseDTO> addBonus(@PathVariable("Id") Integer employeeId, @RequestBody @Valid BonusRequestDTO request) {
         BonusResponseDTO response = employeeService.addBonus(employeeId, request);
         return new ResponseEntity<>(response, HttpStatus.CREATED);

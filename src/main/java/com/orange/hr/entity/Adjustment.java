@@ -5,8 +5,10 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.GenerationTime;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "salary_adjustments")
@@ -14,6 +16,7 @@ import java.time.LocalDate;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
+@DynamicInsert
 public class Adjustment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,7 +28,10 @@ public class Adjustment {
     private Employee employee;
 
     private Double amount;
-    @Column(name = "adjustment_date")
-    private LocalDate date;
+
+    @org.hibernate.annotations.Generated(GenerationTime.INSERT)
+    @Column(name = "created_at", nullable = false)
+    private LocalDateTime createdAt;
+
 
 }

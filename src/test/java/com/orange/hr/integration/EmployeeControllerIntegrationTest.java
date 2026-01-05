@@ -2,6 +2,7 @@ package com.orange.hr.integration;
 
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.orange.hr.dto.BonusRequestDTO;
 import com.orange.hr.dto.EmployeeRequestDTO;
 import com.orange.hr.dto.EmployeeResponseDTO;
 import com.orange.hr.dto.LeaveRequestDTO;
@@ -693,4 +694,29 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
                     .andExpect(jsonPath("$.msg").value("Can't find selected employee."));
         }
     }
+
+
+    @Test
+    public void addBonus_GivenValidAmount_ShouldReturnCreated() throws Exception {
+        prepareDB("/datasets/EmployeeController/AddBonus.xml");
+
+        //arrange
+        Double BonusAmount = 500d;
+        BonusRequestDTO bonus = new BonusRequestDTO(BonusAmount);
+        //act
+        ResultActions result = mockMvc.perform(post("/employee/" + EXISTING_EMPLOYEE_ID + "/bonus")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL)
+                        .writeValueAsString(bonus)));
+        System.out.println(result.andReturn().getResponse().getContentAsString());
+        //assert
+        result.andExpect(status().isCreated())
+                .andExpect(jsonPath("$.id").isNumber())
+                .andExpect(jsonPath("$.employeeId").value(EXISTING_EMPLOYEE_ID))
+                .andExpect(jsonPath("$.amount").value(BonusAmount))
+                .andExpect(jsonPath("$.createdAt").isNotEmpty());
+
+
+    }
 }
+

@@ -29,6 +29,8 @@ public class EmployeeServiceImpl implements EmployeeService {
     private EmployeeMapper employeeMapper;
     @Autowired
     private LeaveRepository leaveRepository;
+    @Autowired
+    private AdjustmentRepository adjustmentRepository;
 
     public EmployeeResponseDTO addEmployee(EmployeeRequestDTO employee) {
         // validating the input data
@@ -168,12 +170,14 @@ public class EmployeeServiceImpl implements EmployeeService {
         }
         Employee employee = employeeRepository.findById(employeeId).orElseThrow(() -> new NoSuchEmployeeException(HttpStatus.NOT_FOUND, "Can't find selected employee."));
         Leave leave = leaveRepository.save(new Leave(null, employee, requestDTO.getDate(), null));
-        return new LeaveResponseDTO(leave.getLeaveID(), employeeId, leave.getDate(), leave.getCreatedAt());
+        return new LeaveResponseDTO(leave.getLeaveID(), employeeId, leave.getDate(), leave.getCreatedAt().toLocalDate());
     }
 
     @Override
     public BonusResponseDTO addBonus(Integer employeeId, BonusRequestDTO requestDTO) {
         Employee employee = employeeRepository.findById(employeeId).orElseThrow(() -> new NoSuchEmployeeException(HttpStatus.NOT_FOUND, "No Such Employee."));
-
+        Adjustment bonus = adjustmentRepository.saveAndFlush(new Adjustment(null, employee, requestDTO.getAmount(), null));
+        BonusResponseDTO response = new BonusResponseDTO(bonus.getAdjustmentId(), employeeId, bonus.getAmount(), bonus.getCreatedAt().toLocalDate());
+        return response;
     }
 }
