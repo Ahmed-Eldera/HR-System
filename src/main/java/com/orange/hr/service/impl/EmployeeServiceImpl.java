@@ -180,7 +180,11 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Override
     public BonusResponseDTO addBonus(Integer employeeId, BonusRequestDTO requestDTO) {
         Employee employee = employeeRepository.findById(employeeId).orElseThrow(() -> new NoSuchEmployeeException(HttpStatus.NOT_FOUND, "No Such Employee."));
-        Adjustment bonus = adjustmentRepository.saveAndFlush(new Adjustment(null, employee, requestDTO.getAmount(), null));
+        Adjustment bonus = Adjustment.builder()
+                .amount(requestDTO.getAmount())
+                .employee(employee)
+                .build();
+        adjustmentRepository.save(bonus);
         BonusResponseDTO response = new BonusResponseDTO(bonus.getAdjustmentId(), employeeId, bonus.getAmount(), bonus.getCreatedAt().toLocalDate());
         return response;
     }
