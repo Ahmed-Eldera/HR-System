@@ -14,14 +14,4 @@ public class BonusResponseDTO {
     Integer employeeId;
     Double amount;
     LocalDate createdAt;
-
-    @Override
-    public String toString() {
-        return "BonusResponseDTO{" +
-                "id=" + id +
-                ", employeeId=" + employeeId +
-                ", amount=" + amount +
-                ", createdAt=" + createdAt +
-                '}';
-    }
 }
