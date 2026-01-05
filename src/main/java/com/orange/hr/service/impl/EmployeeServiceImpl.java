@@ -167,7 +167,11 @@ public class EmployeeServiceImpl implements EmployeeService {
             throw new InValidDateException(HttpStatus.BAD_REQUEST, "You can only record leaves in the current year.");
         }
         Employee employee = employeeRepository.findById(employeeId).orElseThrow(() -> new NoSuchEmployeeException(HttpStatus.NOT_FOUND, "Can't find selected employee."));
-        Leave leave = leaveRepository.save(new Leave(null, employee, requestDTO.getDate(), null));
+        Leave leave = Leave.builder()
+                .employee(employee)
+                .date(requestDTO.getDate())
+                .build();
+        leaveRepository.save(leave);
         return new LeaveResponseDTO(leave.getLeaveID(), employeeId, leave.getDate(), leave.getCreatedAt());
     }
 }
