@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Setter
 @Getter
@@ -13,5 +14,5 @@ public class LeaveResponseDTO {
     Integer id;
     Integer employeeId;
     LocalDate date;
-    LocalDate createdAt;
+    LocalDateTime createdAt;
 }
