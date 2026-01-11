@@ -2,8 +2,8 @@ package com.orange.hr.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.DynamicInsert;
-import org.hibernate.annotations.GenerationTime;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.SourceType;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -14,7 +14,6 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Entity
 @Table(name = "leaves")
-@DynamicInsert
 @Builder
 public class Leave {
     @Id
@@ -29,7 +28,7 @@ public class Leave {
     @Column(name = "leave_date", nullable = false)
     private LocalDate date;
 
-    @org.hibernate.annotations.Generated(GenerationTime.INSERT)
+    @CreationTimestamp(source = SourceType.DB)
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 }
