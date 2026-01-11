@@ -1,8 +1,6 @@
 package com.orange.hr.controller;
 
-import com.orange.hr.dto.EmployeeRequestDTO;
-import com.orange.hr.dto.EmployeeResponseDTO;
-import com.orange.hr.dto.SalaryDTO;
+import com.orange.hr.dto.*;
 import com.orange.hr.service.EmployeeService;
 import com.orange.hr.validation.Always;
 import jakarta.validation.Valid;
@@ -64,5 +62,11 @@ public class EmployeeController {
     public ResponseEntity<List<EmployeeResponseDTO>> getDirectSubordinates(@RequestParam("managerId") Integer managerId) {
         List<EmployeeResponseDTO> response = employeeService.getDirectSubordinates(managerId);
         return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @PostMapping("/{Id}/leave")
+    public ResponseEntity<LeaveResponseDTO> addLeave(@PathVariable("Id") Integer employeeId, @RequestBody @Valid LeaveRequestDTO request) {
+        LeaveResponseDTO response = employeeService.addLeave(employeeId, request);
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 }
