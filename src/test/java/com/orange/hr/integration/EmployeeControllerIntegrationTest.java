@@ -759,5 +759,21 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
         result.andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("amount can't be negative."));
     }
+
+    @Test
+    public void addRaise_GivenValidData_ShouldReturnCreated() throws Exception {
+        prepareDB("/datasets/EmployeeController/AddBonus.xml");
+        //arrange
+        Double raisePercentage = 20d;
+        //act
+        ResultActions result = mockMvc.perform(post("/employee/" + EXISTING_EMPLOYEE_ID + "/raise")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL)
+                        .writeValueAsString(raisePercentage)));
+        //assert
+        String expectedMsg = raisePercentage + " raise added to employee " + EXISTING_EMPLOYEE_ID;
+        result.andExpect(status().isCreated())
+                .andExpect(jsonPath("$.message").value(expectedMsg));
+    }
 }
 
