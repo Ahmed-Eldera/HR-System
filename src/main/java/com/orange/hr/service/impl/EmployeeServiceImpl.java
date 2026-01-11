@@ -30,7 +30,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Autowired
     private LeaveRepository leaveRepository;
     @Autowired
-    private AdjustmentRepository adjustmentRepository;
+    private SalaryAdjustmentRepository salaryAdjustmentRepository;
 
     public EmployeeResponseDTO addEmployee(EmployeeRequestDTO employee) {
         // validating the input data
@@ -174,22 +174,32 @@ public class EmployeeServiceImpl implements EmployeeService {
                 .date(requestDTO.getDate())
                 .build();
         leaveRepository.save(leave);
-        return new LeaveResponseDTO(leave.getLeaveID(), employeeId, leave.getDate(), leave.getCreatedAt());
+
+        return LeaveResponseDTO.builder()
+                .id(leave.getLeaveID())
+                .employeeId(employeeId)
+                .date(leave.getDate())
+                .createdAt(leave.getCreatedAt())
+                .build();
     }
 
     @Override
     public BonusResponseDTO addBonus(Integer employeeId, BonusRequestDTO requestDTO) {
         Employee employee = employeeRepository.findById(employeeId).orElseThrow(() -> new NoSuchEmployeeException(HttpStatus.NOT_FOUND, "No Such Employee."));
-        Adjustment bonus = Adjustment.builder()
+
+        SalaryAdjustment bonus = SalaryAdjustment.builder()
                 .amount(requestDTO.getAmount())
                 .employee(employee)
                 .build();
-        adjustmentRepository.save(bonus);
-        BonusResponseDTO response = new BonusResponseDTO(
-                bonus.getAdjustmentId(),
-                employeeId,
-                bonus.getAmount(),
-                bonus.getCreatedAt().toLocalDate());
+        salaryAdjustmentRepository.save(bonus);
+
+        BonusResponseDTO response = BonusResponseDTO.builder()
+                .id(bonus.getAdjustmentId())
+                .employeeId(employeeId)
+                .amount(bonus.getAmount())
+                .createdAt(bonus.getCreatedAt().toLocalDate())
+                .build();
+
         return response;
     }
 }

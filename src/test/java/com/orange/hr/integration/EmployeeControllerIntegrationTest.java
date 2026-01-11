@@ -6,15 +6,15 @@ import com.orange.hr.dto.BonusRequestDTO;
 import com.orange.hr.dto.EmployeeRequestDTO;
 import com.orange.hr.dto.EmployeeResponseDTO;
 import com.orange.hr.dto.LeaveRequestDTO;
-import com.orange.hr.entity.Adjustment;
 import com.orange.hr.entity.Employee;
 import com.orange.hr.entity.Expertise;
 import com.orange.hr.entity.Leave;
+import com.orange.hr.entity.SalaryAdjustment;
 import com.orange.hr.enums.Gender;
 import com.orange.hr.mapper.EmployeeMapper;
-import com.orange.hr.repository.AdjustmentRepository;
 import com.orange.hr.repository.EmployeeRepository;
 import com.orange.hr.repository.LeaveRepository;
+import com.orange.hr.repository.SalaryAdjustmentRepository;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
@@ -75,7 +75,7 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
     @Autowired
     private LeaveRepository leaveRepository;
     @Autowired
-    private AdjustmentRepository adjustmentRepository;
+    private SalaryAdjustmentRepository salaryAdjustmentRepository;
 
     @Test
     public void addEmpolyeeSuccessfully_WithFullData_ExpectCreated() throws Exception {
@@ -721,9 +721,9 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
                 .andExpect(jsonPath("$.employeeId").value(EXISTING_EMPLOYEE_ID))
                 .andExpect(jsonPath("$.amount").value(bonusAmount))
                 .andExpect(jsonPath("$.createdAt").isNotEmpty());
-        List<Adjustment> totalAdjustment = adjustmentRepository.findAll();
+        List<SalaryAdjustment> totalSalaryAdjustment = salaryAdjustmentRepository.findAll();
         Integer noOfInsertedBonuses = 1;
-        assertEquals(noOfInsertedBonuses, totalAdjustment.size());
+        assertEquals(noOfInsertedBonuses, totalSalaryAdjustment.size());
     }
 
     @Test
@@ -743,7 +743,8 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
                 .andExpect(jsonPath("$.msg").value("No Such Employee."));
     }
 
-    public void addBonus_GivenNegativeAmount_ShouldReturnNotFound() throws Exception {
+    @Test
+    public void addBonus_GivenNegativeAmount_ShouldReturnBadRequest() throws Exception {
         prepareDB("/datasets/EmployeeController/AddBonus.xml");
 
         //arrange
