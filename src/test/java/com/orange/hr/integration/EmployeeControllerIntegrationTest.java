@@ -2,16 +2,19 @@ package com.orange.hr.integration;
 
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.orange.hr.dto.BonusRequestDTO;
 import com.orange.hr.dto.EmployeeRequestDTO;
 import com.orange.hr.dto.EmployeeResponseDTO;
 import com.orange.hr.dto.LeaveRequestDTO;
 import com.orange.hr.entity.Employee;
 import com.orange.hr.entity.Expertise;
 import com.orange.hr.entity.Leave;
+import com.orange.hr.entity.SalaryAdjustment;
 import com.orange.hr.enums.Gender;
 import com.orange.hr.mapper.EmployeeMapper;
 import com.orange.hr.repository.EmployeeRepository;
 import com.orange.hr.repository.LeaveRepository;
+import com.orange.hr.repository.SalaryAdjustmentRepository;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
@@ -71,6 +74,8 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
     private EmployeeMapper employeeMapper;
     @Autowired
     private LeaveRepository leaveRepository;
+    @Autowired
+    private SalaryAdjustmentRepository salaryAdjustmentRepository;
 
     @Test
     public void addEmpolyeeSuccessfully_WithFullData_ExpectCreated() throws Exception {
@@ -696,4 +701,63 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
                     .andExpect(jsonPath("$.msg").value("Can't find selected employee."));
         }
     }
+
+
+    @Test
+    public void addBonus_GivenValidAmount_ShouldReturnCreated() throws Exception {
+        prepareDB("/datasets/EmployeeController/AddBonus.xml");
+
+        //arrange
+        Double bonusAmount = 500d;
+        BonusRequestDTO bonus = new BonusRequestDTO(bonusAmount);
+        //act
+        ResultActions result = mockMvc.perform(post("/employee/" + EXISTING_EMPLOYEE_ID + "/bonus")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL)
+                        .writeValueAsString(bonus)));
+        //assert
+        result.andExpect(status().isCreated())
+                .andExpect(jsonPath("$.id").isNumber())
+                .andExpect(jsonPath("$.employeeId").value(EXISTING_EMPLOYEE_ID))
+                .andExpect(jsonPath("$.amount").value(bonusAmount))
+                .andExpect(jsonPath("$.createdAt").isNotEmpty());
+        List<SalaryAdjustment> totalSalaryAdjustment = salaryAdjustmentRepository.findAll();
+        Integer noOfInsertedBonuses = 1;
+        assertEquals(noOfInsertedBonuses, totalSalaryAdjustment.size());
+    }
+
+    @Test
+    public void addBonus_GivenInValidEmployee_ShouldReturnNotFound() throws Exception {
+        prepareDB("/datasets/EmployeeController/AddBonus.xml");
+
+        //arrange
+        Double bonusAmount = 500d;
+        BonusRequestDTO bonus = new BonusRequestDTO(bonusAmount);
+        //act
+        ResultActions result = mockMvc.perform(post("/employee/" + NON_EXISTENT_EMPLOYEE_ID + "/bonus")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL)
+                        .writeValueAsString(bonus)));
+        //assert
+        result.andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.msg").value("No Such Employee."));
+    }
+
+    @Test
+    public void addBonus_GivenNegativeAmount_ShouldReturnBadRequest() throws Exception {
+        prepareDB("/datasets/EmployeeController/AddBonus.xml");
+
+        //arrange
+        Double bonusAmount = -500d;
+        BonusRequestDTO bonus = new BonusRequestDTO(bonusAmount);
+        //act
+        ResultActions result = mockMvc.perform(post("/employee/" + EXISTING_EMPLOYEE_ID + "/bonus")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL)
+                        .writeValueAsString(bonus)));
+        //assert
+        result.andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("amount can't be negative."));
+    }
 }
+
