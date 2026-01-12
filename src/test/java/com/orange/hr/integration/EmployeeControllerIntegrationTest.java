@@ -724,8 +724,8 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
                 .andExpect(jsonPath("$.createdAt").isNotEmpty());
 
         List<SalaryAdjustment> totalSalaryAdjustment = salaryAdjustmentRepository.findAll();
-        Integer noOfInsertedBonuses = 1;
-        assertEquals(noOfInsertedBonuses, totalSalaryAdjustment.size());
+        Integer TOTAL_INSERTED_BONUSES_COUNT = 1;
+        assertEquals(TOTAL_INSERTED_BONUSES_COUNT, totalSalaryAdjustment.size());
 
         SalaryAdjustment savedBonus = totalSalaryAdjustment.getFirst();
         assertEquals(BONUS_AMOUNT, savedBonus.getAmount());
@@ -735,7 +735,7 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
     }
 
     @Test
-    public void addBonus_GivenInValidEmployee_ShouldReturnNotFound() throws Exception {
+    public void addBonus_GivenNonExistingEmployee_ShouldReturnNotFound() throws Exception {
         prepareDB("/datasets/EmployeeController/AddBonus.xml");
 
         //arrange
