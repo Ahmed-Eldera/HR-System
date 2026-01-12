@@ -771,7 +771,7 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
                 .content(objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL)
                         .writeValueAsString(raisePercentage)));
         //assert
-        String expectedMsg = raisePercentage + " raise added to employee " + EXISTING_EMPLOYEE_ID;
+        String expectedMsg = raisePercentage + " raise applied for Employee: " + EXISTING_EMPLOYEE_NAME;
         result.andExpect(status().isCreated())
                 .andExpect(jsonPath("$.message").value(expectedMsg));
     }

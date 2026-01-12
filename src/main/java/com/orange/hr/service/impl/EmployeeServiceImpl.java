@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Transactional
 @Service
@@ -31,6 +32,8 @@ public class EmployeeServiceImpl implements EmployeeService {
     private LeaveRepository leaveRepository;
     @Autowired
     private SalaryAdjustmentRepository salaryAdjustmentRepository;
+    @Autowired
+    private RaiseRepository raiseRepository;
 
     public EmployeeResponseDTO addEmployee(EmployeeRequestDTO employee) {
         // validating the input data
@@ -201,5 +204,22 @@ public class EmployeeServiceImpl implements EmployeeService {
                 .build();
 
         return response;
+    }
+
+    @Override
+    public String addRaise(Integer employeeId, Double raisePercentage) {
+        Employee employee = employeeRepository.findById(employeeId).orElseThrow(() -> new NoSuchEmployeeException(HttpStatus.NOT_FOUND, "No Such Employee."));
+        raisePercentage /= 100;
+        Optional<Raise> lastRaise = raiseRepository.findFirstByEmployeeOrderByCreatedAtDesc(employee);
+        Double salaryBeforeRaise = lastRaise.isPresent() ? lastRaise.get().getSalaryAfterRaise() : employee.getSalary();
+        final Double newSalary = salaryBeforeRaise + salaryBeforeRaise * raisePercentage;
+        Raise raise = Raise.builder()
+                .employee(employee)
+                .lastRaise(lastRaise.orElse(null))
+                .percentage(raisePercentage)
+                .salaryAfterRaise(newSalary)
+                .build();
+        raiseRepository.save(raise);
+        return raisePercentage + " raise applied for Employee: " + employee.getName();
     }
 }

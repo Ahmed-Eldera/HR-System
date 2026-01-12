@@ -75,4 +75,10 @@ public class EmployeeController {
         BonusResponseDTO response = employeeService.addBonus(employeeId, request);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
+
+    @PostMapping("/{Id}/raise")
+    public ResponseEntity<String> addRaise(@PathVariable("Id") Integer employeeId, @RequestBody @Valid Double raisePercentage) {
+        String response = employeeService.addRaise(employeeId, raisePercentage);
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
+    }
 }
