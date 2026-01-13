@@ -724,7 +724,7 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
                 .andExpect(jsonPath("$.createdAt").isNotEmpty());
 
         List<SalaryAdjustment> totalSalaryAdjustment = salaryAdjustmentRepository.findAll();
-        Integer TOTAL_INSERTED_BONUSES_COUNT = 1;
+        final Integer TOTAL_INSERTED_BONUSES_COUNT = 1;
         assertEquals(TOTAL_INSERTED_BONUSES_COUNT, totalSalaryAdjustment.size());
 
         SalaryAdjustment savedBonus = totalSalaryAdjustment.getFirst();
