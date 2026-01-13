@@ -29,8 +29,6 @@ public class EmployeeServiceImpl implements EmployeeService {
     private EmployeeMapper employeeMapper;
     @Autowired
     private LeaveRepository leaveRepository;
-    @Autowired
-    private SalaryAdjustmentRepository salaryAdjustmentRepository;
 
     public EmployeeResponseDTO addEmployee(EmployeeRequestDTO employee) {
         // validating the input data
@@ -174,32 +172,6 @@ public class EmployeeServiceImpl implements EmployeeService {
                 .date(requestDTO.getDate())
                 .build();
         leaveRepository.save(leave);
-
-        return LeaveResponseDTO.builder()
-                .id(leave.getLeaveID())
-                .employeeId(employeeId)
-                .date(leave.getDate())
-                .createdAt(leave.getCreatedAt())
-                .build();
-    }
-
-    @Override
-    public BonusResponseDTO addBonus(Integer employeeId, BonusRequestDTO requestDTO) {
-        Employee employee = employeeRepository.findById(employeeId).orElseThrow(() -> new NoSuchEmployeeException(HttpStatus.NOT_FOUND, "No Such Employee."));
-
-        SalaryAdjustment bonus = SalaryAdjustment.builder()
-                .amount(requestDTO.getAmount())
-                .employee(employee)
-                .build();
-        salaryAdjustmentRepository.save(bonus);
-
-        BonusResponseDTO response = BonusResponseDTO.builder()
-                .id(bonus.getAdjustmentId())
-                .employeeId(employeeId)
-                .amount(bonus.getAmount())
-                .createdAt(bonus.getCreatedAt().toLocalDate())
-                .build();
-
-        return response;
+        return new LeaveResponseDTO(leave.getLeaveID(), employeeId, leave.getDate(), leave.getCreatedAt());
     }
 }

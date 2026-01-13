@@ -69,10 +69,4 @@ public class EmployeeController {
         LeaveResponseDTO response = employeeService.addLeave(employeeId, request);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
-
-    @PostMapping("/{Id}/bonus")
-    public ResponseEntity<BonusResponseDTO> addBonus(@PathVariable("Id") Integer employeeId, @RequestBody @Valid BonusRequestDTO request) {
-        BonusResponseDTO response = employeeService.addBonus(employeeId, request);
-        return new ResponseEntity<>(response, HttpStatus.CREATED);
-    }
 }

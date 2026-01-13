@@ -1,6 +1,6 @@
 package com.orange.hr.dto;
 
-import lombok.Builder;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 
 @Setter
 @Getter
-@Builder
+@AllArgsConstructor
 public class LeaveResponseDTO {
     Integer id;
     Integer employeeId;
