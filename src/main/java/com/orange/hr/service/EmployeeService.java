@@ -21,4 +21,6 @@ public interface EmployeeService {
 
     public LeaveResponseDTO addLeave(Integer employeeId, LeaveRequestDTO requestDTO);
 
+    public BonusResponseDTO addBonus(Integer employeeId, BonusRequestDTO requestDTO);
+
 }

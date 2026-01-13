@@ -5,14 +5,13 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 @Setter
 @Getter
 @Builder
-public class LeaveResponseDTO {
+public class BonusResponseDTO {
     Integer id;
     Integer employeeId;
-    LocalDate date;
-    LocalDateTime createdAt;
+    Double amount;
+    LocalDate createdAt;
 }
