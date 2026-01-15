@@ -77,8 +77,8 @@ public class EmployeeController {
     }
 
     @PostMapping("/{Id}/raise")
-    public ResponseEntity<String> addRaise(@PathVariable("Id") Integer employeeId, @RequestBody @Valid Double raisePercentage) {
-        String response = employeeService.addRaise(employeeId, raisePercentage);
+    public ResponseEntity<SalaryDTO> addRaise(@PathVariable("Id") Integer employeeId, @RequestBody @Valid RaiseRequestDTO request) {
+        SalaryDTO response = employeeService.addRaise(employeeId, request);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 }

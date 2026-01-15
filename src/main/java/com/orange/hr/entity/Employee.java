@@ -18,7 +18,7 @@ import java.util.List;
 @Entity
 @Table(name = "employees")
 public class Employee {
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinTable(
             name = "employees_expertise",
             joinColumns = @JoinColumn(name = "employee_id"),
@@ -37,8 +37,6 @@ public class Employee {
     private Gender gender;
     @Column(name = "graduation_date", nullable = false)
     private LocalDate graduationDate;
-    @Column(nullable = false)
-    private Float salary;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "department_id", nullable = false)
     private Department department;
@@ -51,4 +49,7 @@ public class Employee {
     @OneToMany(mappedBy = "manager", fetch = FetchType.LAZY)
     @JsonBackReference
     private List<Employee> subordinates;
+
+    @OneToMany(mappedBy = "employee", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<Salary> salaryHistory;
 }

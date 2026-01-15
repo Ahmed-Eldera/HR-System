@@ -13,7 +13,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 
 @Transactional
 @Service
@@ -33,7 +32,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Autowired
     private SalaryAdjustmentRepository salaryAdjustmentRepository;
     @Autowired
-    private RaiseRepository raiseRepository;
+    private SalaryRepository salaryRepository;
 
     public EmployeeResponseDTO addEmployee(EmployeeRequestDTO employee) {
         // validating the input data
@@ -60,7 +59,15 @@ public class EmployeeServiceImpl implements EmployeeService {
         entity.setTeam(team);
         entity.setManager(manager);
         entity.setExpertises(expertises);
+        Double newGrossSalary = employee.getSalary();
+        Salary newSalary = Salary.builder()
+                .employee(entity)
+                .gross(newGrossSalary)
+                .net(calculateNetSalary(newGrossSalary))
+                .percentage(0d)
+                .build();
         employeeRepository.save(entity);
+        entity.setSalaryHistory(List.of(newSalary));
         return employeeMapper.toDTO(entity);
     }
 
@@ -76,7 +83,16 @@ public class EmployeeServiceImpl implements EmployeeService {
         }
 
         if (dto.getSalary() != null) {
-            entity.setSalary(dto.getSalary());
+            Double newGrossSalary = dto.getSalary();
+            Salary newSalary = Salary.builder()
+                    .employee(entity)
+                    .gross(newGrossSalary)
+                    .net(calculateNetSalary(newGrossSalary))
+                    .percentage(0d)
+                    .build();
+            List<Salary> salaryhistory = entity.getSalaryHistory();
+            salaryhistory.add(newSalary);
+            entity.setSalaryHistory(salaryhistory);
         }
 
         if (dto.getExpertise() != null) {
@@ -139,10 +155,10 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Override
     public SalaryDTO getSalary(Integer id) {
         Employee employee = employeeRepository.findById(id).orElseThrow(() -> new NoSuchEmployeeException(HttpStatus.NOT_FOUND, "Can't find the selected employee"));
-        Float gross = employee.getSalary();
-        final Float INSURANCE = 500f;
-        final Float TAXRATIO = 0.15f;
-        Float net = gross - gross * TAXRATIO - INSURANCE;
+        Double gross = salaryRepository.findByEmployee(employee).getGross();
+        final Double INSURANCE = 500d;
+        final Double TAXRATIO = 0.15d;
+        Double net = gross - gross * TAXRATIO - INSURANCE;
         SalaryDTO salaryDTO = new SalaryDTO(gross, net);
         return salaryDTO;
 
@@ -206,20 +222,27 @@ public class EmployeeServiceImpl implements EmployeeService {
         return response;
     }
 
+    Double calculateNetSalary(Double Gross) {
+        return Gross - Gross * 0.15d - 500;
+    }
+
     @Override
-    public String addRaise(Integer employeeId, Double raisePercentage) {
+    public SalaryDTO addRaise(Integer employeeId, RaiseRequestDTO request) {
         Employee employee = employeeRepository.findById(employeeId).orElseThrow(() -> new NoSuchEmployeeException(HttpStatus.NOT_FOUND, "No Such Employee."));
-        raisePercentage /= 100;
-        Optional<Raise> lastRaise = raiseRepository.findFirstByEmployeeOrderByCreatedAtDesc(employee);
-        Double salaryBeforeRaise = lastRaise.isPresent() ? lastRaise.get().getSalaryAfterRaise() : employee.getSalary();
-        final Double newSalary = salaryBeforeRaise + salaryBeforeRaise * raisePercentage;
-        Raise raise = Raise.builder()
+        Double raisePercentage = request.getRatio() / 100d;
+        Salary lastSalary = salaryRepository.findFirstByEmployeeOrderByCreatedAtDesc(employee);
+        Double grossSalaryBeforeRaise = lastSalary.getGross();
+        Double newGrossSalary = grossSalaryBeforeRaise + grossSalaryBeforeRaise * raisePercentage;
+        Salary raise = Salary.builder()
                 .employee(employee)
-                .lastRaise(lastRaise.orElse(null))
                 .percentage(raisePercentage)
-                .salaryAfterRaise(newSalary)
+                .gross(newGrossSalary)
+                .net(calculateNetSalary(newGrossSalary))
                 .build();
-        raiseRepository.save(raise);
-        return raisePercentage + " raise applied for Employee: " + employee.getName();
+        salaryRepository.save(raise);
+        return SalaryDTO.builder()
+                .gross(newGrossSalary)
+                .net(calculateNetSalary(newGrossSalary))
+                .build();
     }
 }

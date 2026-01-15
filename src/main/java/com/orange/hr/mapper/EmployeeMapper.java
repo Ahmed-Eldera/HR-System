@@ -21,9 +21,7 @@ public class EmployeeMapper {
         employee.setName(dto.getName());
         employee.setDateOfBirth(dto.getDateOfBirth());
         employee.setGraduationDate(dto.getGraduationDate());
-        employee.setSalary(dto.getSalary());
         employee.setGender(dto.getGender());
-
         return employee;
     }
 
@@ -32,7 +30,8 @@ public class EmployeeMapper {
         response.setEmployeeID(entity.getEmployeeID());
         response.setName(entity.getName());
         response.setGender(entity.getGender());
-        response.setSalary(entity.getSalary());
+        response.setSalary(entity.getSalaryHistory().stream().sorted((a, b) -> a.getCreatedAt().isBefore(b.getCreatedAt()) ? 1 : -1).findFirst().get().getGross());
+
         response.setGraduationDate(entity.getGraduationDate());
         response.setDateOfBirth(entity.getDateOfBirth());
         if (entity.getManager() != null) {
