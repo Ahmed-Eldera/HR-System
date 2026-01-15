@@ -30,7 +30,12 @@ public class EmployeeMapper {
         response.setEmployeeID(entity.getEmployeeID());
         response.setName(entity.getName());
         response.setGender(entity.getGender());
-        response.setSalary(entity.getSalaryHistory().stream().sorted((a, b) -> a.getCreatedAt().isBefore(b.getCreatedAt()) ? 1 : -1).findFirst().get().getGross());
+        response.setSalary(entity.getSalaryHistory()
+                .stream()
+                .sorted((a, b) -> a.getCreatedAt().isBefore(b.getCreatedAt()) ? 1 : -1)
+                .findFirst()
+                .get()
+                .getGross());
 
         response.setGraduationDate(entity.getGraduationDate());
         response.setDateOfBirth(entity.getDateOfBirth());

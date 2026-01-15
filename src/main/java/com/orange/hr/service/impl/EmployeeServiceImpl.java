@@ -222,8 +222,8 @@ public class EmployeeServiceImpl implements EmployeeService {
         return response;
     }
 
-    Double calculateNetSalary(Double Gross) {
-        return Gross - Gross * 0.15d - 500;
+    Double calculateNetSalary(Double gross) {
+        return gross - gross * 0.15d - 500;
     }
 
     @Override
