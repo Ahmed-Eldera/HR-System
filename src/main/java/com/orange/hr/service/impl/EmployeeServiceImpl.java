@@ -157,7 +157,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         Employee employee = employeeRepository.findById(id).orElseThrow(() -> new NoSuchEmployeeException(HttpStatus.NOT_FOUND, "Can't find the selected employee"));
         Double gross = salaryRepository.findByEmployee(employee).getGross();
         final Double INSURANCE = 500d;
-        final Double TAXRATIO = 0.15d;
+        final Double TAX_RATIO = 0.15d;
         Double net = gross - gross * TAXRATIO - INSURANCE;
         SalaryDTO salaryDTO = new SalaryDTO(gross, net);
         return salaryDTO;
