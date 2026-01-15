@@ -1,3 +1,16 @@
+# [1.2.0](https://github.com/Ahmed-Eldera/HR-System/compare/v1.1.0...v1.2.0) (2026-01-11)
+
+
+### Bug Fixes
+
+* createdAt data type ([3548f16](https://github.com/Ahmed-Eldera/HR-System/commit/3548f16eb912bc0e8692fef178f9d52f7dc1e645))
+* db timestamp not working ([9a4d287](https://github.com/Ahmed-Eldera/HR-System/commit/9a4d287df92cb6e2d725010d6cc189a0521deb7d))
+
+
+### Features
+
+* record leaves ([2608825](https://github.com/Ahmed-Eldera/HR-System/commit/2608825a4845749bf2e13f44bf78334a854fc66f))
+
 # [1.1.0](https://github.com/Ahmed-Eldera/HR-System/compare/v1.0.0...v1.1.0) (2025-12-23)
 
 

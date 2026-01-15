@@ -647,7 +647,8 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
                     .content(objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL)
                             .writeValueAsString(leave)));
             //assert
-            result.andExpect(status().isCreated()).andExpect(jsonPath("$.employeeId").value(EXISTING_EMPLOYEE_ID))
+            result.andExpect(status().isCreated())
+                    .andExpect(jsonPath("$.employeeId").value(EXISTING_EMPLOYEE_ID))
                     .andExpect(jsonPath("$.date").value(leave.getDate().toString()))
                     .andExpect(jsonPath("$.id").isNumber())
                     .andExpect(jsonPath("$.createdAt").isNotEmpty());
@@ -708,8 +709,8 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
         prepareDB("/datasets/EmployeeController/AddBonus.xml");
 
         //arrange
-        Double bonusAmount = 500d;
-        BonusRequestDTO bonus = new BonusRequestDTO(bonusAmount);
+        final Double BONUS_AMOUNT = 500d;
+        BonusRequestDTO bonus = new BonusRequestDTO(BONUS_AMOUNT);
         //act
         ResultActions result = mockMvc.perform(post("/employee/" + EXISTING_EMPLOYEE_ID + "/bonus")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -719,20 +720,27 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
         result.andExpect(status().isCreated())
                 .andExpect(jsonPath("$.id").isNumber())
                 .andExpect(jsonPath("$.employeeId").value(EXISTING_EMPLOYEE_ID))
-                .andExpect(jsonPath("$.amount").value(bonusAmount))
+                .andExpect(jsonPath("$.amount").value(BONUS_AMOUNT))
                 .andExpect(jsonPath("$.createdAt").isNotEmpty());
+
         List<SalaryAdjustment> totalSalaryAdjustment = salaryAdjustmentRepository.findAll();
-        Integer noOfInsertedBonuses = 1;
-        assertEquals(noOfInsertedBonuses, totalSalaryAdjustment.size());
+        final Integer TOTAL_INSERTED_BONUSES_COUNT = 1;
+        assertEquals(TOTAL_INSERTED_BONUSES_COUNT, totalSalaryAdjustment.size());
+
+        SalaryAdjustment savedBonus = totalSalaryAdjustment.getFirst();
+        assertEquals(BONUS_AMOUNT, savedBonus.getAmount());
+        assertEquals(EXISTING_EMPLOYEE_ID, savedBonus.getEmployee().getEmployeeID());
+        assertNotNull(savedBonus.getAdjustmentId());
+        assertNotNull(savedBonus.getCreatedAt());
     }
 
     @Test
-    public void addBonus_GivenInValidEmployee_ShouldReturnNotFound() throws Exception {
+    public void addBonus_GivenNonExistingEmployee_ShouldReturnNotFound() throws Exception {
         prepareDB("/datasets/EmployeeController/AddBonus.xml");
 
         //arrange
-        Double bonusAmount = 500d;
-        BonusRequestDTO bonus = new BonusRequestDTO(bonusAmount);
+        final Double BONUS_AMOUNT = 500d;
+        BonusRequestDTO bonus = new BonusRequestDTO(BONUS_AMOUNT);
         //act
         ResultActions result = mockMvc.perform(post("/employee/" + NON_EXISTENT_EMPLOYEE_ID + "/bonus")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -748,8 +756,8 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
         prepareDB("/datasets/EmployeeController/AddBonus.xml");
 
         //arrange
-        Double bonusAmount = -500d;
-        BonusRequestDTO bonus = new BonusRequestDTO(bonusAmount);
+        final Double BONUS_AMOUNT = -500d;
+        BonusRequestDTO bonus = new BonusRequestDTO(BONUS_AMOUNT);
         //act
         ResultActions result = mockMvc.perform(post("/employee/" + EXISTING_EMPLOYEE_ID + "/bonus")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -757,7 +765,7 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
                         .writeValueAsString(bonus)));
         //assert
         result.andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value("amount can't be negative."));
+                .andExpect(jsonPath("$.msg").value("amount can't be negative."));
     }
 
     @Test
