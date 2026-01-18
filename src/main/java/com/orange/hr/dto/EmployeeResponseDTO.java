@@ -19,7 +19,7 @@ public class EmployeeResponseDTO {
     private LocalDate dateOfBirth;
     private Gender gender;
     private LocalDate graduationDate;
-    private Float salary;
+    private Double salary;
     private Integer departmentId;
     private Integer managerId;
     private Integer teamId;

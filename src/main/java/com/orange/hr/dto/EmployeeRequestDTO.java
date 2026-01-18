@@ -38,7 +38,7 @@ public class EmployeeRequestDTO {
 
     @Min(value = 500, groups = {Default.class, Always.class})
     @NotNull(message = "Salary can't be null")
-    private Float salary;
+    private Double salary;
 
     @NotNull(message = "Department can't be null")
     private Integer departmentId;

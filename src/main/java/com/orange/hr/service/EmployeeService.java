@@ -23,4 +23,5 @@ public interface EmployeeService {
 
     public BonusResponseDTO addBonus(Integer employeeId, BonusRequestDTO requestDTO);
 
+    public SalaryDTO addRaise(Integer employeeId, RaiseRequestDTO raisePercentage);
 }

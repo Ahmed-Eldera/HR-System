@@ -23,16 +23,14 @@ public interface EmployeeRepository extends JpaRepository<Employee, Integer> {
     void reassignSubordinates(@Param("oldManagerId") Integer oldManagerId,
                               @Param("newManagerId") Integer newManagerId);
 
-    @Modifying(clearAutomatically = true, flushAutomatically = true)
-    @Transactional
+
     @Query(value = """
-            WITH RECURSIVE employee_hierarchy(
+            WITH RECURSIVE employee_hierarchy (
                 employee_id,
                 name,
                 date_of_birth,
                 gender,
                 graduation_date,
-                salary,
                 department_id,
                 team_id,
                 manager_id
@@ -43,7 +41,6 @@ public interface EmployeeRepository extends JpaRepository<Employee, Integer> {
                     date_of_birth,
                     gender,
                     graduation_date,
-                    salary,
                     department_id,
                     team_id,
                     manager_id
@@ -58,29 +55,57 @@ public interface EmployeeRepository extends JpaRepository<Employee, Integer> {
                     e.date_of_birth,
                     e.gender,
                     e.graduation_date,
-                    e.salary,
                     e.department_id,
                     e.team_id,
                     e.manager_id
                 FROM employees e
                 INNER JOIN employee_hierarchy eh
                     ON e.manager_id = eh.employee_id
+            ),
+
+            latest_salary (
+                employee_id,
+                gross_salary
+            ) AS (
+                SELECT
+                    s.employee_id,
+                    s.gross_salary
+                FROM salaries s
+                INNER JOIN (
+                    SELECT employee_id, MAX(created_at) AS max_created_at
+                    FROM salaries
+                    GROUP BY employee_id
+                ) latest
+                    ON s.employee_id = latest.employee_id
+                   AND s.created_at = latest.max_created_at
             )
+
             SELECT
-                eh.*,
+                eh.employee_id,
+                eh.name,
+                eh.date_of_birth,
+                eh.gender,
+                eh.graduation_date,
+                ls.gross_salary AS salary,
+                eh.department_id,
+                eh.team_id,
+                eh.manager_id,
                 ex.expertise_id,
                 ex.name AS expertise_name
             FROM employee_hierarchy eh
+            LEFT JOIN latest_salary ls
+                ON eh.employee_id = ls.employee_id
             LEFT JOIN employees_expertise ee
                 ON eh.employee_id = ee.employee_id
             LEFT JOIN expertises ex
                 ON ee.expertise_id = ex.expertise_id
-            WHERE eh.employee_id != :managerId 
-            ORDER BY eh.employee_id;
-
-                                    """,
+            WHERE eh.employee_id != :managerId
+            ORDER BY eh.employee_id
+            """,
             nativeQuery = true)
-    List<EmployeeHierarchyProjection> findSubordinatesRec(@Param("managerId") Integer managerId);
+    List<EmployeeHierarchyProjection> findSubordinatesRec(
+            @Param("managerId") Integer managerId
+    );
 
     List<Employee> findByManager(Employee manager);
 
