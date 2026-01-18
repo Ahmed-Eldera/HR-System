@@ -11,6 +11,12 @@
             department_id="1"
             team_id="1"
     />
-
+    <salaries
+            salary_id="1"
+            employee_id="1"
+            raise_percentage="0"
+            gross_salary="500"
+            created_at="2024-03-01 10:00:00"
+    />
     <expertises expertise_id="1" name="java"/>
 </dataset>

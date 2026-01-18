@@ -766,29 +766,43 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
     }
 
     @Test
-    public void addRaise_GivenValidData_ShouldReturnCreated() throws Exception {
-        prepareDB("/datasets/EmployeeController/AddBonus.xml");
+    public void addRaise_GivenValidEmployee_ShouldReturnCreated() throws Exception {
+        prepareDB("/datasets/EmployeeController/AddRaise.xml");
         //arrange
         final Double RAISE_RATIO = 20d;
         final Double RAISE_PERCENTAGE = 20d / 100;
         RaiseRequestDTO requestDTO = new RaiseRequestDTO(RAISE_RATIO);
         Employee employee = employeeRepository.findById(EXISTING_EMPLOYEE_ID).get();
-        Salary salaryBeforeRaise = salaryRepository.findFirstByEmployeeOrderByCreatedAtDesc(employee);
+        Salary salaryBeforeRaise = salaryRepository.findByEmployee(employee);
         //act
         ResultActions result = mockMvc.perform(post("/employee/" + EXISTING_EMPLOYEE_ID + "/raise")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL)
                         .writeValueAsString(requestDTO)));
         //assert
-        Salary salaryAfterRaise = salaryRepository.findFirstByEmployeeOrderByCreatedAtDesc(employee);
+        Salary salaryAfterRaise = salaryRepository.findByEmployee(employee);
         Double grossAfterRaise = salaryBeforeRaise.getGross() + salaryBeforeRaise.getGross() * RAISE_PERCENTAGE;
         Double netAfterRaise = grossAfterRaise - grossAfterRaise * .15 - 500;
         result.andExpect(status().isCreated())
-                .andExpect(jsonPath("$.gross").value(salaryAfterRaise.getGross()))
-                .andExpect(jsonPath("$.net").value(salaryAfterRaise.getNet()));
+                .andExpect(jsonPath("$.gross").value(salaryAfterRaise.getGross()));
         assertEquals(grossAfterRaise, salaryAfterRaise.getGross());
-        assertEquals(netAfterRaise, salaryAfterRaise.getNet());
+    }
 
+    @Test
+    public void addRaise_GivenNonExistentEmployee_ShouldReturnCreated() throws Exception {
+        prepareDB("/datasets/EmployeeController/AddRaise.xml");
+        //arrange
+        final Double RAISE_RATIO = 20d;
+        final Double RAISE_PERCENTAGE = 20d / 100;
+        RaiseRequestDTO requestDTO = new RaiseRequestDTO(RAISE_RATIO);
+        //act
+        ResultActions result = mockMvc.perform(post("/employee/" + NON_EXISTENT_EMPLOYEE_ID + "/raise")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL)
+                        .writeValueAsString(requestDTO)));
+        //assert
+        result.andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.msg").value("No Such Employee."));
     }
 }
 

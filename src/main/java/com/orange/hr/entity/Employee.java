@@ -52,4 +52,8 @@ public class Employee {
 
     @OneToMany(mappedBy = "employee", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<Salary> salaryHistory;
+
+    public Double getSalary() {
+        return salaryHistory.stream().max((a, b) -> a.getCreatedAt().isBefore(b.getCreatedAt()) ? -1 : 1).get().getGross();
+    }
 }

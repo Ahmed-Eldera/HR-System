@@ -64,7 +64,6 @@
             employee_id="2"
             raise_percentage="10"
             gross_salary="2000"
-            net_salary="1800"
             created_at="2024-06-01 10:00:00"
     />
 

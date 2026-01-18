@@ -16,7 +16,6 @@
             employee_id="1"
             raise_percentage="0"
             gross_salary="500"
-            net_salary="450"
             created_at="2024-03-01 10:00:00"
     />
 

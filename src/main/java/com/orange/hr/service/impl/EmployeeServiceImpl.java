@@ -54,20 +54,15 @@ public class EmployeeServiceImpl implements EmployeeService {
             throw new NoSuchExpertiseException(HttpStatus.NOT_FOUND, "Can't find the Selected Expertise");
         }
         //saving the employee
-        Employee entity = employeeMapper.toEntity(employee);
-        entity.setDepartment(dept);
-        entity.setTeam(team);
-        entity.setManager(manager);
-        entity.setExpertises(expertises);
+        Employee entity = employeeMapper.toEntity(employee, dept, team, manager, expertises);
         Double newGrossSalary = employee.getSalary();
         Salary newSalary = Salary.builder()
                 .employee(entity)
                 .gross(newGrossSalary)
-                .net(calculateNetSalary(newGrossSalary))
                 .percentage(0d)
                 .build();
-        employeeRepository.save(entity);
         entity.setSalaryHistory(List.of(newSalary));
+        employeeRepository.save(entity);
         return employeeMapper.toDTO(entity);
     }
 
@@ -87,7 +82,6 @@ public class EmployeeServiceImpl implements EmployeeService {
             Salary newSalary = Salary.builder()
                     .employee(entity)
                     .gross(newGrossSalary)
-                    .net(calculateNetSalary(newGrossSalary))
                     .percentage(0d)
                     .build();
             List<Salary> salaryhistory = entity.getSalaryHistory();
@@ -237,7 +231,6 @@ public class EmployeeServiceImpl implements EmployeeService {
                 .employee(employee)
                 .percentage(raisePercentage)
                 .gross(newGrossSalary)
-                .net(calculateNetSalary(newGrossSalary))
                 .build();
         salaryRepository.save(raise);
         return SalaryDTO.builder()

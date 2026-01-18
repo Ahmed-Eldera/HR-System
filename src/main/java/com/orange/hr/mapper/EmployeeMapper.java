@@ -3,8 +3,10 @@ package com.orange.hr.mapper;
 import com.orange.hr.dto.EmployeeHierarchyProjection;
 import com.orange.hr.dto.EmployeeRequestDTO;
 import com.orange.hr.dto.EmployeeResponseDTO;
+import com.orange.hr.entity.Department;
 import com.orange.hr.entity.Employee;
 import com.orange.hr.entity.Expertise;
+import com.orange.hr.entity.Team;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -15,13 +17,17 @@ import java.util.stream.Collectors;
 
 @Component
 public class EmployeeMapper {
-    public Employee toEntity(EmployeeRequestDTO dto) {
+    public Employee toEntity(EmployeeRequestDTO dto, Department department, Team team, Employee manager, List<Expertise> expertises) {
         Employee employee = new Employee();
 //        employee.setEmployeeID(dto.getEmployeeId());
         employee.setName(dto.getName());
         employee.setDateOfBirth(dto.getDateOfBirth());
         employee.setGraduationDate(dto.getGraduationDate());
         employee.setGender(dto.getGender());
+        employee.setDepartment(department);
+        employee.setTeam(team);
+        employee.setManager(manager);
+        employee.setExpertises(expertises);
         return employee;
     }
 
@@ -30,24 +36,18 @@ public class EmployeeMapper {
         response.setEmployeeID(entity.getEmployeeID());
         response.setName(entity.getName());
         response.setGender(entity.getGender());
-        response.setSalary(entity.getSalaryHistory()
-                .stream()
-                .sorted((a, b) -> a.getCreatedAt().isBefore(b.getCreatedAt()) ? 1 : -1)
-                .findFirst()
-                .get()
-                .getGross());
-
+        response.setSalary(entity.getSalary());
         response.setGraduationDate(entity.getGraduationDate());
         response.setDateOfBirth(entity.getDateOfBirth());
+        response.setDepartmentId(entity.getDepartment().getDepartmentId());
+        response.setTeamId(entity.getTeam().getTeamId());
         if (entity.getManager() != null) {
             response.setManagerId(entity.getManager().getEmployeeID());
         }
-        response.setDepartmentId(entity.getDepartment().getDepartmentId());
         response.setExpertisesIds(entity.getExpertises()
                 .stream()
                 .map(Expertise::getExpertiseId)
                 .collect(Collectors.toList()));
-        response.setTeamId(entity.getTeam().getTeamId());
         return response;
     }
 

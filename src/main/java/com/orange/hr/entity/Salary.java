@@ -34,9 +34,6 @@ public class Salary {
     @Column(name = "gross_salary")
     private Double gross;
 
-    @Column(name = "net_salary")
-    private Double net;
-
     @CreationTimestamp(source = SourceType.DB)
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
