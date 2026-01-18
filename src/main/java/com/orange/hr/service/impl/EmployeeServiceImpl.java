@@ -224,7 +224,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     public SalaryDTO addRaise(Integer employeeId, RaiseRequestDTO request) {
         Employee employee = employeeRepository.findById(employeeId).orElseThrow(() -> new NoSuchEmployeeException(HttpStatus.NOT_FOUND, "No Such Employee."));
         Double raisePercentage = request.getRatio() / 100d;
-        Salary lastSalary = salaryRepository.findFirstByEmployeeOrderByCreatedAtDesc(employee);
+        Salary lastSalary = salaryRepository.findFirstByEmployeeOrderByCreatedAtDesc(employee).orElseThrow(() -> new MyException(HttpStatus.INTERNAL_SERVER_ERROR, "Couldn't find this employee's salary"));
         Double grossSalaryBeforeRaise = lastSalary.getGross();
         Double newGrossSalary = grossSalaryBeforeRaise + grossSalaryBeforeRaise * raisePercentage;
         Salary raise = Salary.builder()
