@@ -17,9 +17,12 @@ import java.util.stream.Collectors;
 
 @Component
 public class EmployeeMapper {
-    public Employee toEntity(EmployeeRequestDTO dto, Department department, Team team, Employee manager, List<Expertise> expertises) {
+    public Employee toEntity(EmployeeRequestDTO dto,
+                             Department department,
+                             Team team,
+                             Employee manager,
+                             List<Expertise> expertises) {
         Employee employee = new Employee();
-//        employee.setEmployeeID(dto.getEmployeeId());
         employee.setName(dto.getName());
         employee.setDateOfBirth(dto.getDateOfBirth());
         employee.setGraduationDate(dto.getGraduationDate());

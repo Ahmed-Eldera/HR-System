@@ -17,6 +17,8 @@ import java.util.List;
 @Transactional
 @Service
 public class EmployeeServiceImpl implements EmployeeService {
+    static final Double INSURANCE = 500d;
+    static final Double TAX_RATIO = 0.15d;
     @Autowired
     private DepartmentRepository departmentRepository;
     @Autowired
@@ -54,8 +56,8 @@ public class EmployeeServiceImpl implements EmployeeService {
             throw new NoSuchExpertiseException(HttpStatus.NOT_FOUND, "Can't find the Selected Expertise");
         }
         //saving the employee
-        Employee entity = employeeMapper.toEntity(employee, dept, team, manager, expertises);
         Double newGrossSalary = employee.getSalary();
+        Employee entity = employeeMapper.toEntity(employee, dept, team, manager, expertises);
         Salary newSalary = Salary.builder()
                 .employee(entity)
                 .gross(newGrossSalary)
@@ -150,9 +152,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     public SalaryDTO getSalary(Integer id) {
         Employee employee = employeeRepository.findById(id).orElseThrow(() -> new NoSuchEmployeeException(HttpStatus.NOT_FOUND, "Can't find the selected employee"));
         Double gross = salaryRepository.findByEmployee(employee).getGross();
-        final Double INSURANCE = 500d;
-        final Double TAX_RATIO = 0.15d;
-        Double net = gross - gross * TAX_RATIO - INSURANCE;
+        Double net = calculateNetSalary(gross);
         SalaryDTO salaryDTO = new SalaryDTO(gross, net);
         return salaryDTO;
 
@@ -217,7 +217,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     Double calculateNetSalary(Double gross) {
-        return gross - gross * 0.15d - 500;
+        return gross - gross * TAX_RATIO - INSURANCE;
     }
 
     @Override

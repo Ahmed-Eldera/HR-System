@@ -23,7 +23,7 @@ public class Salary {
     @Column(name = "salary_id")
     private Integer salaryId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "employee_id", nullable = false)
     private Employee employee;
 

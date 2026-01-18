@@ -54,6 +54,9 @@ public class Employee {
     private List<Salary> salaryHistory;
 
     public Double getSalary() {
-        return salaryHistory.stream().max((a, b) -> a.getCreatedAt().isBefore(b.getCreatedAt()) ? -1 : 1).get().getGross();
+        return salaryHistory.stream()
+                .max((a, b) -> a.getCreatedAt().isBefore(b.getCreatedAt()) ? -1 : 1)
+                .get()
+                .getGross();
     }
 }
