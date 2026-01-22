@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.util.Comparator;
 import java.util.List;
 
 @Getter
@@ -53,9 +54,13 @@ public class Employee {
     @OneToMany(mappedBy = "employee", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<Salary> salaryHistory;
 
+    private static Comparator<Salary> byLatestSalaryComparator() {
+        return (a, b) -> a.getCreatedAt().isBefore(b.getCreatedAt()) ? -1 : 1;
+    }
+
     public Double getSalary() {
         return salaryHistory.stream()
-                .max((a, b) -> a.getCreatedAt().isBefore(b.getCreatedAt()) ? -1 : 1)
+                .max(byLatestSalaryComparator())
                 .get()
                 .getGross();
     }

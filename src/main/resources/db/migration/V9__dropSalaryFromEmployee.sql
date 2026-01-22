@@ -1,1 +1,0 @@
-alter table employees drop column salary;

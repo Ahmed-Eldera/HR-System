@@ -151,7 +151,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Override
     public SalaryDTO getSalary(Integer id) {
         Employee employee = employeeRepository.findById(id).orElseThrow(() -> new NoSuchEmployeeException(HttpStatus.NOT_FOUND, "Can't find the selected employee"));
-        Double gross = salaryRepository.findByEmployee(employee).getGross();
+        Double gross = salaryRepository.findCurrentSalaryByEmployee(employee).getGross();
         Double net = calculateNetSalary(gross);
         SalaryDTO salaryDTO = new SalaryDTO(gross, net);
         return salaryDTO;

@@ -9,3 +9,5 @@ create table if not exists salaries (
 
 insert into salaries (employee_id,gross_salary)
 select employee_id,salary from employees;
+
+alter table employees drop column salary;
