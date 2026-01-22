@@ -34,7 +34,6 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
     private static final int NON_EXISTENT_EMPLOYEE_ID = 999;
     private static final int EXISTING_EMPLOYEE_ID = 1;
     private static final int EXISTING_EMPLOYEE_ID2 = 2;
-    private static final int LEAF_EMPLOYEE_ID3 = 3;
     private static final int SUPER_MANAGER_ID2 = 2;
     private static final int NEW_EMPLOYEE_ID = 2;
     private static final String EXISTING_EMPLOYEE_NAME = "Ahmed";
@@ -76,7 +75,7 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
 
     @Test
     public void addEmpolyeeSuccessfully_WithFullData_ExpectCreated() throws Exception {
-        prepareDB("/datasets/EmployeeController/AddEmployeeDataset.xml");
+        prepareDB("/datasets/EmployeeController/DefaultDBState.xml");
         //Arrange
         List<Integer> expertises = new ArrayList<>();
         expertises.add(EXPERTISE_ID);
@@ -112,7 +111,7 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
 
     @Test
     public void addEmpolyeeSuccessfully_WithNoManager_ExpectCreated() throws Exception {
-        prepareDB("/datasets/EmployeeController/AddEmployeeDataset.xml");
+        prepareDB("/datasets/EmployeeController/DefaultDBState.xml");
         //Arrange
         List<Integer> expertises = new ArrayList<>();
         expertises.add(EXPERTISE_ID);
@@ -150,7 +149,7 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
 
     @Test
     public void addEmpolyee_WithMissingData_ExpectBadRequest() throws Exception {
-        prepareDB("/datasets/EmployeeController/AddEmployeeDataset.xml");
+        prepareDB("/datasets/EmployeeController/DefaultDBState.xml");
         //Arrange
         List<Integer> expertises = new ArrayList<>();
         expertises.add(EXPERTISE_ID);
@@ -175,7 +174,7 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
 
     @Test
     public void addEmpolyee_WithDepartmentNotValid_ExpectNotFound() throws Exception {
-        prepareDB("/datasets/EmployeeController/AddEmployeeDataset.xml");
+        prepareDB("/datasets/EmployeeController/DefaultDBState.xml");
         //Arrange
         List<Integer> expertises = new ArrayList<>();
         expertises.add(EXPERTISE_ID);
@@ -201,7 +200,7 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
 
     @Test
     public void addEmpolyee_WithTeamNotValid_ExpectNotFound() throws Exception {
-        prepareDB("/datasets/EmployeeController/AddEmployeeDataset.xml");
+        prepareDB("/datasets/EmployeeController/DefaultDBState.xml");
         //Arrange
         List<Integer> expertises = new ArrayList<>();
         expertises.add(EXPERTISE_ID);
@@ -227,7 +226,7 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
 
     @Test
     public void addEmpolyee_WithManagerNotValid_ExpectNotFound() throws Exception {
-        prepareDB("/datasets/EmployeeController/AddEmployeeDataset.xml");
+        prepareDB("/datasets/EmployeeController/DefaultDBState.xml");
         //Arrange
         List<Integer> expertises = new ArrayList<>();
         expertises.add(EXPERTISE_ID);
@@ -253,7 +252,7 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
 
     @Test
     public void addEmpolyee_WithBirthDateNotValid_ExpectNotFound() throws Exception {
-        prepareDB("/datasets/EmployeeController/AddEmployeeDataset.xml");
+        prepareDB("/datasets/EmployeeController/DefaultDBState.xml");
         //Arrange
         List<Integer> expertises = new ArrayList<>();
         expertises.add(EXPERTISE_ID);
@@ -279,7 +278,7 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
 
     @Test
     public void addEmpolyee_WithExpertiseNotValid_ExpectNotFound() throws Exception {
-        prepareDB("/datasets/EmployeeController/AddEmployeeDataset.xml");
+        prepareDB("/datasets/EmployeeController/DefaultDBState.xml");
         //Arrange
         List<Integer> expertises = new ArrayList<>();
         expertises.add(NON_EXISTENT_EXPERTISE_ID);
@@ -305,7 +304,7 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
 
     @Test
     public void modifyEmployee_WithValidData_ExpectOK() throws Exception {
-        prepareDB("/datasets/EmployeeController/ModifyEmployeeDataset.xml");
+        prepareDB("/datasets/EmployeeController/DefaultDBState.xml");
         //arrange
         List<Integer> expertises = new ArrayList<>();
         expertises.add(EXPERTISE_ID2);
@@ -341,7 +340,7 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
 
     @Test
     public void modifyEmployee_RemoveManager_ExpectOK() throws Exception {
-        prepareDB("/datasets/EmployeeController/ModifyEmployeeDataset.xml");
+        prepareDB("/datasets/EmployeeController/DefaultDBState.xml");
         //arrange
         List<Integer> expertises = new ArrayList<>();
         expertises.add(EXPERTISE_ID);
@@ -366,7 +365,7 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
 
     @Test
     public void modifyEmployee_PartialUpdateLeaveManagerAsItIs_ExpectOK() throws Exception {
-        prepareDB("/datasets/EmployeeController/ModifyEmployeeDataset.xml");
+        prepareDB("/datasets/EmployeeController/DefaultDBState.xml");
         //arrange
         List<Integer> expertises = new ArrayList<>();
         EmployeeRequestDTO employee = new EmployeeRequestDTO();
@@ -391,7 +390,7 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
 
     @Test
     public void modifyEmployee_RemoveExpertises_ExpectOK() throws Exception {
-        prepareDB("/datasets/EmployeeController/ModifyEmployeeDataset.xml");
+        prepareDB("/datasets/EmployeeController/DefaultDBState.xml");
         //arrange
         List<Integer> expertises = new ArrayList<>();
         EmployeeRequestDTO employee = new EmployeeRequestDTO();
@@ -421,7 +420,7 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
 
     @Test
     public void modifyEmployee_InValidSalary_ExpectBadRequest() throws Exception {
-        prepareDB("/datasets/EmployeeController/ModifyEmployeeDataset.xml");
+        prepareDB("/datasets/EmployeeController/DefaultDBState.xml");
         //arrange
         List<Integer> expertises = new ArrayList<>();
         EmployeeRequestDTO employee = new EmployeeRequestDTO();
@@ -440,7 +439,7 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
 
     @Test
     public void deleteEmployee_WithManager_ShouldReturnNoContent() throws Exception {
-        prepareDB("/datasets/EmployeeController/DeleteEmployee.xml");
+        prepareDB("/datasets/EmployeeController/DefaultDBState.xml");
         //act
         ResultActions result = mockMvc.perform(delete("/employee/" + EXISTING_EMPLOYEE_ID));
 
@@ -450,7 +449,7 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
 
     @Test
     public void deleteEmployee_WithNoManager_ShouldReturnConflict() throws Exception {
-        prepareDB("/datasets/EmployeeController/DeleteEmployee.xml");
+        prepareDB("/datasets/EmployeeController/DefaultDBState.xml");
         //arrange
         Employee entityBefore = employeeRepository.findById(EXISTING_EMPLOYEE_ID).get();
         String beforeVal = objectMapper.writeValueAsString(employeeMapper.toDTO(entityBefore));
@@ -466,7 +465,7 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
 
     @Test
     public void deleteEmployee_WithNonExistentEmployee_ShouldReturnNotFound() throws Exception {
-        prepareDB("/datasets/EmployeeController/DeleteEmployee.xml");
+        prepareDB("/datasets/EmployeeController/DefaultDBState.xml");
         //act
         ResultActions result = mockMvc.perform(delete("/employee/" + NON_EXISTENT_EMPLOYEE_ID));
 
@@ -476,7 +475,7 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
 
     @Test
     public void deleteEmployee_WithAManagerThatHasEmployees_ShouldMoveEmployeesToHisManager() throws Exception {
-        prepareDB("/datasets/EmployeeController/DeleteEmployee.xml");
+        prepareDB("/datasets/EmployeeController/DefaultDBState.xml");
         //arrange
         List<Employee> subordinatesBeforeReassign = employeeRepository.findById(EXISTING_EMPLOYEE_ID)
                 .get()
@@ -498,9 +497,12 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
 
     @Test
     public void getEmployee_WithValidEmployee_ShouldReturnOK() throws Exception {
-        prepareDB("/datasets/EmployeeController/GetEmployee.xml");
+        prepareDB("/datasets/EmployeeController/DefaultDBState.xml");
         //act
         ResultActions result = mockMvc.perform(get("/employee/" + EXISTING_EMPLOYEE_ID));
+        List<Integer> expectedExpertise = new ArrayList<>();
+        expectedExpertise.add(EXPERTISE_ID);
+
 
         result.andExpect(status().isOk())
                 .andExpect(jsonPath("$.employeeID").value(EXISTING_EMPLOYEE_ID))
@@ -510,15 +512,15 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
                 .andExpect(jsonPath("$.graduationDate").value(GRADUATION_DATE.toString()))
                 .andExpect(jsonPath("$.salary").value(SALARY))
                 .andExpect(jsonPath("$.departmentId").value(DEPARTMENT_ID))
-                .andExpect(jsonPath("$.managerId").isEmpty())
+                .andExpect(jsonPath("$.managerId").value(2))
                 .andExpect(jsonPath("$.teamId").value(TEAM_ID))
-                .andExpect(jsonPath("$.expertisesIds").isEmpty());
+                .andExpect(jsonPath("$.expertisesIds").value(expectedExpertise));
 
     }
 
     @Test
     public void getEmployee_WithInValidEmployee_ShouldReturnNotFound() throws Exception {
-        prepareDB("/datasets/EmployeeController/GetEmployee.xml");
+        prepareDB("/datasets/EmployeeController/DefaultDBState.xml");
         //act
         ResultActions result = mockMvc.perform(get("/employee/" + NON_EXISTENT_EMPLOYEE_ID));
 
@@ -528,7 +530,7 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
 
     @Test
     public void getSalary_WithValidEmployee_ShouldReturnOK() throws Exception {
-        prepareDB("/datasets/EmployeeController/GetSalary.xml");
+        prepareDB("/datasets/EmployeeController/DefaultDBState.xml");
         //prepare
         Double netSalary = SALARY - INSURANCE - SALARY * TAX; //net = gross - fixed 500 and - 15% tax
         //act
@@ -541,7 +543,7 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
 
     @Test
     public void getSalary_WithInValidEmployee_ShouldReturnNotFound() throws Exception {
-        prepareDB("/datasets/EmployeeController/GetSalary.xml");
+        prepareDB("/datasets/EmployeeController/DefaultDBState.xml");
         //act
         ResultActions result = mockMvc.perform(get("/employee/" + NON_EXISTENT_EMPLOYEE_ID + "/salary"));
         //assert
@@ -630,7 +632,7 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
 
     @Test
     public void addLeave_GivenValidDate_ShouldReturnCreated() throws Exception {
-        prepareDB("/datasets/EmployeeController/AddLeave.xml");
+        prepareDB("/datasets/EmployeeController/DefaultDBState.xml");
         //mocking
         LocalDate fixedNow = LocalDate.of(2000, 1, 1);
         try (MockedStatic<LocalDate> date = Mockito.mockStatic(LocalDate.class, Mockito.CALLS_REAL_METHODS)) {
@@ -660,7 +662,7 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
 
     @Test
     public void addLeave_GivenInValidDate_ShouldReturnBadRequest() throws Exception {
-        prepareDB("/datasets/EmployeeController/AddLeave.xml");
+        prepareDB("/datasets/EmployeeController/DefaultDBState.xml");
         //mocking
         LocalDate fixedNow = LocalDate.of(2000, 1, 1);
         try (MockedStatic<LocalDate> date = Mockito.mockStatic(LocalDate.class, Mockito.CALLS_REAL_METHODS)) {
@@ -681,7 +683,7 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
 
     @Test
     public void addLeave_GivenInValidEmployee_ShouldReturnNotFound() throws Exception {
-        prepareDB("/datasets/EmployeeController/AddLeave.xml");
+        prepareDB("/datasets/EmployeeController/DefaultDBState.xml");
         //mocking
         LocalDate fixedNow = LocalDate.of(2000, 1, 1);
         try (MockedStatic<LocalDate> date = Mockito.mockStatic(LocalDate.class, Mockito.CALLS_REAL_METHODS)) {
@@ -703,7 +705,7 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
 
     @Test
     public void addBonus_GivenValidAmount_ShouldReturnCreated() throws Exception {
-        prepareDB("/datasets/EmployeeController/AddBonus.xml");
+        prepareDB("/datasets/EmployeeController/DefaultDBState.xml");
 
         //arrange
         final Double BONUS_AMOUNT = 500d;
@@ -733,7 +735,7 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
 
     @Test
     public void addBonus_GivenNonExistingEmployee_ShouldReturnNotFound() throws Exception {
-        prepareDB("/datasets/EmployeeController/AddBonus.xml");
+        prepareDB("/datasets/EmployeeController/DefaultDBState.xml");
 
         //arrange
         final Double BONUS_AMOUNT = 500d;
@@ -750,7 +752,7 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
 
     @Test
     public void addBonus_GivenNegativeAmount_ShouldReturnBadRequest() throws Exception {
-        prepareDB("/datasets/EmployeeController/AddBonus.xml");
+        prepareDB("/datasets/EmployeeController/DefaultDBState.xml");
 
         //arrange
         final Double BONUS_AMOUNT = -500d;
@@ -767,7 +769,7 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
 
     @Test
     public void addRaise_GivenValidEmployee_ShouldReturnCreated() throws Exception {
-        prepareDB("/datasets/EmployeeController/AddRaise.xml");
+        prepareDB("/datasets/EmployeeController/DefaultDBState.xml");
         //arrange
         final Double RAISE_RATIO = 20d;
         final Double RAISE_PERCENTAGE = 20d / 100;
@@ -790,7 +792,7 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
 
     @Test
     public void addRaise_GivenNonExistentEmployee_ShouldReturnNotFound() throws Exception {
-        prepareDB("/datasets/EmployeeController/AddRaise.xml");
+        prepareDB("/datasets/EmployeeController/DefaultDBState.xml");
         //arrange
         final Double RAISE_RATIO = 20d;
         final Double RAISE_PERCENTAGE = 20d / 100;
