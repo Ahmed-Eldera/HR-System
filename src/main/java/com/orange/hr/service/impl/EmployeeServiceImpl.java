@@ -17,6 +17,8 @@ import java.util.List;
 @Transactional
 @Service
 public class EmployeeServiceImpl implements EmployeeService {
+    static final Double INSURANCE = 500d;
+    static final Double TAX_RATIO = 0.15d;
     @Autowired
     private DepartmentRepository departmentRepository;
     @Autowired
@@ -31,6 +33,8 @@ public class EmployeeServiceImpl implements EmployeeService {
     private LeaveRepository leaveRepository;
     @Autowired
     private SalaryAdjustmentRepository salaryAdjustmentRepository;
+    @Autowired
+    private SalaryRepository salaryRepository;
 
     public EmployeeResponseDTO addEmployee(EmployeeRequestDTO employee) {
         // validating the input data
@@ -52,11 +56,14 @@ public class EmployeeServiceImpl implements EmployeeService {
             throw new NoSuchExpertiseException(HttpStatus.NOT_FOUND, "Can't find the Selected Expertise");
         }
         //saving the employee
-        Employee entity = employeeMapper.toEntity(employee);
-        entity.setDepartment(dept);
-        entity.setTeam(team);
-        entity.setManager(manager);
-        entity.setExpertises(expertises);
+        Double newGrossSalary = employee.getSalary();
+        Employee entity = employeeMapper.toEntity(employee, dept, team, manager, expertises);
+        Salary newSalary = Salary.builder()
+                .employee(entity)
+                .gross(newGrossSalary)
+                .percentage(0d)
+                .build();
+        entity.setSalaryHistory(List.of(newSalary));
         employeeRepository.save(entity);
         return employeeMapper.toDTO(entity);
     }
@@ -73,7 +80,15 @@ public class EmployeeServiceImpl implements EmployeeService {
         }
 
         if (dto.getSalary() != null) {
-            entity.setSalary(dto.getSalary());
+            Double newGrossSalary = dto.getSalary();
+            Salary newSalary = Salary.builder()
+                    .employee(entity)
+                    .gross(newGrossSalary)
+                    .percentage(0d)
+                    .build();
+            List<Salary> salaryhistory = entity.getSalaryHistory();
+            salaryhistory.add(newSalary);
+            entity.setSalaryHistory(salaryhistory);
         }
 
         if (dto.getExpertise() != null) {
@@ -136,10 +151,8 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Override
     public SalaryDTO getSalary(Integer id) {
         Employee employee = employeeRepository.findById(id).orElseThrow(() -> new NoSuchEmployeeException(HttpStatus.NOT_FOUND, "Can't find the selected employee"));
-        Float gross = employee.getSalary();
-        final Float INSURANCE = 500f;
-        final Float TAXRATIO = 0.15f;
-        Float net = gross - gross * TAXRATIO - INSURANCE;
+        Double gross = salaryRepository.findCurrentSalaryByEmployee(employee).getGross();
+        Double net = calculateNetSalary(gross);
         SalaryDTO salaryDTO = new SalaryDTO(gross, net);
         return salaryDTO;
 
@@ -201,5 +214,28 @@ public class EmployeeServiceImpl implements EmployeeService {
                 .build();
 
         return response;
+    }
+
+    Double calculateNetSalary(Double gross) {
+        return gross - gross * TAX_RATIO - INSURANCE;
+    }
+
+    @Override
+    public SalaryDTO addRaise(Integer employeeId, RaiseRequestDTO request) {
+        Employee employee = employeeRepository.findById(employeeId).orElseThrow(() -> new NoSuchEmployeeException(HttpStatus.NOT_FOUND, "No Such Employee."));
+        Double raisePercentage = request.getRatio() / 100d;
+        Salary lastSalary = salaryRepository.findFirstByEmployeeOrderByCreatedAtDesc(employee).orElseThrow(() -> new MyException(HttpStatus.INTERNAL_SERVER_ERROR, "Couldn't find this employee's salary"));
+        Double grossSalaryBeforeRaise = lastSalary.getGross();
+        Double newGrossSalary = grossSalaryBeforeRaise + grossSalaryBeforeRaise * raisePercentage;
+        Salary raise = Salary.builder()
+                .employee(employee)
+                .percentage(raisePercentage)
+                .gross(newGrossSalary)
+                .build();
+        salaryRepository.save(raise);
+        return SalaryDTO.builder()
+                .gross(newGrossSalary)
+                .net(calculateNetSalary(newGrossSalary))
+                .build();
     }
 }

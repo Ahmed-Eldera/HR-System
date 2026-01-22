@@ -15,7 +15,7 @@ public interface EmployeeHierarchyProjection {
 
     LocalDate getGraduationDate();
 
-    Float getSalary();
+    Double getSalary();
 
     Integer getDepartmentId();
 

@@ -2,19 +2,14 @@ package com.orange.hr.integration;
 
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.orange.hr.dto.BonusRequestDTO;
-import com.orange.hr.dto.EmployeeRequestDTO;
-import com.orange.hr.dto.EmployeeResponseDTO;
-import com.orange.hr.dto.LeaveRequestDTO;
-import com.orange.hr.entity.Employee;
-import com.orange.hr.entity.Expertise;
-import com.orange.hr.entity.Leave;
-import com.orange.hr.entity.SalaryAdjustment;
+import com.orange.hr.dto.*;
+import com.orange.hr.entity.*;
 import com.orange.hr.enums.Gender;
 import com.orange.hr.mapper.EmployeeMapper;
 import com.orange.hr.repository.EmployeeRepository;
 import com.orange.hr.repository.LeaveRepository;
 import com.orange.hr.repository.SalaryAdjustmentRepository;
+import com.orange.hr.repository.SalaryRepository;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
@@ -49,9 +44,9 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
     private static final LocalDate FUTURE_DATE_OF_BIRTH = LocalDate.of(2999, 2, 18);
     private static final LocalDate GRADUATION_DATE = LocalDate.of(2026, 2, 18);
     private static final LocalDate NEW_GRADUATION_DATE = LocalDate.of(2029, 2, 18);
-    private static final float SALARY = 2000F;
-    private static final float INVALID_SALARY = 100F;
-    private static final float NEW_SALARY = 550F;
+    private static final Double SALARY = 2000D;
+    private static final Double INVALID_SALARY = 100D;
+    private static final Double NEW_SALARY = 5500D;
     private static final int DEPARTMENT_ID = 1;
     private static final int DEPARTMENT_ID2 = 2;
     private static final int NON_EXISTENT_DEPARTMENT_ID = 9876;
@@ -65,7 +60,7 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
     private static final int EXPERTISE_ID2 = 1;
     private static final int NON_EXISTENT_EXPERTISE_ID = 123;
     private static final int INSURANCE = 500;
-    private static final float TAX = 0.15f;
+    private static final Double TAX = 0.15d;
     @Autowired
     MockMvc mockMvc;
     @Autowired
@@ -76,6 +71,8 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
     private LeaveRepository leaveRepository;
     @Autowired
     private SalaryAdjustmentRepository salaryAdjustmentRepository;
+    @Autowired
+    private SalaryRepository salaryRepository;
 
     @Test
     public void addEmpolyeeSuccessfully_WithFullData_ExpectCreated() throws Exception {
@@ -533,7 +530,7 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
     public void getSalary_WithValidEmployee_ShouldReturnOK() throws Exception {
         prepareDB("/datasets/EmployeeController/GetSalary.xml");
         //prepare
-        Float netSalary = SALARY - INSURANCE - SALARY * TAX; //net = gross - fixed 500 and - 15% tax
+        Double netSalary = SALARY - INSURANCE - SALARY * TAX; //net = gross - fixed 500 and - 15% tax
         //act
         ResultActions result = mockMvc.perform(get("/employee/" + EXISTING_EMPLOYEE_ID + "/salary"));
 
@@ -766,6 +763,46 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
         //assert
         result.andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.msg").value("amount can't be negative."));
+    }
+
+    @Test
+    public void addRaise_GivenValidEmployee_ShouldReturnCreated() throws Exception {
+        prepareDB("/datasets/EmployeeController/AddRaise.xml");
+        //arrange
+        final Double RAISE_RATIO = 20d;
+        final Double RAISE_PERCENTAGE = 20d / 100;
+        RaiseRequestDTO requestDTO = new RaiseRequestDTO(RAISE_RATIO);
+        Employee employee = employeeRepository.findById(EXISTING_EMPLOYEE_ID).get();
+        Salary salaryBeforeRaise = salaryRepository.findCurrentSalaryByEmployee(employee);
+        //act
+        ResultActions result = mockMvc.perform(post("/employee/" + EXISTING_EMPLOYEE_ID + "/raise")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL)
+                        .writeValueAsString(requestDTO)));
+        //assert
+        Salary salaryAfterRaise = salaryRepository.findCurrentSalaryByEmployee(employee);
+        Double grossAfterRaise = salaryBeforeRaise.getGross() + salaryBeforeRaise.getGross() * RAISE_PERCENTAGE;
+        Double netAfterRaise = grossAfterRaise - grossAfterRaise * .15 - 500;
+        result.andExpect(status().isCreated())
+                .andExpect(jsonPath("$.gross").value(salaryAfterRaise.getGross()));
+        assertEquals(grossAfterRaise, salaryAfterRaise.getGross());
+    }
+
+    @Test
+    public void addRaise_GivenNonExistentEmployee_ShouldReturnNotFound() throws Exception {
+        prepareDB("/datasets/EmployeeController/AddRaise.xml");
+        //arrange
+        final Double RAISE_RATIO = 20d;
+        final Double RAISE_PERCENTAGE = 20d / 100;
+        RaiseRequestDTO requestDTO = new RaiseRequestDTO(RAISE_RATIO);
+        //act
+        ResultActions result = mockMvc.perform(post("/employee/" + NON_EXISTENT_EMPLOYEE_ID + "/raise")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL)
+                        .writeValueAsString(requestDTO)));
+        //assert
+        result.andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.msg").value("No Such Employee."));
     }
 }
 
