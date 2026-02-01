@@ -1,3 +1,15 @@
+# [1.3.0](https://github.com/Ahmed-Eldera/HR-System/compare/v1.2.0...v1.3.0) (2026-02-01)
+
+
+### Bug Fixes
+
+* setting salary in the add employee ([22735e4](https://github.com/Ahmed-Eldera/HR-System/commit/22735e48392e6aa3498446e0b5f1192be91a995d))
+
+
+### Features
+
+* implemented happy scenario ([157d72e](https://github.com/Ahmed-Eldera/HR-System/commit/157d72eaaf931467b11ebd7490e7f961df09de5e))
+
 # [1.2.0](https://github.com/Ahmed-Eldera/HR-System/compare/v1.1.0...v1.2.0) (2026-01-11)
 
 
