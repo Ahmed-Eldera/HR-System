@@ -11,7 +11,6 @@
             date_of_birth="2003-02-18"
             gender="MALE"
             graduation_date="2026-02-18"
-            salary="2000"
             department_id="1"
             team_id="1"
             manager_id="2"
@@ -22,9 +21,22 @@
             date_of_birth="2003-02-18"
             gender="MALE"
             graduation_date="2026-02-18"
-            salary="2000"
             department_id="1"
             team_id="1"
+    />
+    <salaries
+            salary_id="2"
+            employee_id="2"
+            raise_percentage="0"
+            gross_salary="2000"
+            created_at="2024-03-01 10:00:00"
+    />
+    <salaries
+            salary_id="1"
+            employee_id="1"
+            raise_percentage="0"
+            gross_salary="2000"
+            created_at="2024-03-01 10:00:00"
     />
 
     <expertises expertise_id="1" name="java"/>
