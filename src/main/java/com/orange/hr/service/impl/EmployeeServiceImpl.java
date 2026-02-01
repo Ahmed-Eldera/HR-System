@@ -106,7 +106,6 @@ public class EmployeeServiceImpl implements EmployeeService {
         if (dto.getDateOfBirth() != null) {
             entity.setDateOfBirth(dto.getDateOfBirth());
         }
-
         if (dto.getDepartmentId() != null) {
             Department dept = departmentRepository.findById(dto.getDepartmentId()).orElseThrow(() -> new NoSuchDepartmentException(HttpStatus.NOT_FOUND, "Can't find the Selected Department"));
             entity.setDepartment(dept);
