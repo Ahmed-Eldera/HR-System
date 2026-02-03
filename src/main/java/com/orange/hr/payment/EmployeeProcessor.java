@@ -1,11 +1,15 @@
 package com.orange.hr.payment;
+
+import com.orange.hr.entity.Employee;
 import org.springframework.batch.item.ItemProcessor;
+import org.springframework.stereotype.Component;
 
-public class EmployeeProcessor implements ItemProcessor<String,String> {
+@Component
+public class EmployeeProcessor implements ItemProcessor<Employee, String> {
 
-        @Override
-        public String process(String item) {
-            return item.toUpperCase(); // Convert item to uppercase
-        }
+    @Override
+    public String process(Employee item) {
+        return item.getName().toUpperCase(); // Convert item to uppercase
+    }
 
 }
