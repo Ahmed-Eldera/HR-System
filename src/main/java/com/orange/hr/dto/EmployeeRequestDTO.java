@@ -33,6 +33,12 @@ public class EmployeeRequestDTO {
     @NotNull(message = "Gender can't be null")
     private Gender gender;
 
+    @NotNull(message = "Email can't be null")
+    private String email;
+
+    @NotNull(message = "Password can't be null")
+    private String password;
+
     @NotNull(message = "Graduation Date can't be null")
     private LocalDate graduationDate;
 

@@ -11,5 +11,3 @@ public class HrApplication {
     }
 
 }
-
-//testing the release bot

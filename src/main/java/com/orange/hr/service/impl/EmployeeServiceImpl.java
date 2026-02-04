@@ -8,6 +8,7 @@ import com.orange.hr.repository.*;
 import com.orange.hr.service.EmployeeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,6 +36,8 @@ public class EmployeeServiceImpl implements EmployeeService {
     private SalaryAdjustmentRepository salaryAdjustmentRepository;
     @Autowired
     private SalaryRepository salaryRepository;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     public EmployeeResponseDTO addEmployee(EmployeeRequestDTO employee) {
         // validating the input data
@@ -57,6 +60,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         }
         //saving the employee
         Double newGrossSalary = employee.getSalary();
+        employee.setPassword(passwordEncoder.encode(employee.getPassword()));
         Employee entity = employeeMapper.toEntity(employee, dept, team, manager, expertises);
         Salary newSalary = Salary.builder()
                 .employee(entity)

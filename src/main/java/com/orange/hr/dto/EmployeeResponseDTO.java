@@ -12,6 +12,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
+@Builder
 @JsonInclude(JsonInclude.Include.ALWAYS)
 public class EmployeeResponseDTO {
     private Integer employeeID;
@@ -23,5 +24,6 @@ public class EmployeeResponseDTO {
     private Integer departmentId;
     private Integer managerId;
     private Integer teamId;
+    private String email;
     private List<Integer> expertisesIds;
 }
