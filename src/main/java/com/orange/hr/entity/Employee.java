@@ -58,10 +58,9 @@ public class Employee {
         return (a, b) -> a.getCreatedAt().isBefore(b.getCreatedAt()) ? -1 : 1;
     }
 
-    public Double getSalary() {
+    public Salary getSalary() {
         return salaryHistory.stream()
                 .max(byLatestSalaryComparator())
-                .get()
-                .getGross();
+                .get();
     }
 }

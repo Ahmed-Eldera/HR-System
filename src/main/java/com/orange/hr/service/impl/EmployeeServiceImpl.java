@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Transactional
@@ -235,6 +236,18 @@ public class EmployeeServiceImpl implements EmployeeService {
         return SalaryDTO.builder()
                 .gross(newGrossSalary)
                 .net(calculateNetSalary(newGrossSalary))
+                .build();
+    }
+
+    public Payment pay(Employee employee) {
+        Salary salary = employee.getSalary();
+        List<SalaryAdjustment> adjustments = salaryAdjustmentRepository.findAllByEmployeeAndCreatedAtBetween(employee, LocalDateTime.now(), LocalDateTime.now().plusMonths(1));
+        Double grossSalary = salary.getGross();
+        Double sumOfAdjustments = adjustments.stream().mapToDouble(SalaryAdjustment::getAmount).sum();
+        Double netSalary = grossSalary - grossSalary * TAX_RATIO - INSURANCE + sumOfAdjustments;
+        return Payment.builder()
+                .amount(netSalary)
+                .salary(salary)
                 .build();
     }
 }
