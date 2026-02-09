@@ -13,8 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import java.time.LocalTime;
-
 @Component
 public class PayrollScheduler {
     private static final Logger log = LoggerFactory.getLogger(PayrollScheduler.class);
@@ -25,7 +23,7 @@ public class PayrollScheduler {
 
     @Scheduled(cron = "${payroll.cron}")
     public void reportCurrentTime() throws JobInstanceAlreadyCompleteException, JobExecutionAlreadyRunningException, JobParametersInvalidException, JobRestartException {
-        log.info("The time is now " + LocalTime.now());
+//        log.info("The time is now " + LocalTime.now());
         jobLauncher.run(
                 job,
                 new JobParametersBuilder()

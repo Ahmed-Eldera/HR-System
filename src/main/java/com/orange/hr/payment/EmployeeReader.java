@@ -14,21 +14,37 @@ public class EmployeeReader implements ItemReader<Employee> {
     @Autowired
     EmployeeRepository employeeRepository;
     private int index = 0;
+    private int currentBatchNo = 0;
     private int employeeIdLowerBound = 0;
     private List<Employee> employeeList = null;
+    private long empCount;
+    private int totalBatchesNo;
 
     @Override
     public Employee read() {
         if (employeeList == null) {
+            empCount = employeeRepository.count();
             employeeList = employeeRepository.findTop10ByEmployeeIDGreaterThanOrderByEmployeeIDAsc(employeeIdLowerBound);
-            employeeList.forEach(e -> System.out.println(e.getName()));
+            totalBatchesNo = (int) Math.ceil((double) empCount / CHUNK_SIZE);
         }
-        if (index < employeeIdLowerBound + CHUNK_SIZE || index <= employeeList.size()) {
+//        index < employeeIdLowerBound + CHUNK_SIZE &&
+        if (index < employeeList.size()) {
+            System.out.println("EMPLOYEEEE PROCESSSSIINNNGGGGGGGGGG" + employeeList.get(index).getName());
             return employeeList.get(index++);
-        } else {
+        } else if (currentBatchNo < totalBatchesNo) {
+            index = 0;
+            currentBatchNo++;
             employeeIdLowerBound += CHUNK_SIZE;
             employeeList = employeeRepository.findTop10ByEmployeeIDGreaterThanOrderByEmployeeIDAsc(employeeIdLowerBound);
             return read();
+        } else {
+            index = 0;
+            employeeList = null;
+            currentBatchNo = 0;
+            totalBatchesNo = 0;
+            employeeIdLowerBound = 0;
+            empCount = 0;
+            return null;
         }
     }
 }
