@@ -119,6 +119,9 @@ public class EmployeeServiceImpl implements EmployeeService {
             Team team = teamRepository.findById(dto.getTeamId()).orElseThrow(() -> new NoSuchTeamException(HttpStatus.NOT_FOUND, "Can't find the Selected Team"));
             entity.setTeam(team);
         }
+        if (dto.getEmail() != null) {
+            entity.setEmail(dto.getEmail());
+        }
 
         if (dto.getManagerId() != null) {
             if (dto.getManagerId().isPresent()) {
