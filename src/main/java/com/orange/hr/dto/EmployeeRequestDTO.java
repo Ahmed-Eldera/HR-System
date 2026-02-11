@@ -56,4 +56,6 @@ public class EmployeeRequestDTO {
     @NotNull(message = "Team can't be null")
     private Integer teamId;
     private List<Integer> expertise;
+
+    private List<Integer> roles;
 }

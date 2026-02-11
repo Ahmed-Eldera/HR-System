@@ -37,6 +37,8 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Autowired
     private SalaryRepository salaryRepository;
     @Autowired
+    private RoleRepository roleRepository;
+    @Autowired
     private PasswordEncoder passwordEncoder;
 
     public EmployeeResponseDTO addEmployee(EmployeeRequestDTO employee) {
@@ -47,7 +49,6 @@ public class EmployeeServiceImpl implements EmployeeService {
 
         Department dept = departmentRepository.findById(employee.getDepartmentId()).orElseThrow(() -> new NoSuchDepartmentException(HttpStatus.NOT_FOUND, "Can't find the Selected Department"));
         Team team = teamRepository.findById(employee.getTeamId()).orElseThrow(() -> new NoSuchTeamException(HttpStatus.NOT_FOUND, "Can't find the Selected Team"));
-
         Employee manager = null;
         if (employee.getManagerId() != null) {
             if (employee.getManagerId().isPresent()) {
@@ -58,10 +59,14 @@ public class EmployeeServiceImpl implements EmployeeService {
         if (expertises.size() != employee.getExpertise().size()) {
             throw new NoSuchExpertiseException(HttpStatus.NOT_FOUND, "Can't find the Selected Expertise");
         }
+        List<Role> roles = roleRepository.findAllById(employee.getRoles());
+        if (roles.size() != employee.getRoles().size()) {
+            throw new NoSuchExpertiseException(HttpStatus.NOT_FOUND, "Can't find the Selected Roles");
+        }
         //saving the employee
         Double newGrossSalary = employee.getSalary();
         employee.setPassword(passwordEncoder.encode(employee.getPassword()));
-        Employee entity = employeeMapper.toEntity(employee, dept, team, manager, expertises);
+        Employee entity = employeeMapper.toEntity(employee, dept, team, manager, expertises, roles);
         Salary newSalary = Salary.builder()
                 .employee(entity)
                 .gross(newGrossSalary)

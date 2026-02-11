@@ -3,10 +3,7 @@ package com.orange.hr.mapper;
 import com.orange.hr.dto.EmployeeHierarchyProjection;
 import com.orange.hr.dto.EmployeeRequestDTO;
 import com.orange.hr.dto.EmployeeResponseDTO;
-import com.orange.hr.entity.Department;
-import com.orange.hr.entity.Employee;
-import com.orange.hr.entity.Expertise;
-import com.orange.hr.entity.Team;
+import com.orange.hr.entity.*;
 import lombok.Data;
 import org.springframework.stereotype.Component;
 
@@ -23,7 +20,8 @@ public class EmployeeMapper {
                              Department department,
                              Team team,
                              Employee manager,
-                             List<Expertise> expertises) {
+                             List<Expertise> expertises,
+                             List<Role> roles) {
         Employee employee = new Employee();
         employee.setName(dto.getName());
         employee.setDateOfBirth(dto.getDateOfBirth());
@@ -35,6 +33,7 @@ public class EmployeeMapper {
         employee.setEmail(dto.getEmail());
         employee.setPassword(dto.getPassword());
         employee.setExpertises(expertises);
+        employee.setRoles(roles);
         return employee;
     }
 

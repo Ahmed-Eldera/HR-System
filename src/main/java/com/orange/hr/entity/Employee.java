@@ -59,6 +59,14 @@ public class Employee implements UserDetails {
     private List<Employee> subordinates;
     @OneToMany(mappedBy = "employee", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<Salary> salaryHistory;
+    @ManyToMany
+    @JoinTable(
+            name = "users_roles",
+            joinColumns = @JoinColumn(
+                    name = "user_id", referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn(
+                    name = "role_id", referencedColumnName = "id"))
+    private List<Role> roles;
 
     private static Comparator<Salary> byLatestSalaryComparator() {
         return (a, b) -> a.getCreatedAt().isBefore(b.getCreatedAt()) ? -1 : 1;
@@ -75,6 +83,7 @@ public class Employee implements UserDetails {
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of();
     }
+
 
     @Override
     public String getPassword() {
