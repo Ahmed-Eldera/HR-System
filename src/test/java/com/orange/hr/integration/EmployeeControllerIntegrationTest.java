@@ -77,7 +77,7 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
     @Autowired
     private SalaryRepository salaryRepository;
 
-    private EmployeeRequestDTO.EmployeeRequestDTOBuilder buildBasicEmployeeNoManagerNoExpertise() {
+    public EmployeeRequestDTO.EmployeeRequestDTOBuilder buildBasicEmployeeNoManagerNoExpertise() {
         return EmployeeRequestDTO.builder()
                 .name(NEW_EMPLOYEE_NAME)
                 .gender(Gender.MALE)
