@@ -2,6 +2,7 @@ package com.orange.hr.dto;
 
 import com.orange.hr.enums.Gender;
 import com.orange.hr.validation.Always;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -33,6 +34,7 @@ public class EmployeeRequestDTO {
     @NotNull(message = "Gender can't be null")
     private Gender gender;
 
+    @Email(message = "this is not a proper email format")
     @NotNull(message = "Email can't be null")
     private String email;
 

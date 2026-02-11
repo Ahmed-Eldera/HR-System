@@ -7,10 +7,9 @@ import lombok.Setter;
 @Getter
 @Setter
 @Builder
-//@NoArgsConstructor
 public class LoginResponseDTO {
     private String token;
 
-    private long expiresIn;
+    private Long expiresIn;
 
 }
