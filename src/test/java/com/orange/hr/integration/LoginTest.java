@@ -14,15 +14,18 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @AutoConfigureMockMvc(addFilters = true)
 public class LoginTest extends AbstractTest {
+    private static final String EMAIL = "emp1@orange.com";
+    private static final String PASSWORD = "1234";
+    private static final String WRONG_PASSWORD = "WRONG";
     @Autowired
     MockMvc mockMvc;
 
     @Test
-    public void login_WithValidCredentials_ShouldReturnNotFound() throws Exception {
+    public void login_WithValidCredentials_ShouldReturnOK() throws Exception {
         prepareDB("/datasets/EmployeeController/DefaultDBState.xml");
         LoginRequestDTO requestDTO = LoginRequestDTO.builder()
-                .email("emp1@orange.com")
-                .password("1234")
+                .email(EMAIL)
+                .password(PASSWORD)
                 .build();
         //act
         ResultActions result = mockMvc.perform(MockMvcRequestBuilders.post("/auth/login").contentType(MediaType.APPLICATION_JSON)
@@ -30,6 +33,23 @@ public class LoginTest extends AbstractTest {
 
         result.andExpect(status().isOk())
                 .andExpect(jsonPath("$.token").isNotEmpty());
+
+    }
+
+    @Test
+    public void login_WithWrongCredentials_ShouldReturnUnauthorized() throws Exception {
+        prepareDB("/datasets/EmployeeController/DefaultDBState.xml");
+        LoginRequestDTO requestDTO = LoginRequestDTO.builder()
+                .email(EMAIL)
+                .password(WRONG_PASSWORD)
+                .build();
+        //act
+        ResultActions result = mockMvc.perform(MockMvcRequestBuilders.post("/auth/login").contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(requestDTO)));
+
+        result.andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.token").doesNotExist());
+
 
     }
 }
