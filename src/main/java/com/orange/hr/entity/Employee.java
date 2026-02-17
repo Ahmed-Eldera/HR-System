@@ -7,8 +7,11 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.SourceType;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
 
@@ -52,14 +55,32 @@ public class Employee {
     private List<Employee> subordinates;
 
     @OneToMany(mappedBy = "employee", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private List<Salary> salaryHistory;
+    private List<Salary> salaries;
+
+    @OneToMany(mappedBy = "employee", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<SalaryAdjustment> adjustments;
+    @OneToMany(mappedBy = "employee", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<Leave> leaves;
+
+    private Integer YOE;
+
+    @Column(name = "is_active")
+    private Boolean isActive;
+
+    @CreationTimestamp(source = SourceType.DB)
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
 
     private static Comparator<Salary> byLatestSalaryComparator() {
         return (a, b) -> a.getCreatedAt().isBefore(b.getCreatedAt()) ? -1 : 1;
     }
 
-    public Salary getSalary() {
-        return salaryHistory.stream()
+    public Integer getTotalYOE() {
+        return YOE + LocalDate.now().minusYears(createdAt.getYear()).getYear();
+    }
+
+    public Salary getCurrentSalary() {
+        return salaries.stream()
                 .max(byLatestSalaryComparator())
                 .get();
     }

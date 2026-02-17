@@ -14,13 +14,7 @@ public class EmployeeProcessor implements ItemProcessor<Employee, Payment> {
 
     @Override
     public Payment process(Employee employee) {
-//        Salary salary = employee.getSalary();
-//        Payment payment = Payment.builder()
-//                .salary(salary)
-//                .amount(salary.getGross() - 500)
-//                .build();
-        Payment payment = employeeService.pay(employee);
-        return payment;
+        return employeeService.pay(employee);
     }
 
 }

@@ -27,10 +27,10 @@ public class EmployeeReader implements ItemReader<Employee> {
             employeeList = employeeRepository.findTop10ByEmployeeIDGreaterThanOrderByEmployeeIDAsc(employeeIdLowerBound);
             totalBatchesNo = (int) Math.ceil((double) empCount / CHUNK_SIZE);
         }
-//        index < employeeIdLowerBound + CHUNK_SIZE &&
         if (index < employeeList.size()) {
             System.out.println("EMPLOYEEEE PROCESSSSIINNNGGGGGGGGGG" + employeeList.get(index).getName());
-            return employeeList.get(index++);
+            Employee employee = employeeList.get(index++);
+            return employee;
         } else if (currentBatchNo < totalBatchesNo) {
             index = 0;
             currentBatchNo++;
@@ -38,12 +38,6 @@ public class EmployeeReader implements ItemReader<Employee> {
             employeeList = employeeRepository.findTop10ByEmployeeIDGreaterThanOrderByEmployeeIDAsc(employeeIdLowerBound);
             return read();
         } else {
-            index = 0;
-            employeeList = null;
-            currentBatchNo = 0;
-            totalBatchesNo = 0;
-            employeeIdLowerBound = 0;
-            empCount = 0;
             return null;
         }
     }

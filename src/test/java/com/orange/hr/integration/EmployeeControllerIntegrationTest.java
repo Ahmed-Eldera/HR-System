@@ -6,6 +6,7 @@ import com.orange.hr.dto.*;
 import com.orange.hr.entity.*;
 import com.orange.hr.enums.Gender;
 import com.orange.hr.mapper.EmployeeMapper;
+import com.orange.hr.payment.PayrollScheduler;
 import com.orange.hr.repository.EmployeeRepository;
 import com.orange.hr.repository.LeaveRepository;
 import com.orange.hr.repository.SalaryAdjustmentRepository;
@@ -21,6 +22,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -64,6 +66,8 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
     MockMvc mockMvc;
     @Autowired
     EmployeeRepository employeeRepository;
+    @Autowired
+    PayrollScheduler payrollScheduler;
     @Autowired
     private EmployeeMapper employeeMapper;
     @Autowired
@@ -529,7 +533,7 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
     }
 
     @Test
-    public void getSalary_WithValidEmployee_ShouldReturnOK() throws Exception {
+    public void getCurrentSalary_WithValidEmployee_ShouldReturnOK() throws Exception {
         prepareDB("/datasets/EmployeeController/DefaultDBState.xml");
         //prepare
         Double netSalary = SALARY - INSURANCE - SALARY * TAX; //net = gross - fixed 500 and - 15% tax
@@ -542,7 +546,7 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
     }
 
     @Test
-    public void getSalary_WithInValidEmployee_ShouldReturnNotFound() throws Exception {
+    public void getCurrentSalary_WithInValidEmployee_ShouldReturnNotFound() throws Exception {
         prepareDB("/datasets/EmployeeController/DefaultDBState.xml");
         //act
         ResultActions result = mockMvc.perform(get("/employee/" + NON_EXISTENT_EMPLOYEE_ID + "/salary"));
@@ -656,7 +660,7 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
             assertEquals(numberOfInsertedLeaves, totalLeaves.size());
             Leave expectedLeave = totalLeaves.getFirst();//1st entry because db is empty (check dataset)
             assertEquals(expectedLeave.getEmployee().getEmployeeID(), EXISTING_EMPLOYEE_ID);
-            assertEquals(expectedLeave.getDate(), leave.getDate());
+            assertEquals(expectedLeave.getLeaveDate(), leave.getDate());
         }
     }
 
@@ -809,9 +813,19 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
 
     @Test
     public void generatePayroll_Gzxcv() throws Exception {
-        List<Integer> listy = new ArrayList<>();
-        listy.add(1);
-        System.out.println(listy.get(0));
+        prepareDB("/datasets/EmployeeController/momo.xml");
+        LocalDateTime base = LocalDateTime.of(2024, 6, 15, 0, 0);
+
+        LocalDateTime oneMonthAgo =
+                base.minusMonths(1).withDayOfMonth(1);
+        payrollScheduler.reportCurrentTime();
+        List<Employee> employees =
+                employeeRepository
+                        .findAllWithSalaryAdjustmentsAndLeaves();
+        System.out.println(employees.get(0).getSalaries().get(0).getGross());
+        System.out.println(employees.get(0));
+        System.out.println();
+        System.out.println("hi");
     }
 }
 

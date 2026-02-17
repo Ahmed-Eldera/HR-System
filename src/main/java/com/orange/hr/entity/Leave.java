@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "leaves")
 @Builder
-public class Leave {
+public class Leave implements HasCreatedAt {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "leave_id", nullable = false)
@@ -26,7 +26,7 @@ public class Leave {
     private Employee employee;
 
     @Column(name = "leave_date", nullable = false)
-    private LocalDate date;
+    private LocalDate leaveDate;
 
     @CreationTimestamp(source = SourceType.DB)
     @Column(name = "created_at")

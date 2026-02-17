@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @DynamicInsert
 @Builder
-public class SalaryAdjustment {
+public class SalaryAdjustment implements HasCreatedAt {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "adjustment_id")
