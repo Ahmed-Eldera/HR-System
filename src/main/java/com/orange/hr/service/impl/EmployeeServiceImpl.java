@@ -6,6 +6,7 @@ import com.orange.hr.exceptions.*;
 import com.orange.hr.mapper.EmployeeMapper;
 import com.orange.hr.repository.*;
 import com.orange.hr.service.EmployeeService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -16,6 +17,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.function.Predicate;
 
+@Slf4j
 @Transactional
 @Service
 public class EmployeeServiceImpl implements EmployeeService {
@@ -258,9 +260,10 @@ public class EmployeeServiceImpl implements EmployeeService {
         Salary salary = employee.getCurrentSalary();
         Double grossSalary = salary.getGross();
         applyDeductions(employee);
-        List<SalaryAdjustment> adjustments = salaryAdjustmentRepository.findByEmployee(employee).stream().filter(currentMonth()).toList();
+        List<SalaryAdjustment> adjustments = salaryAdjustmentRepository.findByEmployee(employee).stream().filter(currentYear()).filter(currentMonth()).toList();
         Double sumOfAdjustments = adjustments.stream().mapToDouble(SalaryAdjustment::getAmount).sum();
-        Double netSalary = grossSalary - (grossSalary * TAX_RATIO - INSURANCE) + sumOfAdjustments;
+        log.info("gross: " + grossSalary + " adjustments: " + sumOfAdjustments);
+        Double netSalary = grossSalary - (grossSalary * TAX_RATIO + INSURANCE) + sumOfAdjustments;
         return Payment.builder()
                 .amount(netSalary)
                 .salary(salary)

@@ -64,9 +64,6 @@ public class Employee {
 
     private Integer YOE;
 
-    @Column(name = "is_active")
-    private Boolean isActive;
-
     @CreationTimestamp(source = SourceType.DB)
     @Column(name = "created_at")
     private LocalDateTime createdAt;

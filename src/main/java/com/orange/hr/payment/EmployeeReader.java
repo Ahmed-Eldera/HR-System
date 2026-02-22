@@ -2,12 +2,14 @@ package com.orange.hr.payment;
 
 import com.orange.hr.entity.Employee;
 import com.orange.hr.repository.EmployeeRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+@Slf4j
 @Component
 public class EmployeeReader implements ItemReader<Employee> {
     private final int CHUNK_SIZE = 10;
@@ -28,7 +30,7 @@ public class EmployeeReader implements ItemReader<Employee> {
             totalBatchesNo = (int) Math.ceil((double) empCount / CHUNK_SIZE);
         }
         if (index < employeeList.size()) {
-            System.out.println("EMPLOYEEEE PROCESSSSIINNNGGGGGGGGGG" + employeeList.get(index).getName());
+            log.info("EMPLOYEEEE PROCESSSSIINNNGGGGGGGGGG" + employeeList.get(index).getName());
             Employee employee = employeeList.get(index++);
             return employee;
         } else if (currentBatchNo < totalBatchesNo) {
