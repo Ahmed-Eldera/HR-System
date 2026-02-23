@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -39,6 +40,8 @@ public class EmployeeServiceImpl implements EmployeeService {
     private SalaryAdjustmentRepository salaryAdjustmentRepository;
     @Autowired
     private SalaryRepository salaryRepository;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
     @Value("${senior.yoe}")
     private Integer seniorYOE;
 
@@ -75,6 +78,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         }
         //saving the employee
         Double newGrossSalary = employee.getSalary();
+        employee.setPassword(passwordEncoder.encode(employee.getPassword()));
         Employee entity = employeeMapper.toEntity(employee, dept, team, manager, expertises);
         Salary newSalary = Salary.builder()
                 .employee(entity)
@@ -132,6 +136,9 @@ public class EmployeeServiceImpl implements EmployeeService {
         if (dto.getTeamId() != null) {
             Team team = teamRepository.findById(dto.getTeamId()).orElseThrow(() -> new NoSuchTeamException(HttpStatus.NOT_FOUND, "Can't find the Selected Team"));
             entity.setTeam(team);
+        }
+        if (dto.getEmail() != null) {
+            entity.setEmail(dto.getEmail());
         }
 
         if (dto.getManagerId() != null) {

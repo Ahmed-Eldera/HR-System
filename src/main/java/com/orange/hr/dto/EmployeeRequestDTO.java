@@ -2,14 +2,12 @@ package com.orange.hr.dto;
 
 import com.orange.hr.enums.Gender;
 import com.orange.hr.validation.Always;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.groups.Default;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -19,10 +17,8 @@ import java.util.Optional;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class EmployeeRequestDTO {
-
-    @NotNull(message = "employeeId can't be null")
-    private Integer employeeId;
 
     @NotBlank(message = "Name can't be null")
     private String name;
@@ -32,6 +28,13 @@ public class EmployeeRequestDTO {
 
     @NotNull(message = "Gender can't be null")
     private Gender gender;
+
+    @Email(message = "this is not a proper email format")
+    @NotNull(message = "Email can't be null")
+    private String email;
+
+    @NotNull(message = "Password can't be null")
+    private String password;
 
     @NotNull(message = "Graduation Date can't be null")
     private LocalDate graduationDate;

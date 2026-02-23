@@ -10,6 +10,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface EmployeeRepository extends JpaRepository<Employee, Integer> {
@@ -33,7 +34,8 @@ public interface EmployeeRepository extends JpaRepository<Employee, Integer> {
                 graduation_date,
                 department_id,
                 team_id,
-                manager_id
+                manager_id,
+                email
             ) AS (
                 SELECT
                     employee_id,
@@ -43,7 +45,8 @@ public interface EmployeeRepository extends JpaRepository<Employee, Integer> {
                     graduation_date,
                     department_id,
                     team_id,
-                    manager_id
+                    manager_id,
+                    email
                 FROM employees
                 WHERE employee_id = :managerId
 
@@ -57,7 +60,8 @@ public interface EmployeeRepository extends JpaRepository<Employee, Integer> {
                     e.graduation_date,
                     e.department_id,
                     e.team_id,
-                    e.manager_id
+                    e.manager_id,
+                    e.email
                 FROM employees e
                 INNER JOIN employee_hierarchy eh
                     ON e.manager_id = eh.employee_id
@@ -91,7 +95,8 @@ public interface EmployeeRepository extends JpaRepository<Employee, Integer> {
                 eh.team_id,
                 eh.manager_id,
                 ex.expertise_id,
-                ex.name AS expertise_name
+                ex.name AS expertise_name,
+                eh.email
             FROM employee_hierarchy eh
             LEFT JOIN latest_salary ls
                 ON eh.employee_id = ls.employee_id
@@ -128,5 +133,6 @@ public interface EmployeeRepository extends JpaRepository<Employee, Integer> {
             """)
     List<Employee> findAllWithSalaryAdjustmentsAndLeaves();
 
+    Optional<Employee> findByEmail(String email);
 
 }

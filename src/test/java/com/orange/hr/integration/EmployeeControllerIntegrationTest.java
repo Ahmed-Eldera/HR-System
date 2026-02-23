@@ -61,6 +61,10 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
     private static final int NON_EXISTENT_EXPERTISE_ID = 123;
     private static final int INSURANCE = 500;
     private static final Double TAX = 0.15d;
+    private static final String EMAIL = "emp1@orange.com";
+    private static final String NEW_EMAIL = "test@orange.com";
+    private static final String NEW_PASSWORD = "1234";
+
     @Autowired
     MockMvc mockMvc;
     @Autowired
@@ -76,24 +80,32 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
     @Autowired
     private SalaryRepository salaryRepository;
 
+    public EmployeeRequestDTO.EmployeeRequestDTOBuilder buildBasicEmployeeNoManagerNoExpertise() {
+        return EmployeeRequestDTO.builder()
+                .name(NEW_EMPLOYEE_NAME)
+                .gender(Gender.MALE)
+                .dateOfBirth(NEW_DATE_OF_BIRTH)
+                .email(NEW_EMAIL)
+                .password(NEW_PASSWORD)
+                .salary(NEW_SALARY)
+                .expertise(new ArrayList<>())
+                .departmentId(DEPARTMENT_ID)
+                .teamId(TEAM_ID)
+                .managerId(Optional.empty())
+                .graduationDate(NEW_GRADUATION_DATE);
+
+    }
+
     @Test
     public void addEmpolyeeSuccessfully_WithFullData_ExpectCreated() throws Exception {
         prepareDB("/datasets/EmployeeController/DefaultDBState.xml");
         //Arrange
         List<Integer> expertises = new ArrayList<>();
         expertises.add(EXPERTISE_ID);
-        EmployeeRequestDTO employee = new EmployeeRequestDTO(
-                NEW_EMPLOYEE_ID,
-                NEW_EMPLOYEE_NAME,
-                DATE_OF_BIRTH,
-                Gender.MALE,
-                GRADUATION_DATE,
-                SALARY,
-                DEPARTMENT_ID,
-                Optional.of(MANAGER_ID),
-                TEAM_ID,
-                expertises
-        );
+        EmployeeRequestDTO employee = buildBasicEmployeeNoManagerNoExpertise()
+                .managerId(Optional.of(MANAGER_ID))
+                .expertise(expertises)
+                .build();
 
         //act
         ResultActions result = mockMvc.perform(post("/employee").contentType(MediaType.APPLICATION_JSON)
@@ -109,6 +121,7 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
                 .andExpect(jsonPath("$.departmentId").value(employee.getDepartmentId()))
                 .andExpect(jsonPath("$.managerId").value(employee.getManagerId().get()))
                 .andExpect(jsonPath("$.teamId").value(employee.getTeamId()))
+                .andExpect(jsonPath("$.email").value(employee.getEmail()))
                 .andExpect(jsonPath("$.expertisesIds").value(employee.getExpertise()));
     }
 
@@ -118,18 +131,9 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
         //Arrange
         List<Integer> expertises = new ArrayList<>();
         expertises.add(EXPERTISE_ID);
-        EmployeeRequestDTO employee = new EmployeeRequestDTO(
-                NEW_EMPLOYEE_ID,
-                NEW_EMPLOYEE_NAME,
-                DATE_OF_BIRTH,
-                Gender.MALE,
-                GRADUATION_DATE,
-                SALARY,
-                DEPARTMENT_ID,
-                Optional.empty(),
-                TEAM_ID,
-                expertises
-        );
+        EmployeeRequestDTO employee = buildBasicEmployeeNoManagerNoExpertise()
+                .expertise(expertises)
+                .build();
 
         //act
         ResultActions result = mockMvc
@@ -147,6 +151,7 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
                 .andExpect(jsonPath("$.departmentId").value(employee.getDepartmentId()))
                 .andExpect(jsonPath("$.managerId").isEmpty())
                 .andExpect(jsonPath("$.teamId").value(employee.getTeamId()))
+                .andExpect(jsonPath("$.email").value(employee.getEmail()))
                 .andExpect(jsonPath("$.expertisesIds").value(employee.getExpertise()));
     }
 
@@ -156,18 +161,10 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
         //Arrange
         List<Integer> expertises = new ArrayList<>();
         expertises.add(EXPERTISE_ID);
-        EmployeeRequestDTO employee = new EmployeeRequestDTO(
-                NEW_EMPLOYEE_ID,
-                null,  //missing name
-                DATE_OF_BIRTH,
-                Gender.MALE,
-                GRADUATION_DATE,
-                SALARY,
-                DEPARTMENT_ID,
-                null,
-                TEAM_ID,
-                expertises
-        );
+        EmployeeRequestDTO employee = buildBasicEmployeeNoManagerNoExpertise()
+                .name(null)
+                .build();
+
         //act
         ResultActions result = mockMvc.perform(post("/employee").contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(employee)));
@@ -181,18 +178,10 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
         //Arrange
         List<Integer> expertises = new ArrayList<>();
         expertises.add(EXPERTISE_ID);
-        EmployeeRequestDTO employee = new EmployeeRequestDTO(
-                NEW_EMPLOYEE_ID,
-                NEW_EMPLOYEE_NAME,
-                DATE_OF_BIRTH,
-                Gender.MALE,
-                GRADUATION_DATE,
-                SALARY,
-                NON_EXISTENT_DEPARTMENT_ID,
-                Optional.of(MANAGER_ID),
-                TEAM_ID,
-                expertises
-        );
+        EmployeeRequestDTO employee = buildBasicEmployeeNoManagerNoExpertise()
+                .departmentId(NON_EXISTENT_DEPARTMENT_ID)
+                .build();
+
         //act
         ResultActions result = mockMvc.perform(post("/employee").contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(employee)));
@@ -207,18 +196,10 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
         //Arrange
         List<Integer> expertises = new ArrayList<>();
         expertises.add(EXPERTISE_ID);
-        EmployeeRequestDTO employee = new EmployeeRequestDTO(
-                NEW_EMPLOYEE_ID,
-                NEW_EMPLOYEE_NAME,
-                DATE_OF_BIRTH,
-                Gender.MALE,
-                GRADUATION_DATE,
-                SALARY,
-                DEPARTMENT_ID,
-                Optional.of(MANAGER_ID),
-                NON_EXISTENT_TEAM_ID,
-                expertises
-        );
+        EmployeeRequestDTO employee = buildBasicEmployeeNoManagerNoExpertise()
+                .teamId(NON_EXISTENT_TEAM_ID)
+                .build();
+
         //act
         ResultActions result = mockMvc.perform(post("/employee").contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(employee)));
@@ -233,18 +214,10 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
         //Arrange
         List<Integer> expertises = new ArrayList<>();
         expertises.add(EXPERTISE_ID);
-        EmployeeRequestDTO employee = new EmployeeRequestDTO(
-                NEW_EMPLOYEE_ID,
-                NEW_EMPLOYEE_NAME,
-                DATE_OF_BIRTH,
-                Gender.MALE,
-                GRADUATION_DATE,
-                SALARY,
-                DEPARTMENT_ID,
-                Optional.of(NON_EXISTENT_MANAGER_ID),
-                TEAM_ID,
-                expertises
-        );
+        EmployeeRequestDTO employee = buildBasicEmployeeNoManagerNoExpertise()
+                .managerId(Optional.of(NON_EXISTENT_MANAGER_ID))
+                .build();
+
         //act
         ResultActions result = mockMvc.perform(post("/employee").contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(employee)));
@@ -259,18 +232,10 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
         //Arrange
         List<Integer> expertises = new ArrayList<>();
         expertises.add(EXPERTISE_ID);
-        EmployeeRequestDTO employee = new EmployeeRequestDTO(
-                NEW_EMPLOYEE_ID,
-                NEW_EMPLOYEE_NAME,
-                FUTURE_DATE_OF_BIRTH,
-                Gender.MALE,
-                GRADUATION_DATE,
-                SALARY,
-                DEPARTMENT_ID,
-                Optional.of(MANAGER_ID),
-                TEAM_ID,
-                expertises
-        );
+        EmployeeRequestDTO employee = buildBasicEmployeeNoManagerNoExpertise()
+                .dateOfBirth(FUTURE_DATE_OF_BIRTH)
+                .build();
+
         //act
         ResultActions result = mockMvc.perform(post("/employee").contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(employee)));
@@ -285,18 +250,10 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
         //Arrange
         List<Integer> expertises = new ArrayList<>();
         expertises.add(NON_EXISTENT_EXPERTISE_ID);
-        EmployeeRequestDTO employee = new EmployeeRequestDTO(
-                NEW_EMPLOYEE_ID,
-                NEW_EMPLOYEE_NAME,
-                DATE_OF_BIRTH,
-                Gender.MALE,
-                GRADUATION_DATE,
-                SALARY,
-                DEPARTMENT_ID,
-                Optional.of(MANAGER_ID),
-                TEAM_ID,
-                expertises
-        );
+        EmployeeRequestDTO employee = buildBasicEmployeeNoManagerNoExpertise()
+                .expertise(expertises)
+                .build();
+
         //act
         ResultActions result = mockMvc.perform(post("/employee").contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(employee)));
@@ -311,18 +268,13 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
         //arrange
         List<Integer> expertises = new ArrayList<>();
         expertises.add(EXPERTISE_ID2);
-        EmployeeRequestDTO employee = new EmployeeRequestDTO(
-                null,
-                NEW_EMPLOYEE_NAME,
-                NEW_DATE_OF_BIRTH,
-                Gender.FEMALE,
-                NEW_GRADUATION_DATE,
-                NEW_SALARY,
-                DEPARTMENT_ID2,
-                Optional.of(MANAGER_ID2),
-                TEAM_ID2,
-                expertises
-        );
+        EmployeeRequestDTO employee = buildBasicEmployeeNoManagerNoExpertise()
+                .managerId(Optional.of(MANAGER_ID2))
+                .departmentId(DEPARTMENT_ID2)
+                .teamId(TEAM_ID2)
+                .expertise(expertises)
+                .build();
+
         objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
         //act
         ResultActions result = mockMvc.perform(patch("/employee/" + EXISTING_EMPLOYEE_ID).contentType(MediaType.APPLICATION_JSON)
@@ -337,6 +289,7 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
                 .andExpect(jsonPath("$.departmentId").value(employee.getDepartmentId()))
                 .andExpect(jsonPath("$.managerId").value(employee.getManagerId().get()))
                 .andExpect(jsonPath("$.teamId").value(employee.getTeamId()))
+                .andExpect(jsonPath("$.email").value(employee.getEmail()))
                 .andExpect(jsonPath("$.expertisesIds").value(employee.getExpertise()));
 
     }
@@ -362,6 +315,7 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
                 .andExpect(jsonPath("$.departmentId").value(DEPARTMENT_ID))
                 .andExpect(jsonPath("$.managerId").isEmpty())
                 .andExpect(jsonPath("$.teamId").value(TEAM_ID))
+                .andExpect(jsonPath("$.email").value(EMAIL))
                 .andExpect(jsonPath("$.expertisesIds").value(expertises));
 
     }
@@ -388,6 +342,7 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
                 .andExpect(jsonPath("$.departmentId").value(DEPARTMENT_ID))
                 .andExpect(jsonPath("$.managerId").value(MANAGER_ID2))
                 .andExpect(jsonPath("$.teamId").value(TEAM_ID))
+                .andExpect(jsonPath("$.email").value(EMAIL))
                 .andExpect(jsonPath("$.expertisesIds").value(expertises));
     }
 
@@ -417,6 +372,7 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
                 .andExpect(jsonPath("$.departmentId").value(DEPARTMENT_ID))
                 .andExpect(jsonPath("$.managerId").value(MANAGER_ID2))
                 .andExpect(jsonPath("$.teamId").value(TEAM_ID))
+                .andExpect(jsonPath("$.email").value(EMAIL))
                 .andExpect(jsonPath("$.expertisesIds").value(expertises));
         assertTrue(expertisesAfter.isEmpty());
     }
@@ -517,6 +473,7 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
                 .andExpect(jsonPath("$.departmentId").value(DEPARTMENT_ID))
                 .andExpect(jsonPath("$.managerId").value(2))
                 .andExpect(jsonPath("$.teamId").value(TEAM_ID))
+                .andExpect(jsonPath("$.email").value(EMAIL))
                 .andExpect(jsonPath("$.expertisesIds").value(expectedExpertise));
 
     }

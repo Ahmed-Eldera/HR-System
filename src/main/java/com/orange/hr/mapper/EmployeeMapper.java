@@ -7,6 +7,7 @@ import com.orange.hr.entity.Department;
 import com.orange.hr.entity.Employee;
 import com.orange.hr.entity.Expertise;
 import com.orange.hr.entity.Team;
+import lombok.Data;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -15,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+@Data
 @Component
 public class EmployeeMapper {
     public Employee toEntity(EmployeeRequestDTO dto,
@@ -30,6 +32,8 @@ public class EmployeeMapper {
         employee.setDepartment(department);
         employee.setTeam(team);
         employee.setManager(manager);
+        employee.setEmail(dto.getEmail());
+        employee.setPassword(dto.getPassword());
         employee.setExpertises(expertises);
         return employee;
     }
@@ -44,6 +48,7 @@ public class EmployeeMapper {
         response.setDateOfBirth(entity.getDateOfBirth());
         response.setDepartmentId(entity.getDepartment().getDepartmentId());
         response.setTeamId(entity.getTeam().getTeamId());
+        response.setEmail(entity.getEmail());
         if (entity.getManager() != null) {
             response.setManagerId(entity.getManager().getId());
         }
@@ -69,6 +74,7 @@ public class EmployeeMapper {
                             row.getDepartmentId(),
                             row.getManagerId(),
                             row.getTeamId(),
+                            row.getEmail(),
                             new ArrayList<>()
                     )
             );

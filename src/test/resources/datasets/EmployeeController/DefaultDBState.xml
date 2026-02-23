@@ -5,6 +5,7 @@
     <teams team_id="1" name="Project-X"/>
     <teams team_id="2" name="Project-Y"/>
 
+    <!--employees password = 1234-->
     <employees
             employee_id="1"
             name="Ahmed"
@@ -14,9 +15,8 @@
             department_id="1"
             team_id="1"
             manager_id="2"
-            yoe="5"
-            created_at="2024-03-01 10:00:00"
-
+            email="emp1@orange.com"
+            password="$2a$10$/dyZxgEuldRkxwcWGL7m5.xwXqqdTD0Rx9NoWZI2KzKBucHMaa.EG"
     />
     <employees
             employee_id="2"
@@ -26,6 +26,8 @@
             graduation_date="2026-02-18"
             department_id="1"
             team_id="1"
+            email="emp2@orange.com"
+            password="$2a$10$/dyZxgEuldRkxwcWGL7m5.xwXqqdTD0Rx9NoWZI2KzKBucHMaa.EG"
             yoe="5"
             created_at="2024-03-01 10:00:00"
 
@@ -39,6 +41,8 @@
             department_id="1"
             team_id="1"
             manager_id="1"
+            email="emp3@orange.com"
+            password="$2a$10$/dyZxgEuldRkxwcWGL7m5.xwXqqdTD0Rx9NoWZI2KzKBucHMaa.EG"
             yoe="5"
             created_at="2024-03-01 10:00:00"
 
@@ -55,6 +59,8 @@
             yoe="5"
             created_at="2024-03-01 10:00:00"
 
+            email="emp4@orange.com"
+            password="$2a$10$/dyZxgEuldRkxwcWGL7m5.xwXqqdTD0Rx9NoWZI2KzKBucHMaa.EG"
     />
     <salaries
             salary_id="1"

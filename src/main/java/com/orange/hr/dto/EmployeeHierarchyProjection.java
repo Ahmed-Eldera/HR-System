@@ -27,4 +27,6 @@ public interface EmployeeHierarchyProjection {
     Integer getExpertiseId();
 
     String getExpertiseName();
+
+    String getEmail();
 }
