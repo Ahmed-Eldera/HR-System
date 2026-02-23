@@ -109,7 +109,7 @@ public interface EmployeeRepository extends JpaRepository<Employee, Integer> {
 
     List<Employee> findByManager(Employee manager);
 
-    List<Employee> findTop10ByEmployeeIDGreaterThanOrderByEmployeeIDAsc(Integer id);
+    List<Employee> findTop10ByIdGreaterThanOrderByIdAsc(Integer id);
 
 //    @Query("SELECT DISTINCT e FROM Employee e " +
 //            "LEFT JOIN FETCH e.salaries s " +

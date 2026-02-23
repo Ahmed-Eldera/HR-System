@@ -36,7 +36,7 @@ public class EmployeeMapper {
 
     public EmployeeResponseDTO toDTO(Employee entity) {
         EmployeeResponseDTO response = new EmployeeResponseDTO();
-        response.setEmployeeID(entity.getEmployeeID());
+        response.setEmployeeID(entity.getId());
         response.setName(entity.getName());
         response.setGender(entity.getGender());
         response.setSalary(entity.getCurrentSalary().getGross());
@@ -45,7 +45,7 @@ public class EmployeeMapper {
         response.setDepartmentId(entity.getDepartment().getDepartmentId());
         response.setTeamId(entity.getTeam().getTeamId());
         if (entity.getManager() != null) {
-            response.setManagerId(entity.getManager().getEmployeeID());
+            response.setManagerId(entity.getManager().getId());
         }
         response.setExpertisesIds(entity.getExpertises()
                 .stream()

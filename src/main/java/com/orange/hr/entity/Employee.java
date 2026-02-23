@@ -31,7 +31,7 @@ public class Employee {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "employee_id", nullable = false)
-    private Integer employeeID;
+    private Integer id;
     @Column(nullable = false)
     private String name;
     @Column(name = "date_of_birth", nullable = false)

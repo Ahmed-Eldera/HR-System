@@ -22,7 +22,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -486,7 +485,7 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
                 .getSubordinates();
         List<Integer> subordinatesIds = new ArrayList<>();
         for (Employee emp : subordinatesBeforeReassign) {
-            subordinatesIds.add(emp.getEmployeeID());
+            subordinatesIds.add(emp.getId());
         }
         //act
         ResultActions result = mockMvc.perform(delete("/employee/" + EXISTING_EMPLOYEE_ID));
@@ -494,7 +493,7 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
         //assert
         List<Employee> subordinatesAfterReassign = employeeRepository.findAllById(subordinatesIds);
         for (Employee emp : subordinatesAfterReassign) {
-            assertEquals(SUPER_MANAGER_ID2, emp.getManager().getEmployeeID());
+            assertEquals(SUPER_MANAGER_ID2, emp.getManager().getId());
         }
         assertFalse(employeeRepository.findById(EXISTING_EMPLOYEE_ID).isPresent());
     }
@@ -659,7 +658,7 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
             Integer numberOfInsertedLeaves = 1;
             assertEquals(numberOfInsertedLeaves, totalLeaves.size());
             Leave expectedLeave = totalLeaves.getFirst();//1st entry because db is empty (check dataset)
-            assertEquals(expectedLeave.getEmployee().getEmployeeID(), EXISTING_EMPLOYEE_ID);
+            assertEquals(expectedLeave.getEmployee().getId(), EXISTING_EMPLOYEE_ID);
             assertEquals(expectedLeave.getLeaveDate(), leave.getDate());
         }
     }
@@ -732,7 +731,7 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
 
         SalaryAdjustment savedBonus = totalSalaryAdjustment.getFirst();
         assertEquals(BONUS_AMOUNT, savedBonus.getAmount());
-        assertEquals(EXISTING_EMPLOYEE_ID, savedBonus.getEmployee().getEmployeeID());
+        assertEquals(EXISTING_EMPLOYEE_ID, savedBonus.getEmployee().getId());
         assertNotNull(savedBonus.getAdjustmentId());
         assertNotNull(savedBonus.getCreatedAt());
     }
@@ -809,23 +808,6 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
         //assert
         result.andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.msg").value("No Such Employee."));
-    }
-
-    @Test
-    public void generatePayroll_Gzxcv() throws Exception {
-        prepareDB("/datasets/EmployeeController/momo.xml");
-        LocalDateTime base = LocalDateTime.of(2024, 6, 15, 0, 0);
-
-        LocalDateTime oneMonthAgo =
-                base.minusMonths(1).withDayOfMonth(1);
-        payrollScheduler.reportCurrentTime();
-        List<Employee> employees =
-                employeeRepository
-                        .findAllWithSalaryAdjustmentsAndLeaves();
-        System.out.println(employees.get(0).getSalaries().get(0).getGross());
-        System.out.println(employees.get(0));
-        System.out.println();
-        System.out.println("hi");
     }
 }
 

@@ -1,3 +1,4 @@
+	ch	use hrdb;
 INSERT INTO leaves (leave_date, employee_id,created_at) VALUES ('2025-05-22', 1,'2025-05-22T17:00');
 INSERT INTO leaves (leave_date, employee_id,created_at) VALUES ('2025-08-21', 1,'2025-08-21T17:00');
 INSERT INTO leaves (leave_date, employee_id,created_at) VALUES ('2025-08-20', 1,'2025-08-20T17:00');

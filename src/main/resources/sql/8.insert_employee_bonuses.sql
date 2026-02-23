@@ -162,6 +162,7 @@ INSERT INTO salary_adjustments (amount, created_at, employee_id) VALUES (10000.0
 INSERT INTO salary_adjustments (amount, created_at, employee_id) VALUES (10000.000000, '2025-02-27T17:00', 54);
 INSERT INTO salary_adjustments (amount, created_at, employee_id) VALUES (10000.000000, '2025-08-05T17:00', 54);
 INSERT INTO salary_adjustments (amount, created_at, employee_id) VALUES (10000.000000, '2025-03-17T17:00', 54);
+use hrdb;
 INSERT INTO salary_adjustments (amount, created_at, employee_id) VALUES (10000.000000, '2025-08-28T17:00', 56);
 INSERT INTO salary_adjustments (amount, created_at, employee_id) VALUES (10000.000000, '2025-10-01T17:00', 56);
 INSERT INTO salary_adjustments (amount, created_at, employee_id) VALUES (10000.000000, '2025-06-26T17:00', 58);

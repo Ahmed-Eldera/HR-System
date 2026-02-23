@@ -152,7 +152,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         if (employee.getManager() == null) {
             throw new MyException(HttpStatus.CONFLICT, "Can't delete a super manager");
         }
-        Integer newManagerId = employee.getManager().getEmployeeID();
+        Integer newManagerId = employee.getManager().getId();
         //reassign his subordinates to his manager before deleting him
         employeeRepository.reassignSubordinates(id, newManagerId);
         employeeRepository.deleteById(id);
