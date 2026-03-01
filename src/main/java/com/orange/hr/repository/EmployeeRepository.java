@@ -114,24 +114,6 @@ public interface EmployeeRepository extends JpaRepository<Employee, Integer> {
 
     List<Employee> findByManager(Employee manager);
 
-    List<Employee> findTop10ByIdGreaterThanOrderByIdAsc(Integer id);
-
-//    @Query("SELECT DISTINCT e FROM Employee e " +
-//            "LEFT JOIN FETCH e.salaries s " +
-//            "LEFT JOIN FETCH e.salaryAdjustments a " +
-//            "WHERE e.id >= :startId LIMIT 10")
-//    List<Employee> findWithSalariesAndAdjustmentsInRange(
-//            @Param("startId") Long startId,
-//            @Param("endId") Long endId);
-
-    @Query("""
-                SELECT DISTINCT e
-                FROM Employee e
-                LEFT JOIN FETCH e.salaries s
-                LEFT JOIN FETCH e.adjustments a
-                LEFT JOIN FETCH e.leaves l
-            """)
-    List<Employee> findAllWithSalaryAdjustmentsAndLeaves();
 
     Optional<Employee> findByEmail(String email);
 
