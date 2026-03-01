@@ -92,7 +92,8 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
                 .departmentId(DEPARTMENT_ID)
                 .teamId(TEAM_ID)
                 .managerId(Optional.empty())
-                .graduationDate(NEW_GRADUATION_DATE);
+                .graduationDate(NEW_GRADUATION_DATE)
+                .yoe(5);
 
     }
 

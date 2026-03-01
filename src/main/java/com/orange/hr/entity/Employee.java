@@ -7,12 +7,13 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.SourceType;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
@@ -25,10 +26,7 @@ import java.util.List;
 @Table(name = "employees")
 public class Employee implements UserDetails {
     @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinTable(
-            name = "employees_expertise",
-            joinColumns = @JoinColumn(name = "employee_id"),
-            inverseJoinColumns = @JoinColumn(name = "expertise_id"))
+    @JoinTable(name = "employees_expertise", joinColumns = @JoinColumn(name = "employee_id"), inverseJoinColumns = @JoinColumn(name = "expertise_id"))
     List<Expertise> expertises;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -67,25 +65,24 @@ public class Employee implements UserDetails {
     private List<SalaryAdjustment> adjustments;
     @OneToMany(mappedBy = "employee", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<Leave> leaves;
-
-    private Integer YOE;
+    @Column(nullable = false)
+    private Integer yoe;
 
     @CreationTimestamp(source = SourceType.DB)
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
-    private static Comparator<Salary> byLatestSalaryComparator() {
+    public static Comparator<Salary> byLatestSalaryComparator() {
         return (a, b) -> a.getCreatedAt().isBefore(b.getCreatedAt()) ? -1 : 1;
     }
 
     public Integer getTotalYOE() {
-        return YOE + LocalDate.now().minusYears(createdAt.getYear()).getYear();
+        return yoe + LocalDate.now().minusYears(createdAt.getYear()).getYear();
     }
+
 
     public Salary getCurrentSalary() {
-        return salaries.stream()
-                .max(byLatestSalaryComparator())
-                .get();
+        return salaries.stream().max(byLatestSalaryComparator()).get();
     }
 
     @Override
@@ -103,18 +100,5 @@ public class Employee implements UserDetails {
         return email;
     }
 
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of();
-    }
-
-    @Override
-    public String getPassword() {
-        return password;
-    }
-
-    @Override
-    public String getUsername() {
-        return email;
-    }
 }
+

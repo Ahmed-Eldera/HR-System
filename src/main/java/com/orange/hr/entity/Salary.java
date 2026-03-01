@@ -8,6 +8,7 @@ import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.SourceType;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "salaries")
@@ -37,4 +38,6 @@ public class Salary {
     @CreationTimestamp(source = SourceType.DB)
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
+    @OneToMany(mappedBy = "salary", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<Payment> payments;
 }

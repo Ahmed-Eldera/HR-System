@@ -1,7 +1,5 @@
 package com.orange.hr.payment;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.JobParametersInvalidException;
@@ -12,16 +10,18 @@ import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 @Component
 public class PayrollScheduler {
-    private static final Logger log = LoggerFactory.getLogger(PayrollScheduler.class);
     @Autowired
     JobLauncher jobLauncher;
     @Autowired
     Job job;
 
     @Scheduled(cron = "${payroll.cron}")
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
     public void generatePayroll() throws JobInstanceAlreadyCompleteException, JobExecutionAlreadyRunningException, JobParametersInvalidException, JobRestartException {
         jobLauncher.run(
                 job,

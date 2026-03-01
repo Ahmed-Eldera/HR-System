@@ -10,4 +10,6 @@ import java.util.List;
 @Repository
 public interface SalaryAdjustmentRepository extends JpaRepository<SalaryAdjustment, Integer> {
     List<SalaryAdjustment> findByEmployee(Employee employee);
+
+    List<SalaryAdjustment> findByEmployeeAndAmountLessThan(Employee employee, Double amount);
 }

@@ -35,6 +35,7 @@ public class EmployeeMapper {
         employee.setEmail(dto.getEmail());
         employee.setPassword(dto.getPassword());
         employee.setExpertises(expertises);
+        employee.setYoe(dto.getYoe());
         return employee;
     }
 
