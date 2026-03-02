@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.SourceType;
-import org.springframework.data.domain.Persistable;
 
 import java.time.LocalDateTime;
 
@@ -15,8 +14,7 @@ import java.time.LocalDateTime;
 @Builder
 @Table(name = "payments")
 @Entity
-@SequenceGenerator(name = "NAME_SEQUENCE", sequenceName = "SEQ_ID", initialValue = 1, allocationSize = 1)
-public class Payment implements Persistable<Integer> {
+public class Payment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
@@ -31,9 +29,4 @@ public class Payment implements Persistable<Integer> {
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
-
-    @Override
-    public boolean isNew() {
-        return id == null;
-    }
 }

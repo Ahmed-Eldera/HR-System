@@ -76,8 +76,6 @@ public class PaymentTest extends AbstractTest {
             Employee employee = employeeRepository.findById(EXISTING_EMPLOYEE_ID).get();
             Salary salary = employee.getSalaries().stream().max(byLatestSalaryComparator()).get();
             List<Payment> payments = salary.getPayments();
-            System.out.println(employee.getLeaves().size());
-            System.out.println(payments.getFirst().getAmount());
             double DeductionAmount = 500d;
             assert payments.size() == 1;
             assert payments.getFirst().getAmount() == salary.getGross() - salary.getGross() * TAX - INSURANCE - DeductionAmount;
@@ -96,8 +94,6 @@ public class PaymentTest extends AbstractTest {
             Employee employee = employeeRepository.findById(EXISTING_EMPLOYEE_ID).get();
             Salary salary = employee.getSalaries().stream().max(byLatestSalaryComparator()).get();
             List<Payment> payments = salary.getPayments();
-            System.out.println(employee.getLeaves().size());
-            System.out.println(payments.getFirst().getAmount());
             double DeductionAmount = 500d;
             double bonusAmount = 125d;
             assert payments.size() == 1;
@@ -132,8 +128,6 @@ public class PaymentTest extends AbstractTest {
             Employee employee = employeeRepository.findById(EXISTING_EMPLOYEE_ID).get();
             Salary salary = employee.getSalaries().stream().max(byLatestSalaryComparator()).get();
             List<Payment> payments = salary.getPayments();
-            System.out.println(employee.getLeaves().size());
-            System.out.println(payments.getFirst().getAmount());
             double DeductionAmount = 500d;
             assert payments.size() == 1;
             assert payments.getFirst().getAmount() == salary.getGross() - salary.getGross() * TAX - INSURANCE - DeductionAmount;
@@ -151,10 +145,8 @@ public class PaymentTest extends AbstractTest {
             date.when(LocalDate::now).thenReturn(fixedNow.toLocalDate());
             payrollScheduler.generatePayroll();
             Employee employee = employeeRepository.findById(EXISTING_EMPLOYEE_ID).get();
-            Salary salary = employee.getSalaries().stream().max(byLatestSalaryComparator()).get();
+            Salary salary = employee.getCurrentSalary();
             List<Payment> payments = salary.getPayments();
-            System.out.println(employee.getLeaves().size());
-            System.out.println(payments.getFirst().getAmount());
             double DeductionAmount = 500d;
             double bonusAmount = 125d;
             assert payments.size() == 1;
