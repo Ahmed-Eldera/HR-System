@@ -26,7 +26,7 @@ public class Leave {
     private Employee employee;
 
     @Column(name = "leave_date", nullable = false)
-    private LocalDate date;
+    private LocalDate leaveDate;
 
     @CreationTimestamp(source = SourceType.DB)
     @Column(name = "created_at")

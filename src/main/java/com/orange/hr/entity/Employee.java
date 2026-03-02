@@ -7,10 +7,13 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.SourceType;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
@@ -23,15 +26,12 @@ import java.util.List;
 @Table(name = "employees")
 public class Employee implements UserDetails {
     @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinTable(
-            name = "employees_expertise",
-            joinColumns = @JoinColumn(name = "employee_id"),
-            inverseJoinColumns = @JoinColumn(name = "expertise_id"))
+    @JoinTable(name = "employees_expertise", joinColumns = @JoinColumn(name = "employee_id"), inverseJoinColumns = @JoinColumn(name = "expertise_id"))
     List<Expertise> expertises;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "employee_id", nullable = false)
-    private Integer employeeID;
+    private Integer id;
     @Column(unique = true, length = 100, nullable = false)
     private String email;
     @Column(nullable = false)
@@ -57,18 +57,32 @@ public class Employee implements UserDetails {
     @OneToMany(mappedBy = "manager", fetch = FetchType.LAZY)
     @JsonBackReference
     private List<Employee> subordinates;
-    @OneToMany(mappedBy = "employee", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private List<Salary> salaryHistory;
 
-    private static Comparator<Salary> byLatestSalaryComparator() {
+    @OneToMany(mappedBy = "employee", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<Salary> salaries;
+
+    @OneToMany(mappedBy = "employee", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<SalaryAdjustment> adjustments;
+    @OneToMany(mappedBy = "employee", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<Leave> leaves;
+    @Column(nullable = false)
+    private Integer yoe;
+
+    @CreationTimestamp(source = SourceType.DB)
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
+
+    public static Comparator<Salary> byLatestSalaryComparator() {
         return (a, b) -> a.getCreatedAt().isBefore(b.getCreatedAt()) ? -1 : 1;
     }
 
-    public Double getSalary() {
-        return salaryHistory.stream()
-                .max(byLatestSalaryComparator())
-                .get()
-                .getGross();
+    public Integer getTotalYOE() {
+        return yoe + LocalDate.now().minusYears(createdAt.getYear()).getYear();
+    }
+
+
+    public Salary getCurrentSalary() {
+        return salaries.stream().max(byLatestSalaryComparator()).get();
     }
 
     @Override
@@ -85,4 +99,6 @@ public class Employee implements UserDetails {
     public String getUsername() {
         return email;
     }
+
 }
+

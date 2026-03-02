@@ -6,6 +6,7 @@ import com.orange.hr.exceptions.*;
 import com.orange.hr.mapper.EmployeeMapper;
 import com.orange.hr.repository.*;
 import com.orange.hr.service.EmployeeService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -15,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.util.List;
 
+@Slf4j
 @Transactional
 @Service
 public class EmployeeServiceImpl implements EmployeeService {
@@ -67,7 +69,7 @@ public class EmployeeServiceImpl implements EmployeeService {
                 .gross(newGrossSalary)
                 .percentage(0d)
                 .build();
-        entity.setSalaryHistory(List.of(newSalary));
+        entity.setSalaries(List.of(newSalary));
         employeeRepository.save(entity);
         return employeeMapper.toDTO(entity);
     }
@@ -90,9 +92,9 @@ public class EmployeeServiceImpl implements EmployeeService {
                     .gross(newGrossSalary)
                     .percentage(0d)
                     .build();
-            List<Salary> salaryhistory = entity.getSalaryHistory();
+            List<Salary> salaryhistory = entity.getSalaries();
             salaryhistory.add(newSalary);
-            entity.setSalaryHistory(salaryhistory);
+            entity.setSalaries(salaryhistory);
         }
 
         if (dto.getExpertise() != null) {
@@ -130,6 +132,9 @@ public class EmployeeServiceImpl implements EmployeeService {
                 entity.setManager(null);
             }
         }
+        if (dto.getYoe() != null) {
+            entity.setYoe(dto.getYoe());
+        }
 
         employeeRepository.save(entity);
         return employeeMapper.toDTO(entity);
@@ -141,7 +146,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         if (employee.getManager() == null) {
             throw new MyException(HttpStatus.CONFLICT, "Can't delete a super manager");
         }
-        Integer newManagerId = employee.getManager().getEmployeeID();
+        Integer newManagerId = employee.getManager().getId();
         //reassign his subordinates to his manager before deleting him
         employeeRepository.reassignSubordinates(id, newManagerId);
         employeeRepository.deleteById(id);
@@ -190,14 +195,14 @@ public class EmployeeServiceImpl implements EmployeeService {
         Employee employee = employeeRepository.findById(employeeId).orElseThrow(() -> new NoSuchEmployeeException(HttpStatus.NOT_FOUND, "Can't find selected employee."));
         Leave leave = Leave.builder()
                 .employee(employee)
-                .date(requestDTO.getDate())
+                .leaveDate(requestDTO.getDate())
                 .build();
         leaveRepository.save(leave);
 
         return LeaveResponseDTO.builder()
                 .id(leave.getLeaveID())
                 .employeeId(employeeId)
-                .date(leave.getDate())
+                .date(leave.getLeaveDate())
                 .createdAt(leave.getCreatedAt())
                 .build();
     }
@@ -244,4 +249,5 @@ public class EmployeeServiceImpl implements EmployeeService {
                 .net(calculateNetSalary(newGrossSalary))
                 .build();
     }
+
 }
