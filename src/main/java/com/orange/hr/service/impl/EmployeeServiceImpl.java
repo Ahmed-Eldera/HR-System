@@ -292,6 +292,7 @@ public class EmployeeServiceImpl implements EmployeeService {
                 .stream()
                 .filter(currentYear())
                 .count();
+        // if leaves count equals the allowed leaves and old deductions that means that the exceeded leaves are already deducted in a previous month and I don't need to deduct again else that means that he has some exceeded leaves that need a deduction
         if (leaves.size() > allowedLeavesCount + previousDeductions) {
             long exceededLeaves = leaves.stream()
                     .filter(claimedLeaves()).count() - allowedLeavesCount - previousDeductions;
