@@ -74,6 +74,15 @@ public class AbstractTest {
         dbUnitConnection.getConnection().createStatement().execute("SET REFERENTIAL_INTEGRITY TRUE");
     }
 
+    public void addToDB(String path) throws DatabaseUnitException, SQLException {
+        FlatXmlDataSetBuilder builder = new FlatXmlDataSetBuilder();
+        IDataSet dataSet = builder.build(getClass().getResourceAsStream(path));
+        dbUnitConnection.getConnection().createStatement().execute("SET REFERENTIAL_INTEGRITY FALSE");
+        DatabaseOperation.INSERT.execute(dbUnitConnection, dataSet);
+        dbUnitConnection.getConnection().createStatement().execute("SET REFERENTIAL_INTEGRITY TRUE");
+    }
+
+
     public static class CustomH2DataTypeFactory extends H2DataTypeFactory {
         @Override
         public DataType createDataType(int sqlType, String sqlTypeName) throws DataTypeException {

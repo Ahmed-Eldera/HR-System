@@ -8,13 +8,16 @@ import com.orange.hr.repository.*;
 import com.orange.hr.service.EmployeeService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Predicate;
 
 @Slf4j
 @Transactional
@@ -40,6 +43,20 @@ public class EmployeeServiceImpl implements EmployeeService {
     private SalaryRepository salaryRepository;
     @Autowired
     private PasswordEncoder passwordEncoder;
+    @Value("${senior.yoe}")
+    private Integer seniorYOE;
+
+    private static <E extends HasCreatedAt> Predicate<E> currentYear() {
+        return E -> E.getCreatedAt().getYear() == LocalDate.now().getYear();
+    }
+
+    private static <E extends HasCreatedAt> Predicate<E> currentMonth() {
+        return E -> E.getCreatedAt().toLocalDate().isAfter(LocalDate.now().minusMonths(1));
+    }
+
+    private static Predicate<Leave> claimedLeaves() {
+        return leave -> leave.getLeaveDate().isBefore(LocalDate.now());
+    }
 
     public EmployeeResponseDTO addEmployee(EmployeeRequestDTO employee) {
         // validating the input data
@@ -250,4 +267,31 @@ public class EmployeeServiceImpl implements EmployeeService {
                 .build();
     }
 
+    public Payment pay(Employee employee) {
+        Salary salary = employee.getCurrentSalary();
+        Double grossSalary = salary.getGross();
+        applyDeductions(employee);
+        List<SalaryAdjustment> adjustments = salaryAdjustmentRepository.findByEmployee(employee).stream().filter(currentMonth()).toList();
+        Double sumOfAdjustments = adjustments.stream().mapToDouble(SalaryAdjustment::getAmount).sum();
+        Double netSalary = grossSalary - (grossSalary * TAX_RATIO + INSURANCE) + sumOfAdjustments;
+        return Payment.builder()
+                .amount(netSalary)
+                .salary(salary)
+                .build();
+    }
+
+    private void applyDeductions(Employee employee) {
+        double deductionPerLeave = -500d;
+        List<SalaryAdjustment> deductions = new ArrayList<>();
+        List<Leave> leaves = employee.getLeaves().stream().filter(currentYear()).toList();
+        Integer allowedLeavesCount = employee.getTotalYOE() < seniorYOE ? 21 : 30;
+        Long previousDeductions = salaryAdjustmentRepository.findByEmployeeAndAmountLessThan(employee, 0d).stream().filter(currentYear()).count();
+        if (leaves.size() > allowedLeavesCount + previousDeductions) {
+            long exceededLeaves = leaves.stream().filter(claimedLeaves()).count() - allowedLeavesCount - previousDeductions;
+            for (long i = 0; i < exceededLeaves; i++) {
+                deductions.add(SalaryAdjustment.builder().employee(employee).amount(deductionPerLeave).build());
+            }
+            salaryAdjustmentRepository.saveAll(deductions);
+        }
+    }
 }
