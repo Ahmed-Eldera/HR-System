@@ -271,7 +271,10 @@ public class EmployeeServiceImpl implements EmployeeService {
         Salary salary = employee.getCurrentSalary();
         Double grossSalary = salary.getGross();
         applyDeductions(employee);
-        List<SalaryAdjustment> adjustments = salaryAdjustmentRepository.findByEmployee(employee).stream().filter(currentMonth()).toList();
+        List<SalaryAdjustment> adjustments = salaryAdjustmentRepository.findByEmployee(employee)
+                .stream()
+                .filter(currentMonth())
+                .toList();
         Double sumOfAdjustments = adjustments.stream().mapToDouble(SalaryAdjustment::getAmount).sum();
         Double netSalary = grossSalary - (grossSalary * TAX_RATIO + INSURANCE) + sumOfAdjustments;
         return Payment.builder()
@@ -285,9 +288,13 @@ public class EmployeeServiceImpl implements EmployeeService {
         List<SalaryAdjustment> deductions = new ArrayList<>();
         List<Leave> leaves = employee.getLeaves().stream().filter(currentYear()).toList();
         Integer allowedLeavesCount = employee.getTotalYOE() < seniorYOE ? 21 : 30;
-        Long previousDeductions = salaryAdjustmentRepository.findByEmployeeAndAmountLessThan(employee, 0d).stream().filter(currentYear()).count();
+        Long previousDeductions = salaryAdjustmentRepository.findByEmployeeAndAmountLessThan(employee, 0d)
+                .stream()
+                .filter(currentYear())
+                .count();
         if (leaves.size() > allowedLeavesCount + previousDeductions) {
-            long exceededLeaves = leaves.stream().filter(claimedLeaves()).count() - allowedLeavesCount - previousDeductions;
+            long exceededLeaves = leaves.stream()
+                    .filter(claimedLeaves()).count() - allowedLeavesCount - previousDeductions;
             for (long i = 0; i < exceededLeaves; i++) {
                 deductions.add(SalaryAdjustment.builder().employee(employee).amount(deductionPerLeave).build());
             }

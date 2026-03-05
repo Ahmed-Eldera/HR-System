@@ -26,7 +26,7 @@ import java.util.Collections;
 @Configuration
 @EnableBatchProcessing
 public class PayrollConfig {
-    private final int CHUNK_SIZE = 100;
+    private static final int CHUNK_SIZE = 100;
     @Autowired
     EmployeeRepository employeeRepository;
     @Autowired

@@ -22,7 +22,8 @@ public class PayrollScheduler {
 
     @Scheduled(cron = "${payroll.cron}")
     @Transactional(propagation = Propagation.NOT_SUPPORTED)
-    public void generatePayroll() throws JobInstanceAlreadyCompleteException, JobExecutionAlreadyRunningException, JobParametersInvalidException, JobRestartException {
+    public void generatePayroll() throws JobInstanceAlreadyCompleteException,
+            JobExecutionAlreadyRunningException, JobParametersInvalidException, JobRestartException {
         jobLauncher.run(
                 job,
                 new JobParametersBuilder()
