@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
 import org.springframework.test.context.support.DirtiesContextTestExecutionListener;
@@ -38,8 +39,9 @@ import java.sql.Types;
         TransactionDbUnitTestExecutionListener.class
 })
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@ActiveProfiles("test")
 public class AbstractTest {
-    private static IDatabaseConnection dbUnitConnection;
+    static IDatabaseConnection dbUnitConnection;
     @Autowired
     ObjectMapper objectMapper;
     @Autowired
@@ -66,13 +68,17 @@ public class AbstractTest {
 
 
     public void prepareDB(String path) throws DatabaseUnitException, SQLException {
+        prepareDB(path, DatabaseOperation.CLEAN_INSERT);
+    }
 
+    public void prepareDB(String path, DatabaseOperation databaseOperation) throws DatabaseUnitException, SQLException {
         FlatXmlDataSetBuilder builder = new FlatXmlDataSetBuilder();
         IDataSet dataSet = builder.build(getClass().getResourceAsStream(path));
         dbUnitConnection.getConnection().createStatement().execute("SET REFERENTIAL_INTEGRITY FALSE");
-        DatabaseOperation.CLEAN_INSERT.execute(dbUnitConnection, dataSet);
+        databaseOperation.execute(dbUnitConnection, dataSet);
         dbUnitConnection.getConnection().createStatement().execute("SET REFERENTIAL_INTEGRITY TRUE");
     }
+
 
     public static class CustomH2DataTypeFactory extends H2DataTypeFactory {
         @Override

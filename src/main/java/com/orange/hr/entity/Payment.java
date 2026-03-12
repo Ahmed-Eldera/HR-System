@@ -3,34 +3,30 @@ package com.orange.hr.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.SourceType;
 
 import java.time.LocalDateTime;
 
-@Entity
-@Table(name = "salary_adjustments")
-@Setter
-@Getter
 @NoArgsConstructor
 @AllArgsConstructor
-@DynamicInsert
+@Getter
+@Setter
 @Builder
-public class SalaryAdjustment {
+@Table(name = "payments")
+@Entity
+public class Payment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "adjustment_id")
-    private Integer adjustmentId;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "employee_id", nullable = false)
-    private Employee employee;
+    private Integer id;
 
     private Double amount;
+
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+    @JoinColumn(name = "salaryId")
+    private Salary salary;
 
     @CreationTimestamp(source = SourceType.DB)
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
-
 
 }
