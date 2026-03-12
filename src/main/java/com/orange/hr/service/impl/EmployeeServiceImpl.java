@@ -25,6 +25,8 @@ import java.util.function.Predicate;
 public class EmployeeServiceImpl implements EmployeeService {
     static final Double INSURANCE = 500d;
     static final Double TAX_RATIO = 0.15d;
+    static final Double DEDCTION_PER_LEAVE = -500d;
+
     @Autowired
     private DepartmentRepository departmentRepository;
     @Autowired
@@ -283,7 +285,6 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     public List<SalaryAdjustment> calculateDeductions(Employee employee) {
-        double deductionPerLeave = -500d;
         List<SalaryAdjustment> deductions = new ArrayList<>();
         List<Leave> leaves = employee.getLeaves().stream().filter(currentYear()).toList();
         Integer allowedLeavesCount = employee.getTotalYOE() < seniorYOE ? 21 : 30;
@@ -295,7 +296,7 @@ public class EmployeeServiceImpl implements EmployeeService {
             long exceededLeaves = leaves.stream()
                     .filter(claimedLeaves()).count() - allowedLeavesCount - previousDeductions;
             for (long i = 0; i < exceededLeaves; i++) {
-                deductions.add(SalaryAdjustment.builder().employee(employee).amount(deductionPerLeave).build());
+                deductions.add(SalaryAdjustment.builder().employee(employee).amount(DEDCTION_PER_LEAVE).build());
             }
         }
         return deductions;
