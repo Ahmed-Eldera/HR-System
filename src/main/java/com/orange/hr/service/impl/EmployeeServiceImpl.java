@@ -260,7 +260,11 @@ public class EmployeeServiceImpl implements EmployeeService {
     public Payment calculatePayment(Employee employee) {
         Salary salary = employee.getCurrentSalary();
         Double grossSalary = salary.getGross();
-        List<SalaryAdjustment> adjustments = salaryAdjustmentRepository.findByEmployeeAndCreatedAtGreaterThanAndCreatedAtLessThanEqual(employee, LocalDateTime.now().minusMonths(1), LocalDateTime.now());
+        List<SalaryAdjustment> adjustments = salaryAdjustmentRepository
+                .findByEmployeeAndCreatedAtGreaterThanAndCreatedAtLessThanEqual(
+                        employee,
+                        LocalDateTime.now().minusMonths(1),
+                        LocalDateTime.now());
         Double sumOfAdjustments = adjustments.stream().mapToDouble(SalaryAdjustment::getAmount).sum();
         Double netSalary = grossSalary - (grossSalary * TAX_RATIO + INSURANCE) + sumOfAdjustments;
         return Payment.builder()
@@ -273,8 +277,17 @@ public class EmployeeServiceImpl implements EmployeeService {
         LocalDateTime startOfYear = LocalDateTime.now().withDayOfYear(1).withMinute(0).withHour(0);
         List<SalaryAdjustment> deductions = new ArrayList<>();
         Integer allowedLeavesCount = employee.getTotalYOE() < seniorYOE ? 21 : 30;
-        int previousDeductions = salaryAdjustmentRepository.countByEmployeeAndAmountLessThanAndCreatedAtGreaterThanEqual(employee, 0d, startOfYear);
-        int claimedLeaves = leaveRepository.countByEmployeeAndLeaveDateLessThanAndCreatedAtGreaterThanEqual(employee, LocalDate.now(), startOfYear);
+        int previousDeductions = salaryAdjustmentRepository
+                .countByEmployeeAndAmountLessThanAndCreatedAtGreaterThanEqual(
+                        employee,
+                        0d,
+                        startOfYear);
+
+        int claimedLeaves = leaveRepository
+                .countByEmployeeAndLeaveDateLessThanAndCreatedAtGreaterThanEqual(
+                        employee,
+                        LocalDate.now(),
+                        startOfYear);
         // if leaves count equals the allowed leaves and old deductions
         // that means that the exceeded leaves are already deducted in a previous month
         // and I don't need to deduct again

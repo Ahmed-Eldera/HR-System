@@ -10,5 +10,8 @@ import java.time.LocalDateTime;
 
 @Repository
 public interface LeaveRepository extends JpaRepository<Leave, Integer> {
-    int countByEmployeeAndLeaveDateLessThanAndCreatedAtGreaterThanEqual(Employee employee, LocalDate currentDate, LocalDateTime thisYear);
+    int countByEmployeeAndLeaveDateLessThanAndCreatedAtGreaterThanEqual(
+            Employee employee,
+            LocalDate currentDate,
+            LocalDateTime thisYear);
 }

@@ -12,7 +12,13 @@ import java.util.List;
 public interface SalaryAdjustmentRepository extends JpaRepository<SalaryAdjustment, Integer> {
     List<SalaryAdjustment> findByEmployee(Employee employee);
 
-    int countByEmployeeAndAmountLessThanAndCreatedAtGreaterThanEqual(Employee employee, Double amount, LocalDateTime startOfYear);
+    int countByEmployeeAndAmountLessThanAndCreatedAtGreaterThanEqual(
+            Employee employee,
+            Double amount,
+            LocalDateTime startOfYear);
 
-    List<SalaryAdjustment> findByEmployeeAndCreatedAtGreaterThanAndCreatedAtLessThanEqual(Employee employee, LocalDateTime startOfMonth, LocalDateTime endOfMonth);
+    List<SalaryAdjustment> findByEmployeeAndCreatedAtGreaterThanAndCreatedAtLessThanEqual(
+            Employee employee,
+            LocalDateTime startOfMonth,
+            LocalDateTime endOfMonth);
 }
