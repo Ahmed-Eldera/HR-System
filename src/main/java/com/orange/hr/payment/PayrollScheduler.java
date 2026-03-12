@@ -13,6 +13,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+
 @Component
 public class PayrollScheduler {
     @Autowired
@@ -27,7 +29,7 @@ public class PayrollScheduler {
         jobLauncher.run(
                 job,
                 new JobParametersBuilder()
-                        .addLong("time", System.currentTimeMillis())
+                        .addLocalDate("Date : ", LocalDate.now().withDayOfMonth(25))
                         .toJobParameters()
         );
     }
