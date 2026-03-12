@@ -89,7 +89,8 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
                 .departmentId(DEPARTMENT_ID)
                 .teamId(TEAM_ID)
                 .managerId(Optional.empty())
-                .graduationDate(NEW_GRADUATION_DATE);
+                .graduationDate(NEW_GRADUATION_DATE)
+                .yoe(5);
 
     }
 
@@ -438,7 +439,7 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
                 .getSubordinates();
         List<Integer> subordinatesIds = new ArrayList<>();
         for (Employee emp : subordinatesBeforeReassign) {
-            subordinatesIds.add(emp.getEmployeeID());
+            subordinatesIds.add(emp.getId());
         }
         //act
         ResultActions result = mockMvc.perform(delete("/employee/" + EXISTING_EMPLOYEE_ID));
@@ -446,7 +447,7 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
         //assert
         List<Employee> subordinatesAfterReassign = employeeRepository.findAllById(subordinatesIds);
         for (Employee emp : subordinatesAfterReassign) {
-            assertEquals(SUPER_MANAGER_ID2, emp.getManager().getEmployeeID());
+            assertEquals(SUPER_MANAGER_ID2, emp.getManager().getId());
         }
         assertFalse(employeeRepository.findById(EXISTING_EMPLOYEE_ID).isPresent());
     }
@@ -486,7 +487,7 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
     }
 
     @Test
-    public void getSalary_WithValidEmployee_ShouldReturnOK() throws Exception {
+    public void getCurrentSalary_WithValidEmployee_ShouldReturnOK() throws Exception {
         prepareDB("/datasets/EmployeeController/DefaultDBState.xml");
         //prepare
         Double netSalary = SALARY - INSURANCE - SALARY * TAX; //net = gross - fixed 500 and - 15% tax
@@ -499,7 +500,7 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
     }
 
     @Test
-    public void getSalary_WithInValidEmployee_ShouldReturnNotFound() throws Exception {
+    public void getCurrentSalary_WithInValidEmployee_ShouldReturnNotFound() throws Exception {
         prepareDB("/datasets/EmployeeController/DefaultDBState.xml");
         //act
         ResultActions result = mockMvc.perform(get("/employee/" + NON_EXISTENT_EMPLOYEE_ID + "/salary"));
@@ -612,8 +613,8 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
             Integer numberOfInsertedLeaves = 1;
             assertEquals(numberOfInsertedLeaves, totalLeaves.size());
             Leave expectedLeave = totalLeaves.getFirst();//1st entry because db is empty (check dataset)
-            assertEquals(expectedLeave.getEmployee().getEmployeeID(), EXISTING_EMPLOYEE_ID);
-            assertEquals(expectedLeave.getDate(), leave.getDate());
+            assertEquals(expectedLeave.getEmployee().getId(), EXISTING_EMPLOYEE_ID);
+            assertEquals(expectedLeave.getLeaveDate(), leave.getDate());
         }
     }
 
@@ -685,7 +686,7 @@ public class EmployeeControllerIntegrationTest extends AbstractTest {
 
         SalaryAdjustment savedBonus = totalSalaryAdjustment.getFirst();
         assertEquals(BONUS_AMOUNT, savedBonus.getAmount());
-        assertEquals(EXISTING_EMPLOYEE_ID, savedBonus.getEmployee().getEmployeeID());
+        assertEquals(EXISTING_EMPLOYEE_ID, savedBonus.getEmployee().getId());
         assertNotNull(savedBonus.getAdjustmentId());
         assertNotNull(savedBonus.getCreatedAt());
     }

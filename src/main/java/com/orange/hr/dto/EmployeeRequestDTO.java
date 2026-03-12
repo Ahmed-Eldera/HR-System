@@ -48,6 +48,8 @@ public class EmployeeRequestDTO {
 
     private Optional<Integer> managerId;
 
+    private Integer yoe;
+
     @NotNull(message = "Team can't be null")
     private Integer teamId;
     private List<Integer> expertise;
