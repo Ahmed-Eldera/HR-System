@@ -20,6 +20,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static com.orange.hr.entity.Employee.byLatestSalaryComparator;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBatchTest
 public class PaymentTest extends AbstractTest {
@@ -51,15 +52,19 @@ public class PaymentTest extends AbstractTest {
     @Test
     public void pay_givenYoeLessThan10AllowedLeavesWithNoBonus_NoDeduction() throws Exception {
         prepareDB("/datasets/payment/payment-YOELessThan10.xml");
-        try (MockedStatic<LocalDate> date = Mockito.mockStatic(LocalDate.class, Mockito.CALLS_REAL_METHODS)) {
+        try (MockedStatic<LocalDateTime> dateTime = Mockito.mockStatic(LocalDateTime.class, Mockito.CALLS_REAL_METHODS);
+             MockedStatic<LocalDate> date = Mockito.mockStatic(LocalDate.class, Mockito.CALLS_REAL_METHODS)) {
             date.when(LocalDate::now).thenReturn(FIXED_NOW.toLocalDate());
+            dateTime.when(LocalDateTime::now).thenReturn(FIXED_NOW);
             payrollScheduler.generatePayroll();
             Employee employee = employeeRepository.findById(EXISTING_EMPLOYEE_ID).get();
             Salary salary = employee.getSalaries().stream().max(byLatestSalaryComparator()).get();
             List<Payment> payments = salary.getPayments();
-            assert payments.size() == 1;
-            assert payments.getFirst().getAmount() == salary.getGross() - salary.getGross() * TAX
+            int expectedNoOfDeductions = 1;
+            double expectedPayment = salary.getGross() - salary.getGross() * TAX
                     - INSURANCE;
+            assertEquals(expectedNoOfDeductions, payments.size());
+            assertEquals(expectedPayment, payments.getFirst().getAmount());
         }
     }
 
@@ -67,15 +72,19 @@ public class PaymentTest extends AbstractTest {
     public void pay_givenYoeLessThan10With1ExceededLeavesWithNoBonus_ExpectDeduction() throws Exception {
         prepareDB("/datasets/payment/payment-YOELessThan10.xml");
         prepareDB("/datasets/payment/extraLeaves.xml", DatabaseOperation.INSERT);
-        try (MockedStatic<LocalDate> date = Mockito.mockStatic(LocalDate.class, Mockito.CALLS_REAL_METHODS)) {
+        try (MockedStatic<LocalDateTime> dateTime = Mockito.mockStatic(LocalDateTime.class, Mockito.CALLS_REAL_METHODS);
+             MockedStatic<LocalDate> date = Mockito.mockStatic(LocalDate.class, Mockito.CALLS_REAL_METHODS)) {
             date.when(LocalDate::now).thenReturn(FIXED_NOW.toLocalDate());
+            dateTime.when(LocalDateTime::now).thenReturn(FIXED_NOW);
             payrollScheduler.generatePayroll();
             Employee employee = employeeRepository.findById(EXISTING_EMPLOYEE_ID).get();
             Salary salary = employee.getSalaries().stream().max(byLatestSalaryComparator()).get();
             List<Payment> payments = salary.getPayments();
-            assert payments.size() == 1;
-            assert payments.getFirst().getAmount() == salary.getGross() - salary.getGross() * TAX
+            int expectedNoOfDeductions = 1;
+            double expectedPayment = salary.getGross() - salary.getGross() * TAX
                     - INSURANCE - DEDUCTION_AMOUNT;
+            assertEquals(expectedNoOfDeductions, payments.size());
+            assertEquals(expectedPayment, payments.getFirst().getAmount());
         }
     }
 
@@ -84,31 +93,39 @@ public class PaymentTest extends AbstractTest {
         prepareDB("/datasets/payment/payment-YOELessThan10.xml");
         prepareDB("/datasets/payment/extraLeaves.xml", DatabaseOperation.INSERT);
         prepareDB("/datasets/payment/extraBonus.xml", DatabaseOperation.INSERT);
-        try (MockedStatic<LocalDate> date = Mockito.mockStatic(LocalDate.class, Mockito.CALLS_REAL_METHODS)) {
+        try (MockedStatic<LocalDateTime> dateTime = Mockito.mockStatic(LocalDateTime.class, Mockito.CALLS_REAL_METHODS);
+             MockedStatic<LocalDate> date = Mockito.mockStatic(LocalDate.class, Mockito.CALLS_REAL_METHODS)) {
             date.when(LocalDate::now).thenReturn(FIXED_NOW.toLocalDate());
+            dateTime.when(LocalDateTime::now).thenReturn(FIXED_NOW);
             payrollScheduler.generatePayroll();
             Employee employee = employeeRepository.findById(EXISTING_EMPLOYEE_ID).get();
             Salary salary = employee.getSalaries().stream().max(byLatestSalaryComparator()).get();
             List<Payment> payments = salary.getPayments();
 
-            assert payments.size() == 1;
-            assert payments.getFirst().getAmount() == salary.getGross() - salary.getGross() * TAX
+            int expectedNoOfDeductions = 1;
+            double expectedPayment = salary.getGross() - salary.getGross() * TAX
                     - INSURANCE - DEDUCTION_AMOUNT + BONUS_AMOUNT;
+            assertEquals(expectedNoOfDeductions, payments.size());
+            assertEquals(expectedPayment, payments.getFirst().getAmount());
         }
     }
 
     @Test
     public void pay_givenYoeMoreThan10AllowedLeavesWithNoBonus_NoDeduction() throws Exception {
         prepareDB("/datasets/payment/payment-YOEMoreThan10.xml");
-        try (MockedStatic<LocalDate> date = Mockito.mockStatic(LocalDate.class, Mockito.CALLS_REAL_METHODS)) {
+        try (MockedStatic<LocalDateTime> dateTime = Mockito.mockStatic(LocalDateTime.class, Mockito.CALLS_REAL_METHODS);
+             MockedStatic<LocalDate> date = Mockito.mockStatic(LocalDate.class, Mockito.CALLS_REAL_METHODS)) {
             date.when(LocalDate::now).thenReturn(FIXED_NOW.toLocalDate());
+            dateTime.when(LocalDateTime::now).thenReturn(FIXED_NOW);
             payrollScheduler.generatePayroll();
             Employee employee = employeeRepository.findById(EXISTING_EMPLOYEE_ID).get();
             Salary salary = employee.getSalaries().stream().max(byLatestSalaryComparator()).get();
             List<Payment> payments = salary.getPayments();
-            assert payments.size() == 1;
-            assert payments.getFirst().getAmount() == salary.getGross() - salary.getGross() * TAX
+            int expectedNoOfDeductions = 1;
+            double expectedPayment = salary.getGross() - salary.getGross() * TAX
                     - INSURANCE;
+            assertEquals(expectedNoOfDeductions, payments.size());
+            assertEquals(expectedPayment, payments.getFirst().getAmount());
         }
     }
 
@@ -116,15 +133,19 @@ public class PaymentTest extends AbstractTest {
     public void pay_givenYoeMoreThan10With1ExceededLeavesWithNoBonus_ExpectDeduction() throws Exception {
         prepareDB("/datasets/payment/payment-YOEMoreThan10.xml");
         prepareDB("/datasets/payment/extraLeaves.xml", DatabaseOperation.INSERT);
-        try (MockedStatic<LocalDate> date = Mockito.mockStatic(LocalDate.class, Mockito.CALLS_REAL_METHODS)) {
+        try (MockedStatic<LocalDateTime> dateTime = Mockito.mockStatic(LocalDateTime.class, Mockito.CALLS_REAL_METHODS);
+             MockedStatic<LocalDate> date = Mockito.mockStatic(LocalDate.class, Mockito.CALLS_REAL_METHODS)) {
             date.when(LocalDate::now).thenReturn(FIXED_NOW.toLocalDate());
+            dateTime.when(LocalDateTime::now).thenReturn(FIXED_NOW);
             payrollScheduler.generatePayroll();
             Employee employee = employeeRepository.findById(EXISTING_EMPLOYEE_ID).get();
             Salary salary = employee.getSalaries().stream().max(byLatestSalaryComparator()).get();
             List<Payment> payments = salary.getPayments();
-            assert payments.size() == 1;
-            assert payments.getFirst().getAmount() == salary.getGross() - salary.getGross() * TAX
+            int expectedNoOfDeductions = 1;
+            double expectedPayment = salary.getGross() - salary.getGross() * TAX
                     - INSURANCE - DEDUCTION_AMOUNT;
+            assertEquals(expectedNoOfDeductions, payments.size());
+            assertEquals(expectedPayment, payments.getFirst().getAmount());
         }
     }
 
@@ -133,15 +154,19 @@ public class PaymentTest extends AbstractTest {
         prepareDB("/datasets/payment/payment-YOEMoreThan10.xml");
         prepareDB("/datasets/payment/extraLeaves.xml", DatabaseOperation.INSERT);
         prepareDB("/datasets/payment/extraBonus.xml", DatabaseOperation.INSERT);
-        try (MockedStatic<LocalDate> date = Mockito.mockStatic(LocalDate.class, Mockito.CALLS_REAL_METHODS)) {
+        try (MockedStatic<LocalDateTime> dateTime = Mockito.mockStatic(LocalDateTime.class, Mockito.CALLS_REAL_METHODS);
+             MockedStatic<LocalDate> date = Mockito.mockStatic(LocalDate.class, Mockito.CALLS_REAL_METHODS)) {
             date.when(LocalDate::now).thenReturn(FIXED_NOW.toLocalDate());
+            dateTime.when(LocalDateTime::now).thenReturn(FIXED_NOW);
             payrollScheduler.generatePayroll();
             Employee employee = employeeRepository.findById(EXISTING_EMPLOYEE_ID).get();
             Salary salary = employee.getCurrentSalary();
             List<Payment> payments = salary.getPayments();
-            assert payments.size() == 1;
-            assert payments.getFirst().getAmount() == salary.getGross() - salary.getGross() * TAX
+            int expectedNoOfDeductions = 1;
+            double expectedPayment = salary.getGross() - salary.getGross() * TAX
                     - INSURANCE - DEDUCTION_AMOUNT + BONUS_AMOUNT;
+            assertEquals(expectedNoOfDeductions, payments.size());
+            assertEquals(expectedPayment, payments.getFirst().getAmount());
         }
     }
 }
