@@ -27,6 +27,7 @@ public class PaymentTest extends AbstractTest {
     private static final Double TAX = 0.15d;
     private static final Double DEDUCTION_AMOUNT = 500d;
     private static final Double BONUS_AMOUNT = 125d;
+    private static final LocalDateTime FIXED_NOW = LocalDateTime.of(2025, 2, 25, 1, 1);
 
     @Autowired
     EmployeeRepository employeeRepository;
@@ -49,9 +50,8 @@ public class PaymentTest extends AbstractTest {
     @Test
     public void pay_givenYoeLessThan10AllowedLeavesWithNoBonus_NoDeduction() throws Exception {
         prepareDB("/datasets/payment/payment-YOELessThan10.xml");
-        LocalDateTime fixedNow = LocalDateTime.of(2025, 2, 25, 1, 1);
         try (MockedStatic<LocalDate> date = Mockito.mockStatic(LocalDate.class, Mockito.CALLS_REAL_METHODS)) {
-            date.when(LocalDate::now).thenReturn(fixedNow.toLocalDate());
+            date.when(LocalDate::now).thenReturn(FIXED_NOW.toLocalDate());
             payrollScheduler.generatePayroll();
             Employee employee = employeeRepository.findById(EXISTING_EMPLOYEE_ID).get();
             Salary salary = employee.getSalaries().stream().max(byLatestSalaryComparator()).get();
@@ -66,9 +66,8 @@ public class PaymentTest extends AbstractTest {
     public void pay_givenYoeLessThan10With1ExceededLeavesWithNoBonus_ExpectDeduction() throws Exception {
         prepareDB("/datasets/payment/payment-YOELessThan10.xml");
         addToDB("/datasets/payment/extraLeaves.xml");
-        LocalDateTime fixedNow = LocalDateTime.of(2025, 2, 25, 1, 1);
         try (MockedStatic<LocalDate> date = Mockito.mockStatic(LocalDate.class, Mockito.CALLS_REAL_METHODS)) {
-            date.when(LocalDate::now).thenReturn(fixedNow.toLocalDate());
+            date.when(LocalDate::now).thenReturn(FIXED_NOW.toLocalDate());
             payrollScheduler.generatePayroll();
             Employee employee = employeeRepository.findById(EXISTING_EMPLOYEE_ID).get();
             Salary salary = employee.getSalaries().stream().max(byLatestSalaryComparator()).get();
@@ -84,9 +83,8 @@ public class PaymentTest extends AbstractTest {
         prepareDB("/datasets/payment/payment-YOELessThan10.xml");
         addToDB("/datasets/payment/extraLeaves.xml");
         addToDB("/datasets/payment/extraBonus.xml");
-        LocalDateTime fixedNow = LocalDateTime.of(2025, 2, 25, 1, 1);
         try (MockedStatic<LocalDate> date = Mockito.mockStatic(LocalDate.class, Mockito.CALLS_REAL_METHODS)) {
-            date.when(LocalDate::now).thenReturn(fixedNow.toLocalDate());
+            date.when(LocalDate::now).thenReturn(FIXED_NOW.toLocalDate());
             payrollScheduler.generatePayroll();
             Employee employee = employeeRepository.findById(EXISTING_EMPLOYEE_ID).get();
             Salary salary = employee.getSalaries().stream().max(byLatestSalaryComparator()).get();
@@ -101,9 +99,8 @@ public class PaymentTest extends AbstractTest {
     @Test
     public void pay_givenYoeMoreThan10AllowedLeavesWithNoBonus_NoDeduction() throws Exception {
         prepareDB("/datasets/payment/payment-YOEMoreThan10.xml");
-        LocalDateTime fixedNow = LocalDateTime.of(2025, 2, 25, 1, 1);
         try (MockedStatic<LocalDate> date = Mockito.mockStatic(LocalDate.class, Mockito.CALLS_REAL_METHODS)) {
-            date.when(LocalDate::now).thenReturn(fixedNow.toLocalDate());
+            date.when(LocalDate::now).thenReturn(FIXED_NOW.toLocalDate());
             payrollScheduler.generatePayroll();
             Employee employee = employeeRepository.findById(EXISTING_EMPLOYEE_ID).get();
             Salary salary = employee.getSalaries().stream().max(byLatestSalaryComparator()).get();
@@ -118,9 +115,8 @@ public class PaymentTest extends AbstractTest {
     public void pay_givenYoeMoreThan10With1ExceededLeavesWithNoBonus_ExpectDeduction() throws Exception {
         prepareDB("/datasets/payment/payment-YOEMoreThan10.xml");
         addToDB("/datasets/payment/extraLeaves.xml");
-        LocalDateTime fixedNow = LocalDateTime.of(2025, 2, 25, 1, 1);
         try (MockedStatic<LocalDate> date = Mockito.mockStatic(LocalDate.class, Mockito.CALLS_REAL_METHODS)) {
-            date.when(LocalDate::now).thenReturn(fixedNow.toLocalDate());
+            date.when(LocalDate::now).thenReturn(FIXED_NOW.toLocalDate());
             payrollScheduler.generatePayroll();
             Employee employee = employeeRepository.findById(EXISTING_EMPLOYEE_ID).get();
             Salary salary = employee.getSalaries().stream().max(byLatestSalaryComparator()).get();
@@ -136,9 +132,8 @@ public class PaymentTest extends AbstractTest {
         prepareDB("/datasets/payment/payment-YOEMoreThan10.xml");
         addToDB("/datasets/payment/extraLeaves.xml");
         addToDB("/datasets/payment/extraBonus.xml");
-        LocalDateTime fixedNow = LocalDateTime.of(2025, 2, 25, 1, 1);
         try (MockedStatic<LocalDate> date = Mockito.mockStatic(LocalDate.class, Mockito.CALLS_REAL_METHODS)) {
-            date.when(LocalDate::now).thenReturn(fixedNow.toLocalDate());
+            date.when(LocalDate::now).thenReturn(FIXED_NOW.toLocalDate());
             payrollScheduler.generatePayroll();
             Employee employee = employeeRepository.findById(EXISTING_EMPLOYEE_ID).get();
             Salary salary = employee.getCurrentSalary();
