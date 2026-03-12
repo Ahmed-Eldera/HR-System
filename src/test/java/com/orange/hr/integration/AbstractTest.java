@@ -68,19 +68,14 @@ public class AbstractTest {
 
 
     public void prepareDB(String path) throws DatabaseUnitException, SQLException {
-
-        FlatXmlDataSetBuilder builder = new FlatXmlDataSetBuilder();
-        IDataSet dataSet = builder.build(getClass().getResourceAsStream(path));
-        dbUnitConnection.getConnection().createStatement().execute("SET REFERENTIAL_INTEGRITY FALSE");
-        DatabaseOperation.CLEAN_INSERT.execute(dbUnitConnection, dataSet);
-        dbUnitConnection.getConnection().createStatement().execute("SET REFERENTIAL_INTEGRITY TRUE");
+        prepareDB(path, DatabaseOperation.CLEAN_INSERT);
     }
 
-    public void addToDB(String path) throws DatabaseUnitException, SQLException {
+    public void prepareDB(String path, DatabaseOperation databaseOperation) throws DatabaseUnitException, SQLException {
         FlatXmlDataSetBuilder builder = new FlatXmlDataSetBuilder();
         IDataSet dataSet = builder.build(getClass().getResourceAsStream(path));
         dbUnitConnection.getConnection().createStatement().execute("SET REFERENTIAL_INTEGRITY FALSE");
-        DatabaseOperation.INSERT.execute(dbUnitConnection, dataSet);
+        databaseOperation.execute(dbUnitConnection, dataSet);
         dbUnitConnection.getConnection().createStatement().execute("SET REFERENTIAL_INTEGRITY TRUE");
     }
 

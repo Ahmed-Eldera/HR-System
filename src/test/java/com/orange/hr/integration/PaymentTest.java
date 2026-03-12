@@ -6,6 +6,7 @@ import com.orange.hr.entity.Salary;
 import com.orange.hr.payment.PayrollScheduler;
 import com.orange.hr.repository.EmployeeRepository;
 import com.orange.hr.repository.PaymentRepository;
+import org.dbunit.operation.DatabaseOperation;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
@@ -65,7 +66,7 @@ public class PaymentTest extends AbstractTest {
     @Test
     public void pay_givenYoeLessThan10With1ExceededLeavesWithNoBonus_ExpectDeduction() throws Exception {
         prepareDB("/datasets/payment/payment-YOELessThan10.xml");
-        addToDB("/datasets/payment/extraLeaves.xml");
+        prepareDB("/datasets/payment/extraLeaves.xml", DatabaseOperation.INSERT);
         try (MockedStatic<LocalDate> date = Mockito.mockStatic(LocalDate.class, Mockito.CALLS_REAL_METHODS)) {
             date.when(LocalDate::now).thenReturn(FIXED_NOW.toLocalDate());
             payrollScheduler.generatePayroll();
@@ -81,8 +82,8 @@ public class PaymentTest extends AbstractTest {
     @Test
     public void pay_givenYoeLessThan10With1ExceededLeavesWithBonus_ExpectDeduction() throws Exception {
         prepareDB("/datasets/payment/payment-YOELessThan10.xml");
-        addToDB("/datasets/payment/extraLeaves.xml");
-        addToDB("/datasets/payment/extraBonus.xml");
+        prepareDB("/datasets/payment/extraLeaves.xml", DatabaseOperation.INSERT);
+        prepareDB("/datasets/payment/extraBonus.xml", DatabaseOperation.INSERT);
         try (MockedStatic<LocalDate> date = Mockito.mockStatic(LocalDate.class, Mockito.CALLS_REAL_METHODS)) {
             date.when(LocalDate::now).thenReturn(FIXED_NOW.toLocalDate());
             payrollScheduler.generatePayroll();
@@ -114,7 +115,7 @@ public class PaymentTest extends AbstractTest {
     @Test
     public void pay_givenYoeMoreThan10With1ExceededLeavesWithNoBonus_ExpectDeduction() throws Exception {
         prepareDB("/datasets/payment/payment-YOEMoreThan10.xml");
-        addToDB("/datasets/payment/extraLeaves.xml");
+        prepareDB("/datasets/payment/extraLeaves.xml", DatabaseOperation.INSERT);
         try (MockedStatic<LocalDate> date = Mockito.mockStatic(LocalDate.class, Mockito.CALLS_REAL_METHODS)) {
             date.when(LocalDate::now).thenReturn(FIXED_NOW.toLocalDate());
             payrollScheduler.generatePayroll();
@@ -130,8 +131,8 @@ public class PaymentTest extends AbstractTest {
     @Test
     public void pay_givenYoeMoreThan10With1ExceededLeavesWithBonus_ExpectDeduction() throws Exception {
         prepareDB("/datasets/payment/payment-YOEMoreThan10.xml");
-        addToDB("/datasets/payment/extraLeaves.xml");
-        addToDB("/datasets/payment/extraBonus.xml");
+        prepareDB("/datasets/payment/extraLeaves.xml", DatabaseOperation.INSERT);
+        prepareDB("/datasets/payment/extraBonus.xml", DatabaseOperation.INSERT);
         try (MockedStatic<LocalDate> date = Mockito.mockStatic(LocalDate.class, Mockito.CALLS_REAL_METHODS)) {
             date.when(LocalDate::now).thenReturn(FIXED_NOW.toLocalDate());
             payrollScheduler.generatePayroll();
