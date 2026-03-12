@@ -267,10 +267,9 @@ public class EmployeeServiceImpl implements EmployeeService {
                 .build();
     }
 
-    public Payment pay(Employee employee) {
+    public Payment calculatePayment(Employee employee) {
         Salary salary = employee.getCurrentSalary();
         Double grossSalary = salary.getGross();
-        applyDeductions(employee);
         List<SalaryAdjustment> adjustments = salaryAdjustmentRepository.findByEmployee(employee)
                 .stream()
                 .filter(currentMonth())
@@ -283,7 +282,7 @@ public class EmployeeServiceImpl implements EmployeeService {
                 .build();
     }
 
-    private void applyDeductions(Employee employee) {
+    public List<SalaryAdjustment> calculateDeductions(Employee employee) {
         double deductionPerLeave = -500d;
         List<SalaryAdjustment> deductions = new ArrayList<>();
         List<Leave> leaves = employee.getLeaves().stream().filter(currentYear()).toList();
@@ -298,7 +297,7 @@ public class EmployeeServiceImpl implements EmployeeService {
             for (long i = 0; i < exceededLeaves; i++) {
                 deductions.add(SalaryAdjustment.builder().employee(employee).amount(deductionPerLeave).build());
             }
-            salaryAdjustmentRepository.saveAll(deductions);
         }
+        return deductions;
     }
 }

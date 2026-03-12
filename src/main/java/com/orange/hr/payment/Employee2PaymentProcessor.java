@@ -8,13 +8,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class EmployeeProcessor implements ItemProcessor<Employee, Payment> {
+public class Employee2PaymentProcessor implements ItemProcessor<Employee, Payment> {
     @Autowired
     EmployeeService employeeService;
 
     @Override
     public Payment process(Employee employee) {
-        return employeeService.pay(employee);
+        return employeeService.calculatePayment(employee);
 
     }
 
