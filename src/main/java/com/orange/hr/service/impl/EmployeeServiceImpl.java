@@ -15,9 +15,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Predicate;
 
 @Slf4j
 @Transactional
@@ -47,18 +47,6 @@ public class EmployeeServiceImpl implements EmployeeService {
     private PasswordEncoder passwordEncoder;
     @Value("${senior.yoe}")
     private Integer seniorYOE;
-
-    private static <E extends HasCreatedAt> Predicate<E> currentYear() {
-        return E -> E.getCreatedAt().getYear() == LocalDate.now().getYear();
-    }
-
-    private static <E extends HasCreatedAt> Predicate<E> currentMonth() {
-        return E -> E.getCreatedAt().toLocalDate().isAfter(LocalDate.now().minusMonths(1));
-    }
-
-    private static Predicate<Leave> claimedLeaves() {
-        return leave -> leave.getLeaveDate().isBefore(LocalDate.now());
-    }
 
     public EmployeeResponseDTO addEmployee(EmployeeRequestDTO employee) {
         // validating the input data
@@ -272,10 +260,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     public Payment calculatePayment(Employee employee) {
         Salary salary = employee.getCurrentSalary();
         Double grossSalary = salary.getGross();
-        List<SalaryAdjustment> adjustments = salaryAdjustmentRepository.findByEmployee(employee)
-                .stream()
-                .filter(currentMonth())
-                .toList();
+        List<SalaryAdjustment> adjustments = salaryAdjustmentRepository.findByEmployeeAndCreatedAtGreaterThanAndCreatedAtLessThanEqual(employee, LocalDateTime.now().minusMonths(1), LocalDateTime.now());
         Double sumOfAdjustments = adjustments.stream().mapToDouble(SalaryAdjustment::getAmount).sum();
         Double netSalary = grossSalary - (grossSalary * TAX_RATIO + INSURANCE) + sumOfAdjustments;
         return Payment.builder()
@@ -285,20 +270,17 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     public List<SalaryAdjustment> calculateDeductions(Employee employee) {
+        LocalDateTime startOfYear = LocalDateTime.now().withDayOfYear(1).withMinute(0).withHour(0);
         List<SalaryAdjustment> deductions = new ArrayList<>();
-        List<Leave> leaves = employee.getLeaves().stream().filter(currentYear()).toList();
         Integer allowedLeavesCount = employee.getTotalYOE() < seniorYOE ? 21 : 30;
-        Long previousDeductions = salaryAdjustmentRepository.findByEmployeeAndAmountLessThan(employee, 0d)
-                .stream()
-                .filter(currentYear())
-                .count();
+        int previousDeductions = salaryAdjustmentRepository.countByEmployeeAndAmountLessThanAndCreatedAtGreaterThanEqual(employee, 0d, startOfYear);
+        int claimedLeaves = leaveRepository.countByEmployeeAndLeaveDateLessThanAndCreatedAtGreaterThanEqual(employee, LocalDate.now(), startOfYear);
         // if leaves count equals the allowed leaves and old deductions
         // that means that the exceeded leaves are already deducted in a previous month
         // and I don't need to deduct again
         // else that means that he has some exceeded leaves that need a deduction
-        if (leaves.size() > allowedLeavesCount + previousDeductions) {
-            long exceededLeaves = leaves.stream()
-                    .filter(claimedLeaves()).count() - allowedLeavesCount - previousDeductions;
+        if (claimedLeaves > allowedLeavesCount + previousDeductions) {
+            int exceededLeaves = claimedLeaves - allowedLeavesCount - previousDeductions;
             for (long i = 0; i < exceededLeaves; i++) {
                 deductions.add(SalaryAdjustment.builder().employee(employee).amount(DEDCTION_PER_LEAVE).build());
             }

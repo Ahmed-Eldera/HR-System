@@ -2,8 +2,9 @@ package com.orange.hr.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.DynamicInsert;
-import org.hibernate.annotations.GenerationTime;
+import org.hibernate.annotations.SourceType;
 
 import java.time.LocalDateTime;
 
@@ -15,7 +16,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @DynamicInsert
 @Builder
-public class SalaryAdjustment implements HasCreatedAt {
+public class SalaryAdjustment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "adjustment_id")
@@ -27,7 +28,7 @@ public class SalaryAdjustment implements HasCreatedAt {
 
     private Double amount;
 
-    @org.hibernate.annotations.Generated(GenerationTime.INSERT)
+    @CreationTimestamp(source = SourceType.DB)
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
