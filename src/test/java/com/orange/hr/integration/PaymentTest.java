@@ -9,13 +9,16 @@ import com.orange.hr.repository.PaymentRepository;
 import com.orange.hr.repository.SalaryAdjustmentRepository;
 import org.dbunit.operation.DatabaseOperation;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
+import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.test.context.SpringBatchTest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -42,6 +45,8 @@ public class PaymentTest extends AbstractTest {
     @Autowired
     SalaryAdjustmentRepository salaryAdjustmentRepository;
     @Autowired
+    JobRepository jobRepository;
+    @Autowired
     private JdbcTemplate jdbcTemplate;
 
     @BeforeAll
@@ -51,6 +56,23 @@ public class PaymentTest extends AbstractTest {
                         + "'java.time.LocalDateTime m() { "
                         + "return java.time.LocalDateTime.of(2025, 2, 1, 0, 0, 0); }'"
         );
+    }
+
+    @BeforeEach
+    void clearBatchTables() throws SQLException {
+        String[] tables = {
+                "BATCH_STEP_EXECUTION_CONTEXT",
+                "BATCH_STEP_EXECUTION",
+                "BATCH_JOB_EXECUTION_CONTEXT",
+                "BATCH_JOB_EXECUTION_PARAMS",
+                "BATCH_JOB_EXECUTION",
+                "BATCH_JOB_INSTANCE"
+        };
+        dbUnitConnection.getConnection().createStatement().execute("SET REFERENTIAL_INTEGRITY FALSE");
+        for (String table : tables) {
+            jdbcTemplate.execute("TRUNCATE TABLE " + table);
+        }
+        dbUnitConnection.getConnection().createStatement().execute("SET REFERENTIAL_INTEGRITY TRUE");
     }
 
     @Test

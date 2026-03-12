@@ -41,7 +41,7 @@ import java.sql.Types;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @ActiveProfiles("test")
 public class AbstractTest {
-    private static IDatabaseConnection dbUnitConnection;
+    static IDatabaseConnection dbUnitConnection;
     @Autowired
     ObjectMapper objectMapper;
     @Autowired
