@@ -6,6 +6,7 @@ import com.orange.hr.entity.Salary;
 import com.orange.hr.payment.PayrollScheduler;
 import com.orange.hr.repository.EmployeeRepository;
 import com.orange.hr.repository.PaymentRepository;
+import com.orange.hr.repository.SalaryAdjustmentRepository;
 import org.dbunit.operation.DatabaseOperation;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -20,6 +21,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static com.orange.hr.entity.Employee.byLatestSalaryComparator;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBatchTest
@@ -37,6 +39,8 @@ public class PaymentTest extends AbstractTest {
     PayrollScheduler payrollScheduler;
     @Autowired
     PaymentRepository paymentRepository;
+    @Autowired
+    SalaryAdjustmentRepository salaryAdjustmentRepository;
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
@@ -60,10 +64,10 @@ public class PaymentTest extends AbstractTest {
             Employee employee = employeeRepository.findById(EXISTING_EMPLOYEE_ID).get();
             Salary salary = employee.getSalaries().stream().max(byLatestSalaryComparator()).get();
             List<Payment> payments = salary.getPayments();
-            int expectedNoOfDeductions = 1;
             double expectedPayment = salary.getGross() - salary.getGross() * TAX
                     - INSURANCE;
-            assertEquals(expectedNoOfDeductions, payments.size());
+            assertThat(salaryAdjustmentRepository.findByEmployee(employee).isEmpty());
+            assertEquals(1, payments.size());
             assertEquals(expectedPayment, payments.getFirst().getAmount());
         }
     }
@@ -80,10 +84,10 @@ public class PaymentTest extends AbstractTest {
             Employee employee = employeeRepository.findById(EXISTING_EMPLOYEE_ID).get();
             Salary salary = employee.getSalaries().stream().max(byLatestSalaryComparator()).get();
             List<Payment> payments = salary.getPayments();
-            int expectedNoOfDeductions = 1;
             double expectedPayment = salary.getGross() - salary.getGross() * TAX
                     - INSURANCE - DEDUCTION_AMOUNT;
-            assertEquals(expectedNoOfDeductions, payments.size());
+            assertThat(!salaryAdjustmentRepository.findByEmployee(employee).isEmpty());
+            assertEquals(1, payments.size());
             assertEquals(expectedPayment, payments.getFirst().getAmount());
         }
     }
@@ -102,10 +106,10 @@ public class PaymentTest extends AbstractTest {
             Salary salary = employee.getSalaries().stream().max(byLatestSalaryComparator()).get();
             List<Payment> payments = salary.getPayments();
 
-            int expectedNoOfDeductions = 1;
             double expectedPayment = salary.getGross() - salary.getGross() * TAX
                     - INSURANCE - DEDUCTION_AMOUNT + BONUS_AMOUNT;
-            assertEquals(expectedNoOfDeductions, payments.size());
+            assertThat(!salaryAdjustmentRepository.findByEmployee(employee).isEmpty());
+            assertEquals(1, payments.size());
             assertEquals(expectedPayment, payments.getFirst().getAmount());
         }
     }
@@ -121,10 +125,10 @@ public class PaymentTest extends AbstractTest {
             Employee employee = employeeRepository.findById(EXISTING_EMPLOYEE_ID).get();
             Salary salary = employee.getSalaries().stream().max(byLatestSalaryComparator()).get();
             List<Payment> payments = salary.getPayments();
-            int expectedNoOfDeductions = 1;
             double expectedPayment = salary.getGross() - salary.getGross() * TAX
                     - INSURANCE;
-            assertEquals(expectedNoOfDeductions, payments.size());
+            assertThat(salaryAdjustmentRepository.findByEmployee(employee).isEmpty());
+            assertEquals(1, payments.size());
             assertEquals(expectedPayment, payments.getFirst().getAmount());
         }
     }
@@ -141,10 +145,10 @@ public class PaymentTest extends AbstractTest {
             Employee employee = employeeRepository.findById(EXISTING_EMPLOYEE_ID).get();
             Salary salary = employee.getSalaries().stream().max(byLatestSalaryComparator()).get();
             List<Payment> payments = salary.getPayments();
-            int expectedNoOfDeductions = 1;
             double expectedPayment = salary.getGross() - salary.getGross() * TAX
                     - INSURANCE - DEDUCTION_AMOUNT;
-            assertEquals(expectedNoOfDeductions, payments.size());
+            assertThat(!salaryAdjustmentRepository.findByEmployee(employee).isEmpty());
+            assertEquals(1, payments.size());
             assertEquals(expectedPayment, payments.getFirst().getAmount());
         }
     }
@@ -162,10 +166,10 @@ public class PaymentTest extends AbstractTest {
             Employee employee = employeeRepository.findById(EXISTING_EMPLOYEE_ID).get();
             Salary salary = employee.getCurrentSalary();
             List<Payment> payments = salary.getPayments();
-            int expectedNoOfDeductions = 1;
             double expectedPayment = salary.getGross() - salary.getGross() * TAX
                     - INSURANCE - DEDUCTION_AMOUNT + BONUS_AMOUNT;
-            assertEquals(expectedNoOfDeductions, payments.size());
+            assertThat(!salaryAdjustmentRepository.findByEmployee(employee).isEmpty());
+            assertEquals(1, payments.size());
             assertEquals(expectedPayment, payments.getFirst().getAmount());
         }
     }
