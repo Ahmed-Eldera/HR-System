@@ -21,10 +21,17 @@ public class PaymentControllerTest extends AbstractTest {
     PayrollScheduler payrollScheduler;
 
     @Test
-    public void pay_using_api() throws Exception {
+    public void payUsingApi_ExpectAccepted() throws Exception {
         ResultActions result = mockMvc.perform(MockMvcRequestBuilders.post("/payment").contentType(MediaType.APPLICATION_JSON));
         verify(payrollScheduler, times(2)).generatePayroll();
         result.andExpect(status().isAccepted());
     }
 
+    @Test
+    public void payUsingApi_GivenJobExists_ExpectForbidden() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.post("/payment").contentType(MediaType.APPLICATION_JSON));
+        ResultActions result = mockMvc.perform(MockMvcRequestBuilders.post("/payment").contentType(MediaType.APPLICATION_JSON));
+        verify(payrollScheduler, times(2)).generatePayroll();
+        result.andExpect(status().isForbidden());
+    }
 }
