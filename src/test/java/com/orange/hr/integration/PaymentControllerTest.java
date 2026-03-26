@@ -40,4 +40,12 @@ public class PaymentControllerTest extends AbstractTest {
         verify(payrollScheduler, times(2)).generatePayroll();
         result.andExpect(status().isForbidden());
     }
+
+    @Test
+    public void payUsingApi_Given2DifferentMonths_ExpectAccepted() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.post("/payment"));
+        ResultActions result = mockMvc.perform(MockMvcRequestBuilders.post("/payment"));
+        verify(payrollScheduler, times(2)).generatePayroll();
+        result.andExpect(status().isForbidden());
+    }
 }

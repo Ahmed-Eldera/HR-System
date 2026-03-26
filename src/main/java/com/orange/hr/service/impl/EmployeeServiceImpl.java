@@ -151,7 +151,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     public void deleteEmployeeAndReassignSubordinates(Integer id) {
         Employee employee = employeeRepository.findById(id).orElseThrow(() -> new NoSuchEmployeeException(HttpStatus.NOT_FOUND, "Can't find Such Employee"));
         if (employee.getManager() == null) {
-            throw new MyException(HttpStatus.CONFLICT, "Can't delete a super manager");
+            throw new HrException(HttpStatus.CONFLICT, "Can't delete a super manager");
         }
         Integer newManagerId = employee.getManager().getId();
         //reassign his subordinates to his manager before deleting him
@@ -242,7 +242,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     public SalaryDTO addRaise(Integer employeeId, RaiseRequestDTO request) {
         Employee employee = employeeRepository.findById(employeeId).orElseThrow(() -> new NoSuchEmployeeException(HttpStatus.NOT_FOUND, "No Such Employee."));
         Double raisePercentage = request.getRatio() / 100d;
-        Salary lastSalary = salaryRepository.findFirstByEmployeeOrderByCreatedAtDesc(employee).orElseThrow(() -> new MyException(HttpStatus.INTERNAL_SERVER_ERROR, "Couldn't find this employee's salary"));
+        Salary lastSalary = salaryRepository.findFirstByEmployeeOrderByCreatedAtDesc(employee).orElseThrow(() -> new HrException(HttpStatus.INTERNAL_SERVER_ERROR, "Couldn't find this employee's salary"));
         Double grossSalaryBeforeRaise = lastSalary.getGross();
         Double newGrossSalary = grossSalaryBeforeRaise + grossSalaryBeforeRaise * raisePercentage;
         Salary raise = Salary.builder()

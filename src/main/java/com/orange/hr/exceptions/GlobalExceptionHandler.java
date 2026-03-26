@@ -1,6 +1,7 @@
 package com.orange.hr.exceptions;
 
 import com.orange.hr.dto.CustomError;
+import org.springframework.batch.core.JobExecutionException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.ObjectError;
@@ -29,8 +30,8 @@ public class GlobalExceptionHandler {
                 .body(error);
     }
 
-    @ExceptionHandler({MyException.class})
-    public ResponseEntity<Object> handleRuntimeException(MyException exception) {
+    @ExceptionHandler({HrException.class})
+    public ResponseEntity<Object> handleRuntimeException(HrException exception) {
 
         CustomError error = new CustomError();
 
@@ -38,5 +39,14 @@ public class GlobalExceptionHandler {
         return ResponseEntity
                 .status(exception.getStatusCode())
                 .body(error);
+    }
+
+    @ExceptionHandler({JobExecutionException.class})
+    public ResponseEntity<String> handleRuntimeException(JobExecutionException exception) {
+
+
+        return ResponseEntity
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .build();
     }
 }

@@ -5,7 +5,7 @@ import org.springframework.http.HttpStatus;
 
 
 @Getter
-public class NoSuchTeamException extends MyException {
+public class NoSuchTeamException extends HrException {
     public NoSuchTeamException(HttpStatus statusCode, String message) {
         super(statusCode, message);
     }
