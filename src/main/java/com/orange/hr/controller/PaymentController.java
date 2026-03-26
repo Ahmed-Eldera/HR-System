@@ -20,7 +20,9 @@ public class PaymentController {
     private final PayrollScheduler payrollScheduler;
 
     @PostMapping
-    public ResponseEntity<String> generatePayments() throws JobInstanceAlreadyCompleteException, JobExecutionAlreadyRunningException, JobParametersInvalidException, JobRestartException {
+    public ResponseEntity<String> generatePayments() throws
+            JobInstanceAlreadyCompleteException, JobExecutionAlreadyRunningException,
+            JobParametersInvalidException, JobRestartException {
         payrollScheduler.generatePayroll();
         return new ResponseEntity<>(HttpStatus.ACCEPTED);
 

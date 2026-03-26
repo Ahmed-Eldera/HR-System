@@ -43,7 +43,9 @@ public class PayrollScheduler {
     }
 
     @Async
-    public void launchPayrollJob(Job job, JobParameters jobParameters) throws JobInstanceAlreadyCompleteException, JobExecutionAlreadyRunningException, JobParametersInvalidException, JobRestartException {
+    public void launchPayrollJob(Job job, JobParameters jobParameters) throws
+            JobInstanceAlreadyCompleteException, JobExecutionAlreadyRunningException,
+            JobParametersInvalidException, JobRestartException {
         jobLauncher.run(
                 job,
                 jobParameters
