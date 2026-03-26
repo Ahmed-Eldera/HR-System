@@ -1,9 +1,6 @@
 package com.orange.hr.service;
 
 import com.orange.hr.dto.*;
-import com.orange.hr.entity.Employee;
-import com.orange.hr.entity.Payment;
-import com.orange.hr.entity.SalaryAdjustment;
 
 import java.util.List;
 
@@ -27,8 +24,4 @@ public interface EmployeeService {
     public BonusResponseDTO addBonus(Integer employeeId, BonusRequestDTO requestDTO);
 
     public SalaryDTO addRaise(Integer employeeId, RaiseRequestDTO raisePercentage);
-
-    Payment calculatePayment(Employee employee);
-
-    List<SalaryAdjustment> calculateDeductions(Employee employee);
 }
