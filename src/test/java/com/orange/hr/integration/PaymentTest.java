@@ -17,6 +17,7 @@ import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.test.context.SpringBatchTest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.test.web.servlet.MockMvc;
 
 import java.sql.SQLException;
 import java.time.LocalDate;
@@ -49,6 +50,8 @@ public class PaymentTest extends AbstractTest {
     JobRepository jobRepository;
     @Autowired
     private JdbcTemplate jdbcTemplate;
+    @Autowired
+    private MockMvc mockMvc;
 
     @BeforeAll
     void setupDatabaseTime() {
