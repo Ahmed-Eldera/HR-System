@@ -264,7 +264,7 @@ public class EmployeeServiceImpl implements EmployeeService {
                 .findByEmployeeAndCreatedAtGreaterThanAndCreatedAtLessThanEqual(
                         employee,
                         LocalDateTime.now().minusMonths(1),
-                        LocalDateTime.now());
+                        LocalDateTime.now().minusDays(1).withHour(23).withMinute(59));
         Double sumOfAdjustments = adjustments.stream().mapToDouble(SalaryAdjustment::getAmount).sum();
         Double netSalary = grossSalary - (grossSalary * TAX_RATIO + INSURANCE) + sumOfAdjustments;
         return Payment.builder()
