@@ -110,8 +110,16 @@ public class PaymentTest extends AbstractTest {
             double expectedPayment = salary.getGross() - salary.getGross() * TAX
                     - INSURANCE;
             //assert that 1 deduction is created and its amount
-            assertEquals(1, salaryAdjustmentRepository.countByEmployeeAndAmountLessThanAndCreatedAtGreaterThanEqual(employee, 0d, LocalDateTime.now()));
-            assertEquals(DEDUCTION_AMOUNT, salaryAdjustmentRepository.findByEmployeeAndCreatedAtGreaterThanAndCreatedAtLessThanEqual(employee, LocalDateTime.now().minusDays(1).withHour(23).withMinute(59), LocalDateTime.now()).getFirst().getAmount());
+            assertEquals(1, salaryAdjustmentRepository
+                    .countByEmployeeAndAmountLessThanAndCreatedAtGreaterThanEqual(
+                            employee,
+                            0d,
+                            LocalDateTime.now()));
+            assertEquals(DEDUCTION_AMOUNT, salaryAdjustmentRepository
+                    .findByEmployeeAndCreatedAtGreaterThanAndCreatedAtLessThanEqual(
+                            employee,
+                            LocalDateTime.now().minusDays(1).withHour(23).withMinute(59),
+                            LocalDateTime.now()).getFirst().getAmount());
             assertEquals(1, payments.size());
             assertEquals(expectedPayment, payments.getFirst().getAmount());
         }
@@ -134,8 +142,16 @@ public class PaymentTest extends AbstractTest {
             double expectedPayment = salary.getGross() - salary.getGross() * TAX
                     - INSURANCE + START_OF_MONTH_ADJUSTMENT + END_OF_MONTH_ADJUSTMENT;
             //assert that 1 deduction is created and its amount
-            assertEquals(1, salaryAdjustmentRepository.countByEmployeeAndAmountLessThanAndCreatedAtGreaterThanEqual(employee, 0d, LocalDateTime.now()));
-            assertEquals(DEDUCTION_AMOUNT, salaryAdjustmentRepository.findByEmployeeAndCreatedAtGreaterThanAndCreatedAtLessThanEqual(employee, LocalDateTime.now().minusDays(1).withHour(23).withMinute(59), LocalDateTime.now()).getFirst().getAmount());
+            assertEquals(1, salaryAdjustmentRepository
+                    .countByEmployeeAndAmountLessThanAndCreatedAtGreaterThanEqual(
+                            employee,
+                            0d,
+                            LocalDateTime.now()));
+            assertEquals(DEDUCTION_AMOUNT, salaryAdjustmentRepository
+                    .findByEmployeeAndCreatedAtGreaterThanAndCreatedAtLessThanEqual(
+                            employee,
+                            LocalDateTime.now().minusDays(1).withHour(23).withMinute(59),
+                            LocalDateTime.now()).getFirst().getAmount());
             assertEquals(1, payments.size());
             assertEquals(expectedPayment, payments.getFirst().getAmount());
         }
@@ -175,8 +191,16 @@ public class PaymentTest extends AbstractTest {
             double expectedPayment = salary.getGross() - salary.getGross() * TAX
                     - INSURANCE;
             //assert that 1 deduction is created and its amount
-            assertEquals(1, salaryAdjustmentRepository.countByEmployeeAndAmountLessThanAndCreatedAtGreaterThanEqual(employee, 0d, LocalDateTime.now()));
-            assertEquals(DEDUCTION_AMOUNT, salaryAdjustmentRepository.findByEmployeeAndCreatedAtGreaterThanAndCreatedAtLessThanEqual(employee, LocalDateTime.now().minusDays(1), LocalDateTime.now()).getFirst().getAmount());
+            assertEquals(1, salaryAdjustmentRepository
+                    .countByEmployeeAndAmountLessThanAndCreatedAtGreaterThanEqual(
+                            employee,
+                            0d,
+                            LocalDateTime.now()));
+            assertEquals(DEDUCTION_AMOUNT, salaryAdjustmentRepository
+                    .findByEmployeeAndCreatedAtGreaterThanAndCreatedAtLessThanEqual(
+                            employee,
+                            LocalDateTime.now().minusDays(1),
+                            LocalDateTime.now()).getFirst().getAmount());
             assertEquals(1, payments.size());
             assertEquals(expectedPayment, payments.getFirst().getAmount());
         }
@@ -198,8 +222,16 @@ public class PaymentTest extends AbstractTest {
             double expectedPayment = salary.getGross() - salary.getGross() * TAX
                     - INSURANCE + START_OF_MONTH_ADJUSTMENT + END_OF_MONTH_ADJUSTMENT;
             //assert that 1 deduction is created and its amount
-            assertEquals(1, salaryAdjustmentRepository.countByEmployeeAndAmountLessThanAndCreatedAtGreaterThanEqual(employee, 0d, LocalDateTime.now()));
-            assertEquals(DEDUCTION_AMOUNT, salaryAdjustmentRepository.findByEmployeeAndCreatedAtGreaterThanAndCreatedAtLessThanEqual(employee, LocalDateTime.now().minusMinutes(1), LocalDateTime.now()).getFirst().getAmount());
+            assertEquals(1, salaryAdjustmentRepository
+                    .countByEmployeeAndAmountLessThanAndCreatedAtGreaterThanEqual(
+                            employee,
+                            0d,
+                            LocalDateTime.now()));
+            assertEquals(DEDUCTION_AMOUNT, salaryAdjustmentRepository
+                    .findByEmployeeAndCreatedAtGreaterThanAndCreatedAtLessThanEqual(
+                            employee,
+                            LocalDateTime.now().minusMinutes(1),
+                            LocalDateTime.now()).getFirst().getAmount());
             assertEquals(1, payments.size());
             assertEquals(expectedPayment, payments.getFirst().getAmount());
         }
