@@ -56,6 +56,16 @@ jobs:
           name: app-jar
           path: build/libs/*.jar
 
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@0.35.0
+        with:
+          image-ref: ${{env.MYIMAGE}}:${{env.RELEASE_VERSION}}
+          format: 'table'
+          exit-code: '1'
+          ignore-unfixed: true
+          vuln-type: 'os,library'
+          severity: 'CRITICAL,HIGH'
+
   release:
     needs: build
     if: github.ref == 'refs/heads/main'
@@ -113,13 +123,5 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
 
-      - name: Run Trivy vulnerability scanner
-        uses: aquasecurity/trivy-action@0.35.0
-        with:
-          image-ref: ${{env.MYIMAGE}}:${{env.RELEASE_VERSION}}
-          format: 'table'
-          exit-code: '1'
-          ignore-unfixed: true
-          vuln-type: 'os,library'
-          severity: 'CRITICAL,HIGH'
+
 
