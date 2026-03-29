@@ -5,7 +5,6 @@ import com.orange.hr.entity.Payment;
 import com.orange.hr.entity.Salary;
 import com.orange.hr.payment.PayrollScheduler;
 import com.orange.hr.repository.EmployeeRepository;
-import com.orange.hr.repository.PaymentRepository;
 import com.orange.hr.repository.SalaryAdjustmentRepository;
 import org.dbunit.operation.DatabaseOperation;
 import org.junit.jupiter.api.BeforeAll;
@@ -13,7 +12,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
-import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.test.context.SpringBatchTest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -42,11 +40,7 @@ public class PaymentTest extends AbstractTest {
     @Autowired
     PayrollScheduler payrollScheduler;
     @Autowired
-    PaymentRepository paymentRepository;
-    @Autowired
     SalaryAdjustmentRepository salaryAdjustmentRepository;
-    @Autowired
-    JobRepository jobRepository;
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
