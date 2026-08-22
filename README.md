@@ -1,55 +1,58 @@
 # HR System
 
-A modern, full-featured Human Resources management system built with Spring Boot 3.5.x and Java 21. Designed to streamline employee lifecycle management from onboarding to offboarding, with robust payroll processing, leave tracking, and team collaboration features.
+A modern, full-featured Human Resources management system built with Spring Boot 3.5.6 and Java 21. Designed to streamline employee lifecycle management from onboarding to offboarding, with robust payroll processing, leave tracking, and team collaboration features.
 
-## 🏢 **Overview**
+## Overview
 
 The HR System provides a comprehensive suite of tools for managing employee data, teams, compensation, leaves, and bonuses. It features a RESTful API with JWT authentication, role-based access control, and integrates with MySQL databases via Flyway migrations.
 
----
+## Key Features
 
-## ✨ **Key Features**
+### Employee Management
 
-### **👥 Employee Management**
 - **Add Employees**: Full CRUD operations with validation for email format, date of birth, gender, salary minimum (500), department/team/expertise existence
 - **Modify Employees**: Partial updates with selective field changes
 - **Delete Employees**: Safe deletion that reassigns subordinates to the employee's manager
 - **Employee Hierarchy**: View subordinates, direct reports, and recursive team hierarchies
 
-### **💰 Compensation & Payroll**
+### Compensation & Payroll
+
 - **Salary Processing**: Calculate gross/net salaries with tax (15%) and insurance (500)
 - **Payroll Generation**: Spring Batch-based monthly payroll processing with automatic deductions for exceeded leaves
 - **Salary Raises**: Apply percentage increases to employee salaries with before/after comparison
 - **Bonus System**: Award bonuses that create salary adjustment records
 
-### **� absence & Leave Management**
+### Absence & Leave Management
+
 - **Leave Recording**: Track employee leaves (current year only)
 - **Leave Deductions**: Automatic salary deductions for exceeded leaves based on years of experience
 
-### **👥 Team & Organizational Structure**
+### Team & Organizational Structure
+
 - **Team Management**: Assign employees to teams, retrieve team member lists
 - **Department Assignment**: Organize employees by department
 - **Expertise Tracking**: Tag employees with skills/expertises
 - **Manager-Subordinate Relationships**: Hierarchical organizational structure
 
-### **🔐 Security & Authentication**
+### Security & Authentication
+
 - **JWT-Based Authentication**: Token-based login with 1-hour expiration
 - **Role-Based Access Control**: Secure endpoints with authentication provider
 - **CORS Configuration**: Configurable cross-origin resource sharing
 - **Exception Handling**: Global exception handler for consistent error responses
 
-### **📊 Monitoring & Observability**
+### Monitoring & Observability
+
 - **Prometheus Integration**: Spring Actuator endpoints exposed for Prometheus scraping
 - **Health Metrics**: Application health, metrics, and performance monitoring
 
-### **🐳 DevOps & Deployment**
+### DevOps & Deployment
+
 - **Docker Support**: Multi-stage Dockerfile for containerized deployment
 - **Flyway Migrations**: Database schema versioning and migration management
 - **Gradle Builds**: Optimized build pipeline with Checkstyle and semantic-release
 
----
-
-## 🛠 **Technology Stack**
+## Technology Stack
 
 | Layer | Technology |
 |-------|-----------|
@@ -63,14 +66,14 @@ The HR System provides a comprehensive suite of tools for managing employee data
 | **Containerization** | Docker |
 | **CI/CD** | GitHub Actions, semantic-release |
 
----
+## API Endpoints (Grouped by Feature)
 
-## � API **Endpoints (Grouped by Feature)**
+### Authentication (`/auth`)
 
-### **Authentication** (`/auth`)
 - `POST /login` - Authenticate and receive JWT token
 
-### **Employees** (`/employee`)
+### Employees (`/employee`)
+
 - `POST` - Add new employee
 - `GET` - Get direct subordinates by manager ID
 - `GET /{id}` - Get employee by ID
@@ -82,15 +85,15 @@ The HR System provides a comprehensive suite of tools for managing employee data
 - `POST /{Id}/bonus` - Add bonus to employee
 - `POST /{Id}/raise` - Apply salary raise to employee
 
-### **Teams** (`/team`)
+### Teams (`/team`)
+
 - `GET /{teamId}/members` - Get all members of a team
 
-### **Payroll** (`/payment`)
+### Payroll (`/payment`)
+
 - `POST` - Generate payroll (Spring Batch job)
 
----
-
-## 📸 **Screenshots & API Documentation**
+## Screenshots & API Documentation
 
 The project includes **Swagger UI** for interactive API exploration:
 
@@ -99,22 +102,23 @@ The project includes **Swagger UI** for interactive API exploration:
 
 Generated documentation covers all endpoints with request/response models, error handling, and authentication requirements.
 
----
+## Getting Started
 
-## 🚀 **Getting Started**
+### Prerequisites
 
-### **Prerequisites**
 - Java 21 JDK
 - MySQL 8.x server
 - Gradle 8.x
 - Docker (optional, for containerized deployment)
 
-### **Configuration**
+### Configuration
+
 1. Copy `env.properties` and configure database credentials
 2. Set MySQL root password and HR database
 3. Ensure `allowedOrigins` in `application.properties` matches your frontend domain
 
-### **Running the Application**
+### Running the Application
+
 ```bash
 # Using Gradle
 ./gradlew bootRun
@@ -125,31 +129,27 @@ docker build -t hr-system .
 docker run -p 8080:8080 hr-system
 ```
 
-### **Accessing the System**
+### Accessing the System
+
 - **API Base URL**: `http://localhost:8080`
 - **Health Check**: `GET /actuator/health`
 - **Metrics**: `GET /actuator/prometheus`
 - **Swagger UI**: `http://localhost:8080/swagger-ui.html`
 
----
+## Deployment
 
-## 📦 **Deployment**
+### Docker
 
-### **Docker**
-```dockerfile
-# Already configured in Dockerfile
-# Builds a fat JAR and runs via: java -jar hr.jar
-```
+The Dockerfile builds a fat JAR and runs via: `java -jar hr.jar`
 
-### **Production Considerations**
+### Production Considerations
+
 - Set appropriate `allowedOrigins` for CORS
 - Use environment variables for secrets (JWT secret, DB credentials)
 - Expose only needed Actuator endpoints
 - Configure Flyway for schema migrations on startup
 
----
-
-## 🧪 **Testing**
+## Testing
 
 The project employs a comprehensive testing strategy:
 
@@ -160,13 +160,12 @@ The project employs a comprehensive testing strategy:
 - **Code Coverage**: JaCoCo plugin configured
 
 Run tests:
+
 ```bash
 ./gradlew test
 ```
 
----
-
-## 📁 **Project Structure**
+## Project Structure
 
 ```
 src/main/java/com/orange/hr/
@@ -183,21 +182,23 @@ src/main/java/com/orange/hr/
 └── payment/           # Payroll calculation logic
 ```
 
----
+## Development
 
-## 🛠 **Development**
+### Code Quality
 
-### **Code Quality**
 - **Checkstyle**: Enforced code formatting
 - **Semantic Release**: Automated CHANGELOG and versioning via GitHub Actions
 - **Lombok**: Reduces boilerplate code (getters, setters, builders)
 
-### **Database Migrations**
-Flyway migrations located in `src/main/resources/db/migration/`
+### Database Migrations
+
+Flyway migrations located in `src/main/resources/db/migration/`:
+
 - Common migrations shared across databases
 - MySQL-specific migrations
 
-### **Adding New Features**
+### Adding New Features
+
 1. Create DTO for request/response
 2. Add entity mapping if needed
 3. Extend EmployeeService interface
@@ -205,17 +206,17 @@ Flyway migrations located in `src/main/resources/db/migration/`
 5. Add controller endpoint
 6. Write integration tests with DBUnit datasets
 
----
+## Target Audience
 
-## 👥 **Target Audience**
+### For HR Managers:
 
-### **For HR Managers:**
 - Intuitive employee onboarding/offboarding flow
 - Leave tracking with automatic year validation
 - Bonus and raise management with clear audit trails
 - Team and department organization views
 
-### **For Technical Managers:**
+### For Technical Managers:
+
 - Modern Spring Boot 3.5 with Java 21
 - Scalable architecture with layered design
 - Comprehensive test coverage (integration + unit)
@@ -223,11 +224,10 @@ Flyway migrations located in `src/main/resources/db/migration/`
 - Monitoring via Prometheus + Actuator
 - Semantic-release enabled CI/CD pipeline
 
----
-
-## 📜 **Version History**
+## Version History
 
 See [CHANGELOG.md](CHANGELOG.md) for detailed release notes covering:
+
 - Employee management features (add, modify, delete)
 - Payroll and bonus systems
 - Leave tracking and deductions
@@ -235,9 +235,7 @@ See [CHANGELOG.md](CHANGELOG.md) for detailed release notes covering:
 - Docker and CI/CD pipeline additions
 - Bug fixes and performance improvements
 
----
-
-## 🤝 **Contributing**
+## Contributing
 
 1. Fork the repository
 2. Create a feature branch (`git checkout -b feature/foo-bar`)
@@ -247,9 +245,7 @@ See [CHANGELOG.md](CHANGELOG.md) for detailed release notes covering:
 
 The project uses **semantic-release** with conventional commits - commit messages follow the format: `type: description` (feat, fix, chore, docs, style, refactor, test, build, perf)
 
----
+## Contact
 
-## 📧 **Contact**
-
-Project maintained by Ahmed Eldera. 
+Project maintained by Ahmed Eldera.
 GitHub: [Ahmed-Eldera/HR-System](https://github.com/Ahmed-Eldera/HR-System)
